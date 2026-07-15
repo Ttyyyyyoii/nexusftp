@@ -1,0 +1,263 @@
+{
+  "app": {
+    "name": "NexusFTP",
+    "tagline": "Premium File Transfer",
+    "version": "v1.0.0"
+  },
+  "statusbar": {
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "notConnected": "Not connected to any server",
+    "items": "{count} items"
+  },
+  "nav": {
+    "home": "Home",
+    "connect": "Connect",
+    "files": "File Manager",
+    "history": "History",
+    "settings": "Settings",
+    "log": "Activity Log",
+    "favorites": "Favorites",
+    "faq": "FAQ",
+    "contact": "Contact"
+  },
+  "home": {
+    "hero": {
+      "title": "The Future of",
+      "titleHighlight": "File Transfer",
+      "subtitle": "Enterprise-grade FTP, SFTP, and FTPS client with military-grade security, blazing speeds, and an interface that feels like magic.",
+      "ctaPrimary": "Get Started Free",
+      "ctaSecondary": "Watch Demo"
+    },
+    "stats": {
+      "users": "Active Users",
+      "transfers": "Files Transferred",
+      "servers": "Servers Connected",
+      "uptime": "Uptime SLA"
+    },
+    "features": {
+      "title": "Built for Professionals",
+      "subtitle": "Every feature crafted with precision for those who demand excellence",
+      "ftp": {
+        "title": "Multi-Protocol",
+        "desc": "Connect to FTP, FTPS, and SFTP servers with enterprise security standards."
+      },
+      "speed": {
+        "title": "Blazing Speed",
+        "desc": "Multi-threaded transfers with automatic compression and resume capability."
+      },
+      "security": {
+        "title": "Military Security",
+        "desc": "AES-256 encryption, password vault, and secure credential storage."
+      },
+      "interface": {
+        "title": "Premium Interface",
+        "desc": "Dual-pane file manager with drag-and-drop, previews, and batch operations."
+      },
+      "sync": {
+        "title": "Smart Sync",
+        "desc": "Automatic folder synchronization with change detection and conflict resolution."
+      },
+      "terminal": {
+        "title": "Built-in Terminal",
+        "desc": "Full SSH terminal access directly within the application."
+      }
+    }
+  },
+  "connection": {
+    "title": "Connect to Server",
+    "host": "Hostname",
+    "hostPlaceholder": "ftp.example.com",
+    "username": "Username",
+    "usernamePlaceholder": "your_username",
+    "password": "Password",
+    "passwordPlaceholder": "••••••••",
+    "port": "Port (optional)",
+    "type": "Connection Type",
+    "ftp": "FTP",
+    "ftps": "FTPS (Implicit)",
+    "ftpse": "FTPS (Explicit)",
+    "sftp": "SFTP (SSH)",
+    "saveConnection": "Save this connection",
+    "testConnection": "Test Connection",
+    "quickConnect": "Quick Connect",
+    "autoConnect": "Auto-connect on startup",
+    "connecting": "Connecting...",
+    "connected": "Connected successfully",
+    "failed": "Connection failed",
+    "recentConnections": "Recent Connections",
+    "savedConnections": "Saved Connections",
+    "edit": "Edit",
+    "delete": "Delete",
+    "connect": "Connect"
+  },
+  "files": {
+    "local": "Local Files",
+    "remote": "Remote Files",
+    "name": "Name",
+    "size": "Size",
+    "type": "Type",
+    "modified": "Modified",
+    "permissions": "Permissions",
+    "search": "Search files...",
+    "newFolder": "New Folder",
+    "upload": "Upload",
+    "download": "Download",
+    "delete": "Delete",
+    "rename": "Rename",
+    "refresh": "Refresh",
+    "parent": "Parent Directory",
+    "empty": "This folder is empty",
+    "selectAll": "Select All",
+    "uploadHere": "Upload files here",
+    "downloadSelected": "Download selected",
+    "deleteSelected": "Delete selected",
+    "dropHere": "Drop files here",
+    "createFolder": "Create Folder",
+    "folderName": "Folder name",
+    "cancel": "Cancel",
+    "create": "Create",
+    "confirmDelete": "Are you sure you want to delete {count} item(s)?",
+    "confirmDeleteTitle": "Confirm Delete"
+  },
+  "transfers": {
+    "title": "Transfers",
+    "uploads": "Uploads",
+    "downloads": "Downloads",
+    "completed": "Completed",
+    "failed": "Failed",
+    "paused": "Paused",
+    "progress": "Progress",
+    "speed": "Speed",
+    "timeLeft": "Time Left",
+    "transferred": "Transferred",
+    "total": "Total",
+    "pause": "Pause",
+    "resume": "Resume",
+    "cancel": "Cancel",
+    "retry": "Retry",
+    "clearCompleted": "Clear Completed",
+    "noTransfers": "No active transfers",
+    "queue": "Queue",
+    "simultaneous": "Simultaneous transfers"
+  },
+  "settings": {
+    "title": "Settings",
+    "appearance": "Appearance",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "language": "Language",
+    "transfers": "Transfers",
+    "maxConnections": "Max simultaneous connections",
+    "timeout": "Connection timeout (seconds)",
+    "retries": "Number of retries",
+    "maxFileSize": "Max file size (MB)",
+    "network": "Network",
+    "passiveMode": "Passive mode",
+    "transferMode": "Transfer mode",
+    "binary": "Binary",
+    "ascii": "ASCII",
+    "security": "Security",
+    "encryptPasswords": "Encrypt saved passwords",
+    "notifications": "Notifications",
+    "transferComplete": "Transfer complete",
+    "connectionStatus": "Connection status",
+    "errors": "Errors"
+  },
+  "log": {
+    "title": "Activity Log",
+    "clear": "Clear Log",
+    "filter": "Filter",
+    "all": "All",
+    "info": "Info",
+    "warning": "Warning",
+    "error": "Error",
+    "command": "Command",
+    "response": "Response",
+    "connection": "Connection",
+    "timestamp": "Time",
+    "level": "Level",
+    "message": "Message",
+    "empty": "No log entries"
+  },
+  "favorites": {
+    "title": "Favorites",
+    "connections": "Saved Connections",
+    "folders": "Favorite Folders",
+    "servers": "Recent Servers",
+    "add": "Add to Favorites",
+    "remove": "Remove",
+    "noFavorites": "No favorites yet",
+    "noRecent": "No recent connections"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Everything you need to know about NexusFTP",
+    "questions": {
+      "q1": {
+        "question": "What protocols does NexusFTP support?",
+        "answer": "NexusFTP supports FTP (File Transfer Protocol), FTPS (FTP over SSL/TLS both implicit and explicit modes), and SFTP (SSH File Transfer Protocol) for secure encrypted transfers."
+      },
+      "q2": {
+        "question": "Is my data secure?",
+        "answer": "Absolutely. All transfers use military-grade AES-256 encryption. Saved passwords are encrypted using industry-standard algorithms. SFTP connections use SSH key authentication support."
+      },
+      "q3": {
+        "question": "Can I transfer large files?",
+        "answer": "Yes, NexusFTP is optimized for large file transfers with chunked upload/download, automatic resume capability, and progress tracking for files of any size."
+      },
+      "q4": {
+        "question": "Does it support drag and drop?",
+        "answer": "Yes, full drag-and-drop support between local and remote panels, including multi-file selection and folder transfers."
+      },
+      "q5": {
+        "question": "Can I synchronize folders?",
+        "answer": "Yes, the smart sync feature detects changes and can automatically synchronize folders between local and remote systems."
+      },
+      "q6": {
+        "question": "Is there a file preview?",
+        "answer": "Yes, built-in preview for images, PDFs, text files, JSON, source code with syntax highlighting, and Markdown rendering."
+      }
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "We're here to help you with any questions or issues",
+    "name": "Your Name",
+    "email": "Email Address",
+    "subject": "Subject",
+    "message": "Message",
+    "send": "Send Message",
+    "success": "Message sent successfully!",
+    "error": "Failed to send message. Please try again."
+  },
+  "shortcuts": {
+    "title": "Keyboard Shortcuts",
+    "upload": "Upload files",
+    "download": "Download files",
+    "delete": "Delete selected",
+    "rename": "Rename selected",
+    "selectAll": "Select all",
+    "search": "Search",
+    "refresh": "Refresh"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "close": "Close",
+    "apply": "Apply",
+    "reset": "Reset",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Info",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK"
+  }
+}

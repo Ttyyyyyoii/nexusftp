@@ -1,0 +1,253 @@
+{
+  "app": {
+    "name": "NexusFTP",
+    "tagline": "Transfert de Fichiers Premium",
+    "version": "v1.0.0"
+  },
+  "statusbar": {
+    "connected": "Connecté",
+    "disconnected": "Déconnecté",
+    "notConnected": "Non connecté à un serveur",
+    "items": "{count} éléments"
+  },
+  "nav": {
+    "home": "Accueil",
+    "connect": "Connexion",
+    "files": "Gestionnaire de Fichiers",
+    "history": "Historique",
+    "settings": "Parametres",
+    "log": "Journal d'Activite",
+    "favorites": "Favoris",
+    "faq": "FAQ",
+    "contact": "Contact"
+  },
+  "home": {
+    "hero": {
+      "title": "Le Futur du",
+      "titleHighlight": "Transfert de Fichiers",
+      "subtitle": "Client FTP, SFTP et FTPS de classe entreprise avec securite militaire, vitesses fulgurantes et une interface magique.",
+      "ctaPrimary": "Commencer Gratuitement",
+      "ctaSecondary": "Voir la Demo"
+    },
+    "stats": {
+      "users": "Utilisateurs Actifs",
+      "transfers": "Fichiers Transferes",
+      "servers": "Serveurs Connectes",
+      "uptime": "Disponibilite SLA"
+    },
+    "features": {
+      "title": "Concu pour les Professionnels",
+      "subtitle": "Chaque fonctionnalite elaboree avec precision pour ceux qui exigent l'excellence",
+      "ftp": {
+        "title": "Multi-Protocole",
+        "desc": "Connectez-vous aux serveurs FTP, FTPS et SFTP avec des standards de securite entreprise."
+      },
+      "speed": {
+        "title": "Vitesse Fulgurante",
+        "desc": "Transferts multi-threads avec compression automatique et reprise de transfert."
+      },
+      "security": {
+        "title": "Securite Militaire",
+        "desc": "Chiffrement AES-256, coffre-fort de mots de passe et stockage securise des identifiants."
+      },
+      "interface": {
+        "title": "Interface Premium",
+        "desc": "Gestionnaire dual-pane avec glisser-deposer, apercus et operations par lot."
+      },
+      "sync": {
+        "title": "Synchronisation Intelligente",
+        "desc": "Synchronisation automatique des dossiers avec detection de changements."
+      },
+      "terminal": {
+        "title": "Terminal Integre",
+        "desc": "Acces terminal SSH complet directement dans l'application."
+      }
+    }
+  },
+  "connection": {
+    "title": "Connexion au Serveur",
+    "host": "Nom d'hote",
+    "hostPlaceholder": "ftp.example.com",
+    "username": "Nom d'utilisateur",
+    "usernamePlaceholder": "votre_identifiant",
+    "password": "Mot de passe",
+    "passwordPlaceholder": "••••••••",
+    "port": "Port (optionnel)",
+    "type": "Type de connexion",
+    "ftp": "FTP",
+    "ftps": "FTPS (Implicite)",
+    "ftpse": "FTPS (Explicite)",
+    "sftp": "SFTP (SSH)",
+    "saveConnection": "Enregistrer cette connexion",
+    "testConnection": "Tester la connexion",
+    "quickConnect": "Connexion Rapide",
+    "autoConnect": "Connexion automatique au demarrage",
+    "connecting": "Connexion en cours...",
+    "connected": "Connecte avec succes",
+    "failed": "Echec de la connexion",
+    "recentConnections": "Connexions Recentes",
+    "savedConnections": "Connexions Enregistrees",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "connect": "Connecter"
+  },
+  "files": {
+    "local": "Fichiers Locaux",
+    "remote": "Fichiers Distant",
+    "name": "Nom",
+    "size": "Taille",
+    "type": "Type",
+    "modified": "Modifie",
+    "permissions": "Permissions",
+    "search": "Rechercher des fichiers...",
+    "newFolder": "Nouveau Dossier",
+    "upload": "Envoyer",
+    "download": "Telecharger",
+    "delete": "Supprimer",
+    "rename": "Renommer",
+    "refresh": "Actualiser",
+    "parent": "Dossier Parent",
+    "empty": "Ce dossier est vide",
+    "selectAll": "Tout Selectionner",
+    "uploadHere": "Envoyer des fichiers ici",
+    "downloadSelected": "Telecharger la selection",
+    "deleteSelected": "Supprimer la selection",
+    "dropHere": "Deposer les fichiers ici",
+    "createFolder": "Creer un Dossier",
+    "folderName": "Nom du dossier",
+    "cancel": "Annuler",
+    "create": "Creer",
+    "confirmDelete": "Etes-vous sur de vouloir supprimer {count} element(s)?",
+    "confirmDeleteTitle": "Confirmer la Suppression"
+  },
+  "transfers": {
+    "title": "Transferts",
+    "uploads": "Envois",
+    "downloads": "Telechargements",
+    "completed": "Termine",
+    "failed": "Echoue",
+    "paused": "En Pause",
+    "progress": "Progression",
+    "speed": "Vitesse",
+    "timeLeft": "Temps Restant",
+    "transferred": "Transfere",
+    "total": "Total",
+    "pause": "Pause",
+    "resume": "Reprendre",
+    "cancel": "Annuler",
+    "retry": "Reessayer",
+    "clearCompleted": "Effacer les termines",
+    "noTransfers": "Aucun transfert actif",
+    "queue": "File d'attente",
+    "simultaneous": "Transferts simultanes"
+  },
+  "settings": {
+    "title": "Parametres",
+    "appearance": "Apparence",
+    "theme": "Theme",
+    "light": "Clair",
+    "dark": "Sombre",
+    "language": "Langue",
+    "transfers": "Transferts",
+    "maxConnections": "Connexions simultanees max",
+    "timeout": "Delai de connexion (secondes)",
+    "retries": "Nombre de tentatives",
+    "maxFileSize": "Taille max de fichier (Mo)",
+    "network": "Reseau",
+    "passiveMode": "Mode passif",
+    "transferMode": "Mode de transfert",
+    "binary": "Binaire",
+    "ascii": "ASCII",
+    "security": "Securite",
+    "encryptPasswords": "Chiffrer les mots de passe",
+    "notifications": "Notifications",
+    "transferComplete": "Transfert termine",
+    "connectionStatus": "Statut de connexion",
+    "errors": "Erreurs"
+  },
+  "log": {
+    "title": "Journal d'Activite",
+    "clear": "Effacer le Journal",
+    "filter": "Filtrer",
+    "all": "Tout",
+    "info": "Info",
+    "warning": "Avertissement",
+    "error": "Erreur",
+    "command": "Commande",
+    "response": "Reponse",
+    "connection": "Connexion",
+    "timestamp": "Heure",
+    "level": "Niveau",
+    "message": "Message",
+    "empty": "Aucune entree de journal"
+  },
+  "favorites": {
+    "title": "Favoris",
+    "connections": "Connexions Enregistrees",
+    "folders": "Dossiers Favoris",
+    "servers": "Serveurs Recents",
+    "add": "Ajouter aux Favoris",
+    "remove": "Retirer",
+    "noFavorites": "Aucun favori pour l'instant",
+    "noRecent": "Aucune connexion recente"
+  },
+  "faq": {
+    "title": "Questions Frequemment Posees",
+    "subtitle": "Tout ce que vous devez savoir sur NexusFTP",
+    "questions": {
+      "q1": {
+        "question": "Quels protocoles NexusFTP prend-il en charge?",
+        "answer": "NexusFTP prend en charge FTP, FTPS (FTP sur SSL/TLS en modes implicite et explicite), et SFTP (SSH File Transfer Protocol) pour des transferts securises chiffres."
+      },
+      "q2": {
+        "question": "Mes donnees sont-elles securisees?",
+        "answer": "Absolument. Tous les transferts utilisent un chiffrement AES-256 de qualite militaire. Les mots de passe enregistres sont chiffres avec des algorithmes standard de l'industrie."
+      },
+      "q3": {
+        "question": "Puis-je transferer de gros fichiers?",
+        "answer": "Oui, NexusFTP est optimise pour les transferts de gros fichiers avec envoi/telechargement par segments et reprise automatique."
+      },
+      "q4": {
+        "question": "Supporte-t-il le glisser-deposer?",
+        "answer": "Oui, support complet du glisser-deposer entre les panneaux local et distant, incluant la selection multi-fichiers et les transferts de dossiers."
+      },
+      "q5": {
+        "question": "Puis-je synchroniser des dossiers?",
+        "answer": "Oui, la fonction de synchronisation intelligente detecte les changements et peut synchroniser automatiquement les dossiers."
+      },
+      "q6": {
+        "question": "Y a-t-il un apercu de fichiers?",
+        "answer": "Oui, apercu integre pour les images, PDFs, fichiers texte, JSON, code source avec coloration syntaxique, et rendu Markdown."
+      }
+    }
+  },
+  "contact": {
+    "title": "Contactez-Nous",
+    "subtitle": "Nous sommes la pour vous aider avec vos questions ou problemes",
+    "name": "Votre Nom",
+    "email": "Adresse Email",
+    "subject": "Sujet",
+    "message": "Message",
+    "send": "Envoyer le Message",
+    "success": "Message envoye avec succes!",
+    "error": "Echec de l'envoi. Veuillez reessayer."
+  },
+  "common": {
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Creer",
+    "close": "Fermer",
+    "apply": "Appliquer",
+    "reset": "Reinitialiser",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succes",
+    "warning": "Avertissement",
+    "info": "Info",
+    "yes": "Oui",
+    "no": "Non",
+    "ok": "OK"
+  }
+}
