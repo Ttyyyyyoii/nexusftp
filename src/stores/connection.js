@@ -65,7 +65,7 @@ export const useConnectionStore = defineStore('connection', {
             username: config.username,
             type: config.type
           }
-          
+
           this.sessions.push({
             sessionId: newSessionId,
             connectionInfo,
@@ -100,7 +100,7 @@ export const useConnectionStore = defineStore('connection', {
       } catch (err) {
         console.warn('Disconnect error:', err)
       }
-      
+
       this.sessions = this.sessions.filter(s => s.sessionId !== sessionIdToDisconnect)
       if (this.activeSessionId === sessionIdToDisconnect) {
         this.activeSessionId = this.sessions.length > 0 ? this.sessions[this.sessions.length - 1].sessionId : null
@@ -179,14 +179,58 @@ export const useConnectionStore = defineStore('connection', {
       return response.data
     },
 
-    async deleteRemoteItem(name, path = '/', isDirectory = false) {
+    async deleteRemoteItems(items, path = '/', onProgress = null) {
       if (!this.activeSessionId) throw new Error('Not connected')
       try {
-        const response = await axios.post(`${API_BASE}/delete.php`, {
-          sessionId: this.activeSessionId, path: path, name: name, isDirectory: isDirectory
-        })
-        if (!response.data.success) throw new Error(response.data.message || 'Failed to delete')
-        return response.data
+        if (onProgress) {
+          const response = await fetch(`${API_BASE}/delete.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              sessionId: this.activeSessionId, path: path, items: items, stream: true
+            })
+          });
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let done = false;
+          let finalData = null;
+          let buffer = '';
+          
+          while (!done) {
+            const { value, done: readerDone } = await reader.read();
+            done = readerDone;
+            if (value) {
+              buffer += decoder.decode(value, { stream: !done });
+              const lines = buffer.split('\n');
+              buffer = lines.pop(); // keep incomplete line in buffer
+              
+              for (let line of lines) {
+                line = line.trim();
+                if (line.startsWith('data: ')) {
+                  try {
+                    const data = JSON.parse(line.substring(6));
+                    if (data.status === 'progress') {
+                      onProgress(data.message);
+                    } else if (data.success === false) {
+                      throw new Error(data.message || 'Failed to delete');
+                    } else if (data.success === true) {
+                      finalData = data;
+                    }
+                  } catch (e) {
+                    // Ignore parse errors on incomplete chunks if any
+                  }
+                }
+              }
+            }
+          }
+          return finalData || { success: true };
+        } else {
+          const response = await axios.post(`${API_BASE}/delete.php`, {
+            sessionId: this.activeSessionId, path: path, items: items
+          })
+          if (!response.data.success) throw new Error(response.data.message || 'Failed to delete')
+          return response.data
+        }
       } catch (err) {
         if (err.response && err.response.data && err.response.data.message) throw new Error(err.response.data.message)
         throw err

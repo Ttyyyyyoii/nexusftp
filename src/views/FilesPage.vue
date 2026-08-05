@@ -204,36 +204,57 @@ export default {
       };
       
       let successCount = 0;
-      for (let i = 0; i < total; i++) {
-        const file = files[i];
-        let targetPath = this.connectionStore.currentPath;
-        let relativeDir = '';
-        const relativePath = file.customPath || file.webkitRelativePath;
-        if (relativePath) {
-          const parts = relativePath.split('/');
-          if (parts.length > 1) {
-            parts.pop();
-            relativeDir = '/' + parts.join('/');
-            targetPath = (targetPath === '/' ? '' : targetPath) + relativeDir;
-          }
-        }
-        
-        this.globalLoader.message = `Envoi de ${file.name} (${i + 1}/${total})...`;
-        const transferId = this.transfersStore.addTransfer(file, 'upload', targetPath); 
-        try { 
-          await this.connectionStore.uploadFile(file, targetPath); 
-          this.transfersStore.completeTransfer(transferId); 
-          successCount++;
-        } catch (err) { 
-          this.transfersStore.failTransfer(transferId, err.message); 
-          this.showToast(`Échec de l'envoi: ${file.name}`, 'error') 
-        } 
-        this.globalLoader.progress = i + 1;
-      } 
+      const maxConcurrent = 5;
+      let activeUploads = 0;
+      let currentIndex = 0;
       
-      this.globalLoader.show = false;
-      if (successCount > 0) this.showToast(`${successCount} fichier(s) envoyé(s)`, 'success') 
-      await this.refreshRemote() 
+      return new Promise((resolve) => {
+        const nextUpload = async () => {
+          if (currentIndex >= total && activeUploads === 0) {
+            this.globalLoader.show = false;
+            if (successCount > 0) this.showToast(`${successCount} fichier(s) envoyé(s)`, 'success') 
+            await this.refreshRemote();
+            resolve();
+            return;
+          }
+          
+          while (activeUploads < maxConcurrent && currentIndex < total) {
+            const i = currentIndex++;
+            activeUploads++;
+            const file = files[i];
+            
+            let targetPath = this.connectionStore.currentPath;
+            let relativeDir = '';
+            const relativePath = file.customPath || file.webkitRelativePath;
+            if (relativePath) {
+              const parts = relativePath.split('/');
+              if (parts.length > 1) {
+                parts.pop();
+                relativeDir = '/' + parts.join('/');
+                targetPath = (targetPath === '/' ? '' : targetPath) + relativeDir;
+              }
+            }
+            
+            this.globalLoader.message = `Envoi de ${successCount} sur ${total}: ${file.name}`;
+            
+            const transferId = this.transfersStore.addTransfer(file, 'upload', targetPath); 
+            
+            this.connectionStore.uploadFile(file, targetPath).then(() => {
+              this.transfersStore.completeTransfer(transferId); 
+              successCount++;
+            }).catch((err) => {
+              this.transfersStore.failTransfer(transferId, err.message); 
+              this.showToast(`Échec de l'envoi: ${file.name}`, 'error') 
+            }).finally(() => {
+              activeUploads--;
+              this.globalLoader.progress = successCount;
+              this.globalLoader.message = `Envoi de ${successCount} sur ${total}...`;
+              nextUpload();
+            });
+          }
+        };
+        nextUpload();
+      });
     },
     async handleDownload(files) { for (const file of files) { if (file.isDirectory) continue; const transferId = this.transfersStore.addTransfer({ name: file.name, size: file.size, path: '' }, 'download', this.connectionStore.currentPath); try { const blob = await this.connectionStore.downloadFile(file); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = file.name; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); this.transfersStore.completeTransfer(transferId); this.showToast(`Downloaded ${file.name}`, 'success') } catch (err) { this.transfersStore.failTransfer(transferId, err.message); this.showToast(`Download failed: ${file.name}`, 'error') } } },
     handleDelete(files) { this.filesToDelete = files; this.showDelete = true },
@@ -245,19 +266,22 @@ export default {
         title: 'Suppression en cours', 
         message: `Préparation de la suppression...`,
         progress: 0,
-        total: total
+        total: 0
       };
       let successCount = 0;
-      for (let i = 0; i < total; i++) {
-        const file = this.filesToDelete[i];
-        this.globalLoader.message = `Suppression de ${file.name} (${i + 1}/${total})...`;
-        try { 
-          await this.connectionStore.deleteRemoteItem(file.name, this.connectionStore.currentPath, file.isDirectory); 
-          successCount++;
-        } catch (err) { 
-          this.showToast(`Échec de la suppression: ${file.name}. ${err.message}`, 'error') 
-        } 
-        this.globalLoader.progress = i + 1;
+      try { 
+        const items = this.filesToDelete.map(f => ({ name: f.name, isDirectory: f.isDirectory }));
+        this.globalLoader.message = `Suppression en cours...`;
+        await this.connectionStore.deleteRemoteItems(
+          items, 
+          this.connectionStore.currentPath, 
+          (progressMsg) => {
+            this.globalLoader.message = progressMsg;
+          }
+        ); 
+        successCount = items.length;
+      } catch (err) { 
+        this.showToast(`Échec de la suppression: ${err.message}`, 'error') 
       } 
       this.globalLoader.show = false;
       if (successCount > 0) this.showToast(`${successCount} élément(s) supprimé(s)`, 'success');

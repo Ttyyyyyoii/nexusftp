@@ -3,26 +3,48 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "main": "electron/main.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "electron:dev": "concurrently -k \"cross-env BROWSER=none vite --port 5177\" \"wait-on tcp:5177 && cross-env VITE_DEV_SERVER_URL=http://localhost:5177 electron .\"",
+    "electron:build": "vite build && electron-builder"
+  },
+  "build": {
+    "appId": "com.nexusftp.app",
+    "productName": "NexusFTP",
+    "directories": {
+      "output": "dist_electron"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "win": {
+      "target": "dir"
+    }
   },
   "dependencies": {
-    "vue": "^3.4.21",
-    "vue-router": "^4.3.0",
-    "pinia": "^2.1.7",
-    "vue-i18n": "^9.10.1",
     "axios": "^1.6.8",
-    "splitpanes": "^3.1.5",
     "dayjs": "^1.11.10",
-    "lucide-vue-next": "^0.359.0"
+    "lucide-vue-next": "^0.359.0",
+    "pinia": "^2.1.7",
+    "splitpanes": "^3.1.5",
+    "vue": "^3.4.21",
+    "vue-i18n": "^9.10.1",
+    "vue-router": "^4.3.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
-    "vite": "^5.2.0",
     "autoprefixer": "^10.4.19",
+    "concurrently": "^10.0.3",
+    "cross-env": "^10.1.0",
+    "electron": "^43.1.1",
+    "electron-builder": "^26.15.3",
     "postcss": "^8.4.38",
-    "tailwindcss": "^3.4.3"
+    "tailwindcss": "^3.4.3",
+    "vite": "^5.2.0",
+    "wait-on": "^9.0.10"
   }
 }

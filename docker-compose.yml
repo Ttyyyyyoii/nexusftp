@@ -1,0 +1,10 @@
+services:
+  ftp-app:
+    build: .
+    ports:
+      - "8080:80"
+    volumes:
+      # En développement local Docker, monte le backend directement depuis htdocs
+      - "c:/xampp/htdocs/ftp_backend:/var/www/html/api"
+    environment:
+      - NEXUS_KEY=nexusftp-default-key

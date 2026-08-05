@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# FTP Project specific
+ftp_backend/sessions/
+ftp_backend/api/*.log
+dist_electron/
+*.zip
+*.timestamp-*.mjs

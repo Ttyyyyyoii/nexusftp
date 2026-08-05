@@ -2,9 +2,11 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   plugins: [vue()],
-  base: './',
+  // En dev local: './' pour les chemins relatifs XAMPP
+  // En production (build): '/' pour Docker/Render
+  base: command === 'serve' ? './' : '/',
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
@@ -25,4 +27,4 @@ export default defineConfig({
     assetsDir: 'assets',
     sourcemap: false
   }
-})
+}))

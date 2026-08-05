@@ -1,0 +1,26 @@
+# Fichiers de logs (ne pas envoyer sur GitHub)
+ftp_backend/api/debug*.log
+ftp_backend/api/curl_error.log
+ftp_backend/sessions/
+
+# Sessions PHP locales
+backend/sessions/
+
+# Node
+node_modules/
+dist/
+
+# Electron
+dist_electron/
+
+# Variables d'environnement sensibles
+.env
+.env.local
+.env.production
+
+# Editeurs
+.vscode/
+.idea/
+
+# Timestamps Vite
+*.timestamp-*.mjs

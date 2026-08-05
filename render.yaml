@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: nexusftp
+    runtime: docker
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: NEXUS_KEY
+        generateValue: true
