@@ -71,4 +71,13 @@ const router = createRouter({
   }
 })
 
+router.afterEach((to) => {
+  const baseTitle = 'NexusFTP - Client FTP & SFTP Premium En Ligne'
+  if (to.name && to.name !== 'Home') {
+    document.title = `${to.name.toString()} | ${baseTitle}`
+  } else {
+    document.title = baseTitle
+  }
+})
+
 export default router
