@@ -78,10 +78,10 @@ export default {
       } else {
         const ext = file.name.split('.').pop().toLowerCase()
         if (['jpg', 'jpeg', 'png'].includes(ext)) {
-          items.push({ action: 'optimize', label: 'Optimiser l\'image', icon: 'Image', danger: false })
+          items.push({ action: 'optimize', label: this.$t('files.optimize'), icon: 'Image', danger: false })
         }
-        items.push({ action: 'edit', label: 'Modifier le contenu', icon: 'Edit3', danger: false })
-        items.push({ action: 'share', label: 'Créer un lien de partage', icon: 'Share2', danger: false })
+        items.push({ action: 'edit', label: this.$t('files.edit'), icon: 'Edit3', danger: false })
+        items.push({ action: 'share', label: this.$t('files.share'), icon: 'Share2', danger: false })
       }
       items.push({ action: 'download', label: this.$t('files.download'), icon: 'Download', danger: false })
       items.push({ action: 'rename', label: this.$t('files.rename'), icon: 'Edit2', danger: false })

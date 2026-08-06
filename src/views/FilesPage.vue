@@ -9,19 +9,19 @@
         </button>
         <div class="flex-1" />
         <button @click="showSearch = true" :disabled="!connectionStore.isConnected" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-violet-600 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-all disabled:opacity-30">
-          <SearchIcon class="w-4 h-4" /><span class="hidden sm:inline">Rechercher</span>
+          <SearchIcon class="w-4 h-4" /><span class="hidden sm:inline">{{ $t('files.searchBtn') }}</span>
         </button>
         <button @click="toggleAI" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all">
-          <Bot class="w-4 h-4" /><span class="hidden sm:inline">NexusBot IA</span>
+          <Bot class="w-4 h-4" /><span class="hidden sm:inline">{{ $t('files.aiBot') }}</span>
         </button>
         <button @click="openGitHub" :disabled="!connectionStore.isConnected" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all disabled:opacity-30">
-          <Github class="w-4 h-4" /><span class="hidden sm:inline">GitHub CI/CD</span>
+          <Github class="w-4 h-4" /><span class="hidden sm:inline">{{ $t('files.githubBtn') }}</span>
         </button>
         <button @click="openCreateModal('file')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all">
-          <FilePlus class="w-4 h-4" /><span class="hidden sm:inline">Nouveau Fichier</span>
+          <FilePlus class="w-4 h-4" /><span class="hidden sm:inline">{{ $t('files.newFile') }}</span>
         </button>
         <button @click="openCreateModal('folder')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all">
-          <FolderPlus class="w-4 h-4" /><span class="hidden sm:inline">Nouveau Dossier</span>
+          <FolderPlus class="w-4 h-4" /><span class="hidden sm:inline">{{ $t('files.newFolder') }}</span>
         </button>
       </div>
       <div class="flex-1 overflow-hidden">
