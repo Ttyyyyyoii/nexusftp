@@ -174,7 +174,9 @@ export default {
       showCreateModal: false, createType: 'folder', newItemName: '',
       showRename: false, renameOldName: '', renameNewName: '',
       showDelete: false, filesToDelete: [],
-      showFileEditor: false, fileEditorFile: null, fileEditorContent: '', isEditingFile: false,
+      showFileEditor: false, fileEditorFile: null, fileEditorContent: '', fileEditorSaving: false,
+      deployPollInterval: null,
+      lastDeployTimestamp: 0,
       showSearch: false,
       showShareModal: false, shareFile: null,
       showMediaViewer: false, mediaViewerFile: null,
@@ -207,8 +209,38 @@ export default {
       }
     }
   },
-  async mounted() { if (this.connectionStore.isConnected) await this.refreshRemote() },
+  async mounted() { 
+    if (this.connectionStore.isConnected) await this.refreshRemote() 
+    this.deployPollInterval = setInterval(this.checkDeployStatus, 5000)
+  },
+  beforeUnmount() {
+    if (this.deployPollInterval) clearInterval(this.deployPollInterval)
+  },
   methods: {
+    async checkDeployStatus() {
+      if (!this.connectionStore.isConnected) return
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/github_status.php`)
+        const data = await res.json()
+        if (data && data.success && data.lastDeploy) {
+          const deploy = data.lastDeploy
+          // Si le déploiement a réussi et est plus récent que ce qu'on a déjà vu
+          if (deploy.timestamp > this.lastDeployTimestamp) {
+            // Si on avait déjà enregistré un timestamp (pas le premier chargement de page)
+            if (this.lastDeployTimestamp > 0) {
+              this.showToast(`Déploiement GitHub ${deploy.repo} détecté. Actualisation...`, 'success')
+              // On rafraîchit si on est dans le même dossier ou un dossier parent
+              if (this.connectionStore.currentPath === deploy.remotePath || this.connectionStore.currentPath === '/') {
+                await this.refreshRemote()
+              }
+            }
+            this.lastDeployTimestamp = deploy.timestamp
+          }
+        }
+      } catch (err) {
+        // Silencieux
+      }
+    },
     onPaneResized(event) { this.leftPanelSize = event[0].size },
     async navigateRemote(path) { this.loading = true; try { await this.connectionStore.listRemotePath(path); this.logStore.logInfo(`Navigated to ${path}`) } catch (err) { this.logStore.logError(`Navigation failed: ${err.message}`) } this.loading = false },
     async navigateUp() { const path = this.connectionStore.currentPath; const parent = path.split('/').filter(Boolean).slice(0, -1).join('/'); await this.navigateRemote('/' + parent) },

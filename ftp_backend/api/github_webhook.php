@@ -181,6 +181,16 @@ function deleteDir($dirPath) {
 }
 deleteDir($tempExtractDir);
 
+// Enregistrer le succès du déploiement pour le frontend
+$statusFile = $deploymentsDir . 'last_deploy.json';
+$statusData = [
+    'timestamp'  => time(),
+    'remotePath' => $config['remotePath'],
+    'repo'       => $config['githubRepo']
+];
+file_put_contents($statusFile, json_encode($statusData));
+
+logWebhook("Deployment finished successfully for " . $config['githubRepo']);
 http_response_code(200);
 echo "Déploiement réussi !";
 ?>
