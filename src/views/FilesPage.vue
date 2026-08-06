@@ -427,7 +427,7 @@ export default {
               successCount++;
             }).catch((err) => {
               this.transfersStore.failTransfer(transferId, err.message); 
-              this.showToast(`Échec de l'envoi: ${file.name}`, 'error') 
+              this.showToast(`Échec de l'envoi (${file.name}): ${err.message}`, 'error') 
             }).finally(() => {
               activeUploads--;
               this.globalLoader.progress = successCount;
