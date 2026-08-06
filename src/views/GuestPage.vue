@@ -278,15 +278,13 @@ export default {
           this.authenticated = true
           this.needsPassword = false
           this.authError = null
-        } else {
-          if (res.status === 401) {
-            this.needsPassword = true
-            if (!initialTest) {
-              this.authError = this.$t('guest.wrongPassword')
-            }
-          } else {
-            if (!initialTest) this.showToast(data.message || this.$t('common.error'), 'error')
+        } else if (data.requiresPassword) {
+          this.needsPassword = true
+          if (data.wrongPassword && !initialTest) {
+            this.authError = this.$t('guest.wrongPassword')
           }
+        } else {
+          if (!initialTest) this.showToast(data.message || this.$t('common.error'), 'error')
         }
       } catch (err) {
         if (!initialTest) this.showToast(err.message, 'error')

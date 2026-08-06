@@ -24,8 +24,18 @@ if ($guest['expiresAt'] > 0 && time() > $guest['expiresAt']) {
 
 // Check password
 if (!empty($guest['passwordReq'])) {
-    if (empty($password) || !password_verify($password, $guest['passwordReq'])) {
-        sendError('Invalid or missing password', 401);
+    if (empty($password)) {
+        // No password provided — tell the client to ask for one (200 + flag, avoids console 401 noise)
+        ob_end_clean();
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'requiresPassword' => true]);
+        exit;
+    }
+    if (!password_verify($password, $guest['passwordReq'])) {
+        ob_end_clean();
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'requiresPassword' => true, 'wrongPassword' => true]);
+        exit;
     }
 }
 
