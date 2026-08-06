@@ -18,16 +18,15 @@
         <div>
           <h3 class="font-semibold text-surface-900 dark:text-white mb-4">Product</h3>
           <ul class="space-y-3">
-            <li><router-link to="/" class="text-sm text-surface-500 hover:text-primary-500">Home</router-link></li>
-            <li><router-link to="/connect" class="text-sm text-surface-500 hover:text-primary-500">Connect</router-link></li>
-            <li><router-link to="/faq" class="text-sm text-surface-500 hover:text-primary-500">FAQ</router-link></li>
+            <li><router-link to="/" class="text-sm text-surface-500 hover:text-primary-500">{{ $t('nav.home') }}</router-link></li>
+            <li><router-link to="/connect" class="text-sm text-surface-500 hover:text-primary-500">{{ $t('nav.connect') }}</router-link></li>
+            <li><router-link to="/faq" class="text-sm text-surface-500 hover:text-primary-500">{{ $t('nav.faq') }}</router-link></li>
           </ul>
         </div>
         <div>
           <h3 class="font-semibold text-surface-900 dark:text-white mb-4">Resources</h3>
           <ul class="space-y-3">
-            <li><a href="#" class="text-sm text-surface-500 hover:text-primary-500">Documentation</a></li>
-            <li><a href="#" class="text-sm text-surface-500 hover:text-primary-500">API Reference</a></li>
+            <li><router-link to="/docs" class="text-sm text-surface-500 hover:text-primary-500">{{ $t('nav.docs') }}</router-link></li>
           </ul>
         </div>
       </div>
