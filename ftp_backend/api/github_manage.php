@@ -30,6 +30,8 @@ if ($action === 'list') {
     $result = [];
 
     foreach ($files as $file) {
+        if (basename($file) === 'last_deploy.json') continue;
+        
         $config = json_decode(file_get_contents($file), true);
         if (!$config) continue;
 
