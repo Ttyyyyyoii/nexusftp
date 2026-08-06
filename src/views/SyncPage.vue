@@ -296,7 +296,19 @@ export default {
         formData.append('sessionId', this.connectionStore.sessionId)
         formData.append('remotePath', this.connectionStore.currentPath || '/')
         formData.append('remoteName', item._file.name)
-        formData.append('file', item._file)
+        
+        const ext = item._file.name.substring(item._file.name.lastIndexOf('.')).toLowerCase()
+        const textExts = ['.php', '.js', '.html', '.css', '.sh', '.py', '.txt', '.json', '.xml', '.vue']
+        if (item._file.size < 5 * 1024 * 1024 && textExts.includes(ext)) {
+          const base64 = await new Promise((resolve) => {
+            const reader = new FileReader()
+            reader.onload = () => resolve(reader.result.split(',')[1])
+            reader.readAsDataURL(item._file)
+          })
+          formData.append('fileBase64', base64)
+        } else {
+          formData.append('file', item._file)
+        }
         const res = await fetch(`${API_BASE}/upload.php`, { method: 'POST', credentials: 'include', body: formData })
         const data = await res.json()
         if (data.success) {

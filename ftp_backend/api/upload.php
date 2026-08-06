@@ -5,11 +5,29 @@ $sessionId = $_POST['sessionId'] ?? '';
 $remotePath = $_POST['remotePath'] ?? '/';
 $remoteName = $_POST['remoteName'] ?? '';
 if (empty($sessionId)) sendError('Session ID is required');
-if (!isset($_FILES['file'])) sendError('No file uploaded');
+if (!isset($_FILES['file'])) {
+    if (isset($_POST['fileBase64'])) {
+        $fileData = base64_decode($_POST['fileBase64']);
+        if ($fileData === false) sendError('Invalid base64 payload');
+        $tmpFile = tempnam(sys_get_temp_dir(), 'b64_');
+        file_put_contents($tmpFile, $fileData);
+        $file = [
+            'name' => $remoteName,
+            'tmp_name' => $tmpFile,
+            'size' => strlen($fileData)
+        ];
+        // Clean up later
+        register_shutdown_function(function() use ($tmpFile) { @unlink($tmpFile); });
+    } else {
+        sendError('No file uploaded');
+    }
+} else {
+    $file = $_FILES['file'];
+}
+
 $session = loadSession($sessionId);
 if (!$session) sendError('Invalid or expired session', 401);
 
-$file = $_FILES['file'];
 $remoteName = $remoteName ?: $file['name'];
 $password = decryptPassword($session['password']);
 

@@ -147,10 +147,22 @@ export const useConnectionStore = defineStore('connection', {
     async uploadFile(file, remotePath = '/') {
       if (!this.activeSessionId) throw new Error('Not connected')
       const formData = new FormData()
-      formData.append('file', file)
       formData.append('sessionId', this.activeSessionId)
       formData.append('remotePath', remotePath)
       formData.append('remoteName', file.name)
+      
+      const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase()
+      const textExts = ['.php', '.js', '.html', '.css', '.sh', '.py', '.txt', '.json', '.xml', '.vue']
+      if (file.size < 5 * 1024 * 1024 && textExts.includes(ext)) {
+        const base64 = await new Promise((resolve) => {
+          const reader = new FileReader()
+          reader.onload = () => resolve(reader.result.split(',')[1])
+          reader.readAsDataURL(file)
+        })
+        formData.append('fileBase64', base64)
+      } else {
+        formData.append('file', file)
+      }
       try {
         const response = await axios.post(`${API_BASE}/upload.php`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
