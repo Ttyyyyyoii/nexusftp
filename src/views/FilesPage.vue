@@ -367,7 +367,10 @@ export default {
     },
     async handleUpload(files) { 
       const settingsStore = useSettingsStore()
-      const maxSimultaneous = settingsStore.planLimits.maxSimultaneous
+      // FTP servers don't handle many parallel connections well → force sequential
+      const connType = this.connectionStore.connectionInfo?.type || 'ftp'
+      const isFtp = connType !== 'sftp'
+      const maxSimultaneous = isFtp ? 1 : settingsStore.planLimits.maxSimultaneous
       const maxFileSizeMB = settingsStore.planLimits.maxFileSize
       const maxFileSizeBytes = maxFileSizeMB * 1024 * 1024
 
@@ -389,8 +392,8 @@ export default {
       const total = validFiles.length;
       this.globalLoader = { 
         show: true, 
-        title: 'Envoi en cours', 
-        message: `Préparation de l'envoi...`,
+        title: 'Sending files', 
+        message: `Preparing upload...`,
         progress: 0,
         total: total
       };

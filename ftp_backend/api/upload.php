@@ -30,10 +30,19 @@ try {
         fclose($local); fclose($stream);
     } else {
         $timeout = 30;
-        if ($session['type'] === 'ftps' || $session['type'] === 'ftpse') $conn = @ftp_ssl_connect($session['host'], $session['port'], $timeout);
-        else $conn = @ftp_connect($session['host'], $session['port'], $timeout);
-        
-        if (!$conn || !@ftp_login($conn, $session['username'], $password)) sendError('Failed to connect for upload');
+        $conn = false;
+        $maxRetries = 3;
+        for ($attempt = 0; $attempt < $maxRetries; $attempt++) {
+            if ($session['type'] === 'ftps' || $session['type'] === 'ftpse') {
+                $conn = @ftp_ssl_connect($session['host'], $session['port'], $timeout);
+            } else {
+                $conn = @ftp_connect($session['host'], $session['port'], $timeout);
+            }
+            if ($conn && @ftp_login($conn, $session['username'], $password)) break;
+            if ($conn) { @ftp_close($conn); $conn = false; }
+            if ($attempt < $maxRetries - 1) usleep(600000 * ($attempt + 1)); // 0.6s, 1.2s
+        }
+        if (!$conn) sendError('Failed to connect for upload (server may be busy, try again)');
         
         @ftp_pasv($conn, $session['passive'] ?? true);
         
