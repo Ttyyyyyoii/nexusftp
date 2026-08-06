@@ -19,49 +19,70 @@
     "log": "Activity Log",
     "favorites": "Favorites",
     "faq": "FAQ",
-    "contact": "Contact"
+    "contact": "Contact",
+    "docs": "Documentation",
+    "api": "API"
   },
   "home": {
     "hero": {
-      "title": "The Future of",
-      "titleHighlight": "File Transfer",
-      "subtitle": "Enterprise-grade FTP, SFTP, and FTPS client with military-grade security, blazing speeds, and an interface that feels like magic.",
-      "ctaPrimary": "Get Started Free",
-      "ctaSecondary": "Watch Demo"
+      "badge": "FTP · FTPS · FTPES · SFTP — All protocols supported",
+      "title": "Manage your server files",
+      "titleHighlight": "from your browser",
+      "subtitle": "NexusFTP is a 100% online file transfer client. Connect to any FTP or SFTP server and manage your files without installing any software on your computer.",
+      "ctaPrimary": "Connect to a server",
+      "ctaSecondary": "View FAQ"
+    },
+    "mock": {
+      "connected": "Connected",
+      "local": "Local Files",
+      "remote": "Remote Files"
     },
     "stats": {
-      "users": "Active Users",
-      "transfers": "Files Transferred",
-      "servers": "Servers Connected",
-      "uptime": "Uptime SLA"
+      "protocols": "Supported protocols",
+      "browser": "In the browser",
+      "install": "Installation required",
+      "maxFile": "Max file size"
+    },
+    "protocols": {
+      "title": "All Transfer Protocols",
+      "subtitle": "Whether your host uses FTP, FTPS or SFTP, NexusFTP connects to all of them.",
+      "ftp": { "desc": "Classic transfer protocol, fast and universal. Compatible with all web hosting providers." },
+      "ftps": { "desc": "Secure FTP in implicit mode. The connection is encrypted from the very first byte (port 990)." },
+      "ftpse": { "desc": "Secure FTP in explicit mode. Starts on standard port 21 then switches to SSL/TLS encryption." },
+      "sftp": { "desc": "Secure protocol based on SSH. The most secure and most used on modern Linux servers." }
     },
     "features": {
       "title": "Built for Professionals",
       "subtitle": "Every feature crafted with precision for those who demand excellence",
-      "ftp": {
-        "title": "Multi-Protocol",
-        "desc": "Connect to FTP, FTPS, and SFTP servers with enterprise security standards."
+      "browser": {
+        "title": "100% Browser-Based",
+        "desc": "No software to download, no installation needed. Open your browser and manage your remote files immediately."
       },
       "speed": {
-        "title": "Blazing Speed",
-        "desc": "Multi-threaded transfers with automatic compression and resume capability."
+        "title": "Ultra-Fast Transfers",
+        "desc": "Send multiple files in parallel simultaneously for maximum throughput, even with large numbers of files."
       },
       "security": {
-        "title": "Military Security",
-        "desc": "AES-256 encryption, password vault, and secure credential storage."
+        "title": "End-to-End Security",
+        "desc": "Your credentials are encrypted locally in your browser using AES before being saved. Your privacy is guaranteed."
       },
       "interface": {
-        "title": "Premium Interface",
-        "desc": "Dual-pane file manager with drag-and-drop, previews, and batch operations."
+        "title": "Intuitive Interface",
+        "desc": "Browse remote folders, create, rename, delete and download with a clear and modern interface."
       },
-      "sync": {
-        "title": "Smart Sync",
-        "desc": "Automatic folder synchronization with change detection and conflict resolution."
+      "upload": {
+        "title": "Full Folder Upload",
+        "desc": "Drag and drop an entire folder from your computer and its contents will be sent preserving the subfolder structure."
       },
-      "terminal": {
-        "title": "Built-in Terminal",
-        "desc": "Full SSH terminal access directly within the application."
+      "passwords": {
+        "title": "Saved Connections",
+        "desc": "Save your favorite connections to reconnect in one click without re-entering your credentials each time."
       }
+    },
+    "cta": {
+      "title": "Ready to manage your files?",
+      "subtitle": "Connect to your FTP or SFTP server in seconds, directly from your browser.",
+      "button": "Get started now"
     }
   },
   "connection": {

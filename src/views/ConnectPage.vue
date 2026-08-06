@@ -145,7 +145,7 @@ export default {
       else { this.error = result.error || 'Connection failed'; this.logStore.logError(`Connection failed: ${this.error}`) }
     },
     async testConnection() { this.testing = true; this.error = ''; try { const result = await this.connectionStore.connect({ host: this.form.host, port: parseInt(this.form.port) || this.defaultPort, username: this.form.username, password: this.form.password, type: this.form.type, saveConnection: false }); if (result.success) { await this.connectionStore.disconnect(); this.showToast('Connection test successful', 'success') } else this.error = result.error || 'Connection test failed' } finally { this.testing = false } },
-    quickConnect(conn) { this.form = { host: conn.host, port: conn.port || '', username: conn.username, password: '', type: conn.type, saveConnection: false } },
+    quickConnect(conn) { this.form = { host: conn.host, port: conn.port || '', username: conn.username, password: this.connectionStore.getDecryptedPassword(conn.password), type: conn.type, saveConnection: false } },
     loadConnection(conn) { this.quickConnect(conn) },
     removeSaved(id) { this.connectionStore.removeSavedConnection(id) },
     formatDate(date) { return dayjs(date).format('MMM D, HH:mm') },

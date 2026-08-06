@@ -1,7 +1,19 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
+import CryptoJS from 'crypto-js'
 
 const API_BASE = '/api'
+
+let ENCRYPTION_KEY = localStorage.getItem('nexus_master_key')
+if (!ENCRYPTION_KEY) {
+  ENCRYPTION_KEY = CryptoJS.lib.WordArray.random(32).toString()
+  localStorage.setItem('nexus_master_key', ENCRYPTION_KEY)
+}
+
+function encrypt(text) {
+  if (!text) return ''
+  return CryptoJS.AES.encrypt(text, ENCRYPTION_KEY).toString()
+}
 
 export const useConnectionStore = defineStore('connection', {
   state: () => ({
@@ -252,9 +264,23 @@ export const useConnectionStore = defineStore('connection', {
         this.savedConnections.push({
           id: Date.now(), host: config.host, port: config.port,
           username: config.username, type: config.type,
-          label: config.label || `${config.username}@${config.host}`
+          label: config.label || `${config.username}@${config.host}`,
+          password: encrypt(config.password)
         })
         this.persistSaved()
+      } else if (config.password) {
+        exists.password = encrypt(config.password)
+        this.persistSaved()
+      }
+    },
+
+    getDecryptedPassword(encrypted) {
+      if (!encrypted) return ''
+      try {
+        const bytes = CryptoJS.AES.decrypt(encrypted, ENCRYPTION_KEY)
+        return bytes.toString(CryptoJS.enc.Utf8)
+      } catch (e) {
+        return ''
       }
     },
 

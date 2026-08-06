@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+    <linearGradient id="arrow" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#c4b5fd" stop-opacity="0.9"/>
+    </linearGradient>
+  </defs>
+  <!-- Background rounded square -->
+  <rect width="32" height="32" rx="8" fill="url(#bg)"/>
+  <!-- Server icon lines -->
+  <rect x="5" y="7" width="22" height="5" rx="2" fill="white" fill-opacity="0.3"/>
+  <rect x="5" y="14" width="22" height="5" rx="2" fill="white" fill-opacity="0.2"/>
+  <!-- Transfer arrows -->
+  <path d="M10 25 L10 19" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <path d="M7 22 L10 19 L13 22" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M22 19 L22 25" stroke="#a5b4fc" stroke-width="2" stroke-linecap="round"/>
+  <path d="M19 22 L22 25 L25 22" stroke="#a5b4fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Dot on server lines -->
+  <circle cx="23" cy="9.5" r="1.5" fill="#34d399"/>
+  <circle cx="23" cy="16.5" r="1.5" fill="#fbbf24"/>
+</svg>

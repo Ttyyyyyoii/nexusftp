@@ -15,11 +15,20 @@ export default {
   name: 'App',
   data() {
     return {
-      settingsStore: useSettingsStore()
+      settingsStore: useSettingsStore(),
+      pingInterval: null
     }
   },
   mounted() {
     this.settingsStore.restore()
+    
+    // Keep-alive ping pour empêcher Render de s'endormir (toutes les 10 min)
+    this.pingInterval = setInterval(() => {
+      fetch('/api/ping.php').catch(() => {})
+    }, 10 * 60 * 1000)
+  },
+  beforeUnmount() {
+    if (this.pingInterval) clearInterval(this.pingInterval)
   }
 }
 </script>

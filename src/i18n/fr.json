@@ -15,53 +15,74 @@
     "connect": "Connexion",
     "files": "Gestionnaire de Fichiers",
     "history": "Historique",
-    "settings": "Parametres",
-    "log": "Journal d'Activite",
+    "settings": "Paramètres",
+    "log": "Journal d'Activité",
     "favorites": "Favoris",
     "faq": "FAQ",
-    "contact": "Contact"
+    "contact": "Contact",
+    "docs": "Documentation",
+    "api": "API"
   },
   "home": {
     "hero": {
-      "title": "Le Futur du",
-      "titleHighlight": "Transfert de Fichiers",
-      "subtitle": "Client FTP, SFTP et FTPS de classe entreprise avec securite militaire, vitesses fulgurantes et une interface magique.",
-      "ctaPrimary": "Commencer Gratuitement",
-      "ctaSecondary": "Voir la Demo"
+      "badge": "FTP · FTPS · FTPES · SFTP — Tous les protocoles",
+      "title": "Gérez vos fichiers serveur",
+      "titleHighlight": "depuis votre navigateur",
+      "subtitle": "NexusFTP est un client de transfert de fichiers 100% en ligne. Connectez-vous à n'importe quel serveur FTP ou SFTP et transférez vos fichiers sans installer de logiciel sur votre ordinateur.",
+      "ctaPrimary": "Se connecter à un serveur",
+      "ctaSecondary": "Voir la FAQ"
+    },
+    "mock": {
+      "connected": "Connecté",
+      "local": "Fichiers Locaux",
+      "remote": "Fichiers Distants"
     },
     "stats": {
-      "users": "Utilisateurs Actifs",
-      "transfers": "Fichiers Transferes",
-      "servers": "Serveurs Connectes",
-      "uptime": "Disponibilite SLA"
+      "protocols": "Protocoles supportés",
+      "browser": "Dans le navigateur",
+      "install": "Installation requise",
+      "maxFile": "Taille max par fichier"
+    },
+    "protocols": {
+      "title": "Tous les protocoles de transfert",
+      "subtitle": "Que votre hébergeur utilise FTP, FTPS ou SFTP, NexusFTP se connecte à tous.",
+      "ftp": { "desc": "Protocole de transfert classique, rapide et universel. Compatible avec tous les hébergeurs web." },
+      "ftps": { "desc": "FTP sécurisé en mode implicite. La connexion est chiffrée dès le premier octet échangé (port 990)." },
+      "ftpse": { "desc": "FTP sécurisé en mode explicite. Démarre sur le port 21 standard et bascule en chiffrement SSL/TLS." },
+      "sftp": { "desc": "Protocole sécurisé basé sur SSH. Le plus sûr et le plus utilisé sur les serveurs Linux modernes." }
     },
     "features": {
-      "title": "Concu pour les Professionnels",
-      "subtitle": "Chaque fonctionnalite elaboree avec precision pour ceux qui exigent l'excellence",
-      "ftp": {
-        "title": "Multi-Protocole",
-        "desc": "Connectez-vous aux serveurs FTP, FTPS et SFTP avec des standards de securite entreprise."
+      "title": "Conçu pour les Professionnels",
+      "subtitle": "Chaque fonctionnalité élaborée avec précision pour ceux qui exigent l'excellence",
+      "browser": {
+        "title": "100% dans le Navigateur",
+        "desc": "Aucun logiciel à télécharger, aucune installation. Ouvrez votre navigateur et gérez vos fichiers distants immédiatement."
       },
       "speed": {
-        "title": "Vitesse Fulgurante",
-        "desc": "Transferts multi-threads avec compression automatique et reprise de transfert."
+        "title": "Transferts Ultra-Rapides",
+        "desc": "Envoyez plusieurs fichiers en parallèle simultanément pour un débit maximal, même sur de grandes quantités de fichiers."
       },
       "security": {
-        "title": "Securite Militaire",
-        "desc": "Chiffrement AES-256, coffre-fort de mots de passe et stockage securise des identifiants."
+        "title": "Sécurité de Bout en Bout",
+        "desc": "Vos identifiants sont chiffrés localement dans votre navigateur via AES avant d'être sauvegardés. Votre confidentialité est garantie."
       },
       "interface": {
-        "title": "Interface Premium",
-        "desc": "Gestionnaire dual-pane avec glisser-deposer, apercus et operations par lot."
+        "title": "Interface Intuitive",
+        "desc": "Naviguez dans vos dossiers distants, créez, renommez, supprimez et téléchargez avec une interface claire et moderne."
       },
-      "sync": {
-        "title": "Synchronisation Intelligente",
-        "desc": "Synchronisation automatique des dossiers avec detection de changements."
+      "upload": {
+        "title": "Upload de Dossiers Entiers",
+        "desc": "Glissez-déposez un dossier entier depuis votre ordinateur et son contenu sera envoyé en préservant toute la structure des sous-dossiers."
       },
-      "terminal": {
-        "title": "Terminal Integre",
-        "desc": "Acces terminal SSH complet directement dans l'application."
+      "passwords": {
+        "title": "Connexions Sauvegardées",
+        "desc": "Enregistrez vos connexions favorites pour vous reconnecter en un clic sans ressaisir vos identifiants à chaque fois."
       }
+    },
+    "cta": {
+      "title": "Prêt à gérer vos fichiers ?",
+      "subtitle": "Connectez-vous à votre serveur FTP ou SFTP en quelques secondes, directement depuis votre navigateur.",
+      "button": "Commencer maintenant"
     }
   },
   "connection": {
