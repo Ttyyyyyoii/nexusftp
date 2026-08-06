@@ -1,7 +1,6 @@
 <?php
 // github_oauth_callback.php
-// Reçoit le code OAuth de GitHub, l'échange contre un access_token,
-// puis envoie le token à la fenêtre parente via postMessage et ferme le popup.
+header('Content-Type: text/html; charset=UTF-8');
 
 $clientId     = 'Ov23liyWoYP9G3BMK5q8';
 $clientSecret = '79995788ab7aed53ed76807a831bbdb17a2abb6a';
@@ -33,7 +32,7 @@ function renderPopupMessage(string $type, array $data): void {
     (function() {
       var data = $jsonData;
       if (window.opener) {
-        window.opener.postMessage(data, window.location.origin);
+        window.opener.postMessage(data, '*');
       }
       setTimeout(function() { window.close(); }, 800);
     })();
