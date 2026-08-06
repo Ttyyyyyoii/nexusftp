@@ -8,6 +8,9 @@
           <component :is="action.icon" class="w-4 h-4" /><span class="hidden sm:inline">{{ action.label }}</span>
         </button>
         <div class="flex-1" />
+        <button @click="showSearch = true" :disabled="!connectionStore.isConnected" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-violet-600 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-all disabled:opacity-30">
+          <SearchIcon class="w-4 h-4" /><span class="hidden sm:inline">Rechercher</span>
+        </button>
         <button @click="openCreateModal('file')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all">
           <FilePlus class="w-4 h-4" /><span class="hidden sm:inline">Nouveau Fichier</span>
         </button>
@@ -36,7 +39,7 @@
               <FileList v-if="connectionStore.isConnected" :files="connectionStore.remoteFiles" :current-path="connectionStore.currentPath"
                 :is-remote="true" :loading="loading" @navigate="navigateRemote" @navigate-up="navigateUp" @refresh="refreshRemote"
                 @selection-change="remoteFilesSelected = $event"
-                @file-open="openFile" @upload="handleUpload" @download="handleDownload" @delete="handleDelete" @rename="handleRename" @edit="handleEdit" />
+                @file-open="openFile" @upload="handleUpload" @download="handleDownload" @delete="handleDelete" @rename="handleRename" @edit="handleEdit" @share="handleShare" />
               <div v-else class="flex flex-col items-center justify-center h-full text-center p-8">
                 <Unlink class="w-12 h-12 text-surface-300 dark:text-surface-700 mb-4" />
                 <p class="text-sm text-surface-500 dark:text-surface-400 mb-4">{{ $t('statusbar.notConnected') }}</p>
@@ -75,10 +78,10 @@
         </template>
       </BaseModal>
       
-      <!-- Edit File Modal -->
-      <BaseModal :visible="showFileEditor" :title="'Modifier: ' + (fileEditorFile?.name || '')" @close="showFileEditor = false" maxWidth="max-w-4xl">
-        <div class="h-[60vh] flex flex-col -mx-2 -mt-2">
-          <textarea v-model="fileEditorContent" class="flex-1 w-full p-4 font-mono text-sm bg-surface-50 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 rounded-xl focus:ring-2 focus:ring-primary-500 dark:text-surface-200 resize-none outline-none" spellcheck="false"></textarea>
+      <!-- Edit File Modal with Monaco Editor -->
+      <BaseModal :visible="showFileEditor" :title="'✏️ Modifier: ' + (fileEditorFile?.name || '')" @close="showFileEditor = false" maxWidth="max-w-5xl">
+        <div class="h-[65vh] -mx-2 -mt-2 rounded-xl overflow-hidden border border-surface-200 dark:border-surface-700">
+          <MonacoEditor v-if="showFileEditor" v-model="fileEditorContent" :language="editorLanguage" />
         </div>
         <template #footer>
           <button @click="showFileEditor = false" class="btn-secondary text-sm" :disabled="isEditingFile">{{ $t('common.cancel') }}</button>
@@ -106,6 +109,12 @@
           </div>
         </div>
       </div>
+
+      <!-- Search Modal -->
+      <SearchModal :visible="showSearch" @close="showSearch = false" @navigate="handleSearchNavigate" />
+
+      <!-- Share Modal -->
+      <ShareModal :visible="showShareModal" :file="shareFile" :remote-path="connectionStore.currentPath" @close="showShareModal = false" />
     </div>
   </AppLayout>
 </template>
@@ -122,10 +131,21 @@ import FileList from '@/components/ftp/FileList.vue'
 import LocalFileBrowser from '@/components/ftp/LocalFileBrowser.vue'
 import TransferPanel from '@/components/transfers/TransferPanel.vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
-import { Upload, Download, Trash2, Edit2, RefreshCw, FolderPlus, FilePlus, Monitor, Globe, Loader2, Unlink } from 'lucide-vue-next'
+import MonacoEditor from '@/components/ui/MonacoEditor.vue'
+import SearchModal from '@/components/ftp/SearchModal.vue'
+import ShareModal from '@/components/ui/ShareModal.vue'
+import { Upload, Download, Trash2, Edit2, RefreshCw, FolderPlus, FilePlus, Monitor, Globe, Loader2, Unlink, Search as SearchIcon } from 'lucide-vue-next'
+
+const LANG_MAP = {
+  js: 'javascript', ts: 'typescript', vue: 'html', html: 'html', htm: 'html',
+  css: 'css', scss: 'scss', less: 'less', php: 'php', py: 'python',
+  json: 'json', xml: 'xml', md: 'markdown', sh: 'shell', bash: 'shell',
+  sql: 'sql', yaml: 'yaml', yml: 'yaml', txt: 'plaintext', env: 'plaintext'
+}
+
 export default {
   name: 'FilesPage',
-  components: { AppLayout, Splitpanes, Pane, FileList, LocalFileBrowser, TransferPanel, BaseModal, Monitor, Globe, Loader2, Unlink, FolderPlus, FilePlus, Upload, Download, Trash2, Edit2, RefreshCw },
+  components: { AppLayout, Splitpanes, Pane, FileList, LocalFileBrowser, TransferPanel, BaseModal, MonacoEditor, SearchModal, ShareModal, Monitor, Globe, Loader2, Unlink, FolderPlus, FilePlus, Upload, Download, Trash2, Edit2, RefreshCw, SearchIcon },
   data() {
     return {
       connectionStore: useConnectionStore(),
@@ -136,6 +156,8 @@ export default {
       showRename: false, renameOldName: '', renameNewName: '',
       showDelete: false, filesToDelete: [],
       showFileEditor: false, fileEditorFile: null, fileEditorContent: '', isEditingFile: false,
+      showSearch: false,
+      showShareModal: false, shareFile: null,
       globalLoader: { show: false, title: '', message: '' }
     }
   },
@@ -147,6 +169,11 @@ export default {
         { id: 'delete', label: this.$t('files.delete'), icon: 'Trash2', handler: this.triggerDelete, disabled: !this.connectionStore.isConnected || this.remoteFilesSelected.length === 0, danger: true },
         { id: 'refresh', label: this.$t('files.refresh'), icon: 'RefreshCw', handler: this.refreshRemote, disabled: !this.connectionStore.isConnected }
       ]
+    },
+    editorLanguage() {
+      if (!this.fileEditorFile?.name) return 'plaintext'
+      const ext = this.fileEditorFile.name.split('.').pop()?.toLowerCase() || ''
+      return LANG_MAP[ext] || 'plaintext'
     }
   },
   watch: {
@@ -342,6 +369,8 @@ export default {
     triggerUpload() { if (this.$refs.localBrowser) this.$refs.localBrowser.triggerSelect() },
     triggerDownload() { const selected = this.connectionStore.remoteFiles.filter(f => this.remoteFilesSelected.includes(f.name)); if (selected.length > 0) this.handleDownload(selected) },
     triggerDelete() { const selected = this.connectionStore.remoteFiles.filter(f => this.remoteFilesSelected.includes(f.name)); if (selected.length > 0) this.handleDelete(selected) },
+    handleShare(file) { this.shareFile = file; this.showShareModal = true },
+    handleSearchNavigate(path) { this.navigateRemote(path) },
     showToast(title, type) { window.dispatchEvent(new CustomEvent('show-toast', { detail: { title, type } })) }
   }
 }

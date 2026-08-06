@@ -53,14 +53,14 @@
 </template>
 
 <script>
-import { ChevronUp, RefreshCw, Upload, FolderOpen, Edit3, Download, Edit2, Trash2 } from 'lucide-vue-next'
+import { ChevronUp, RefreshCw, Upload, FolderOpen, Edit3, Download, Edit2, Trash2, Share2 } from 'lucide-vue-next'
 import FileItem from './FileItem.vue'
 import BreadcrumbNav from './BreadcrumbNav.vue'
 export default {
   name: 'FileList',
-  components: { ChevronUp, RefreshCw, Upload, FolderOpen, FileItem, BreadcrumbNav, Edit3, Download, Edit2, Trash2 },
+  components: { ChevronUp, RefreshCw, Upload, FolderOpen, FileItem, BreadcrumbNav, Edit3, Download, Edit2, Trash2, Share2 },
   props: { files: { type: Array, default: () => [] }, currentPath: { type: String, default: '/' }, isRemote: { type: Boolean, default: false }, loading: { type: Boolean, default: false } },
-  emits: ['navigate', 'navigate-up', 'refresh', 'file-open', 'upload', 'download', 'delete', 'rename', 'edit'],
+  emits: ['navigate', 'navigate-up', 'refresh', 'file-open', 'upload', 'download', 'delete', 'rename', 'edit', 'share'],
   data() {
     return { dragOver: false, selectedFiles: [], sortBy: 'name', sortAsc: true, contextMenu: { show: false, x: 0, y: 0, file: null } }
   },
@@ -77,6 +77,7 @@ export default {
         items.push({ action: 'open', label: 'Ouvrir', icon: 'FolderOpen', danger: false })
       } else {
         items.push({ action: 'edit', label: 'Modifier le contenu', icon: 'Edit3', danger: false })
+        items.push({ action: 'share', label: 'Créer un lien de partage', icon: 'Share2', danger: false })
       }
       items.push({ action: 'download', label: this.$t('files.download'), icon: 'Download', danger: false })
       items.push({ action: 'rename', label: this.$t('files.rename'), icon: 'Edit2', danger: false })
@@ -148,7 +149,7 @@ export default {
     },
     showContextMenu(event, file) { event.preventDefault(); this.contextMenu = { show: true, x: event.clientX, y: event.clientY, file } },
     hideContextMenu() { this.contextMenu.show = false },
-    handleContextAction(action) { const file = this.contextMenu.file; if (!file) return; switch (action) { case 'open': this.$emit('file-open', file); break; case 'edit': this.$emit('edit', file); break; case 'download': this.$emit('download', [file]); break; case 'rename': this.$emit('rename', file); break; case 'delete': this.$emit('delete', [file]); break } this.hideContextMenu() },
+    handleContextAction(action) { const file = this.contextMenu.file; if (!file) return; switch (action) { case 'open': this.$emit('file-open', file); break; case 'edit': this.$emit('edit', file); break; case 'download': this.$emit('download', [file]); break; case 'rename': this.$emit('rename', file); break; case 'delete': this.$emit('delete', [file]); break; case 'share': this.$emit('share', file); break } this.hideContextMenu() },
     handleKeydown(e) { if (e.key === 'Delete' && this.selectedFiles.length > 0) { const toDelete = this.files.filter(f => this.selectedFiles.includes(f.name)); this.$emit('delete', toDelete) } if (e.key === 'a' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); this.selectedFiles = this.files.map(f => f.name); this.$emit('selection-change', this.selectedFiles) } }
   }
 }

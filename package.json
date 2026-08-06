@@ -26,6 +26,7 @@
     }
   },
   "dependencies": {
+    "@monaco-editor/loader": "^1.7.0",
     "axios": "^1.6.8",
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.10",
