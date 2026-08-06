@@ -49,7 +49,10 @@
                 <p class="font-medium text-surface-800 dark:text-surface-200">{{ $t(field.label) }}</p>
                 <Lock v-if="field.premiumOnly && !settingsStore.isPremium" class="w-3.5 h-3.5 text-surface-400" />
               </div>
-              <input v-model.number="transferSettings[field.key]" type="number" :min="field.min" :max="field.max" :disabled="field.premiumOnly && !settingsStore.isPremium" class="w-24 px-3 py-2 rounded-xl bg-surface-0 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 text-center dark:text-surface-200 disabled:bg-surface-100 disabled:dark:bg-surface-900" />
+              <div v-if="field.readonly" class="font-bold text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 px-3 py-1 rounded-lg">
+                {{ field.value }}{{ field.key === 'maxFileSize' ? ' MB' : '' }}
+              </div>
+              <input v-else v-model.number="transferSettings[field.key]" type="number" :min="field.min" :max="field.max" :disabled="field.premiumOnly && !settingsStore.isPremium" class="w-24 px-3 py-2 rounded-xl bg-surface-0 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 text-center dark:text-surface-200 disabled:bg-surface-100 disabled:dark:bg-surface-900" />
             </div>
           </div>
         </div>
@@ -112,8 +115,8 @@ export default {
     transferFields() {
       const limits = this.settingsStore.planLimits;
       return [
-        { key: 'maxSimultaneous', label: 'settings.maxConnections', min: 1, max: limits.maxSimultaneous, premiumOnly: false },
-        { key: 'maxFileSize', label: 'settings.maxFileSize', min: 1, max: limits.maxFileSize, premiumOnly: false },
+        { key: 'maxSimultaneous', label: 'settings.maxConnections', readonly: true, value: limits.maxSimultaneous, premiumOnly: false },
+        { key: 'maxFileSize', label: 'settings.maxFileSize', readonly: true, value: limits.maxFileSize, premiumOnly: false },
         { key: 'timeout', label: 'settings.timeout', min: 5, max: 120, premiumOnly: !limits.allowTimeoutChange },
         { key: 'retries', label: 'settings.retries', min: 0, max: 10, premiumOnly: !limits.allowRetry }
       ]
