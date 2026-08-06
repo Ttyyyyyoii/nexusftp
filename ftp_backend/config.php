@@ -14,6 +14,9 @@ if ($origin) {
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(200); exit; }
 
 function sendJson($data, $statusCode = 200) {
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
     http_response_code($statusCode);
     echo json_encode($data, JSON_PRETTY_PRINT);
     exit;
