@@ -4,6 +4,20 @@
     "tagline": "Premium File Transfer",
     "version": "v1.0.0"
   },
+  "footer": {
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "description": "Enterprise-grade FTP, SFTP, and FTPS client built for professionals.",
+    "rights": "All rights reserved."
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "content": "At NexusFTP, we take your privacy seriously. We do not store any of your files or plain-text credentials on our servers. Your saved passwords are encrypted locally on your device. The application acts only as a gateway between you and your server."
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "content": "Using NexusFTP is free. You agree to use this service only for legal access to servers you own or have explicit authorization for. The service is provided 'as is', without any express or implied warranty."
+  },
   "statusbar": {
     "connected": "Connected",
     "disconnected": "Disconnected",

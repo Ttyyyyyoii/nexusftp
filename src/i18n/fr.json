@@ -4,6 +4,20 @@
     "tagline": "Transfert de Fichiers Premium",
     "version": "v1.0.0"
   },
+  "footer": {
+    "privacy": "Politique de confidentialité",
+    "terms": "Conditions d'utilisation",
+    "description": "Client FTP, SFTP et FTPS de niveau entreprise pour les professionnels.",
+    "rights": "Tous droits réservés."
+  },
+  "privacy": {
+    "title": "Politique de confidentialité",
+    "content": "Chez NexusFTP, nous prenons votre vie privée très au sérieux. Nous ne stockons aucun de vos fichiers ou identifiants en clair sur nos serveurs. Vos mots de passe sauvegardés sont chiffrés localement sur votre appareil. L'application agit uniquement comme une passerelle entre vous et votre serveur."
+  },
+  "terms": {
+    "title": "Conditions d'utilisation",
+    "content": "L'utilisation de NexusFTP est gratuite. Vous vous engagez à utiliser ce service uniquement pour des accès légaux à des serveurs dont vous êtes le propriétaire ou pour lesquels vous avez une autorisation explicite. Le service est fourni 'tel quel', sans aucune garantie expresse ou implicite."
+  },
   "statusbar": {
     "connected": "Connecté",
     "disconnected": "Déconnecté",

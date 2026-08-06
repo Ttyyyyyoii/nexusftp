@@ -50,6 +50,16 @@ const routes = [
     path: '/docs',
     name: 'Docs',
     component: () => import('@/views/DocsPage.vue')
+  },
+  {
+    path: '/privacy',
+    name: 'Privacy',
+    component: () => import('@/views/PrivacyPage.vue')
+  },
+  {
+    path: '/terms',
+    name: 'Terms',
+    component: () => import('@/views/TermsPage.vue')
   }
 ]
 
