@@ -34,11 +34,11 @@
 
 <script>
 import { useConnectionStore } from '@/stores/connection'
-import { Home, Plug, FolderOpen, Clock, Settings, ScrollText, Star, Heart, LayoutDashboard, TerminalSquare } from 'lucide-vue-next'
+import { Home, Plug, FolderOpen, Clock, Settings, ScrollText, Star, Heart, LayoutDashboard, TerminalSquare, ShieldCheck, Images, Activity, ArrowLeftRight } from 'lucide-vue-next'
 
 export default {
   name: 'AppSidebar',
-  components: { Home, Plug, FolderOpen, Clock, Settings, ScrollText, Star, Heart, LayoutDashboard, TerminalSquare },
+  components: { Home, Plug, FolderOpen, Clock, Settings, ScrollText, Star, Heart, LayoutDashboard, TerminalSquare, ShieldCheck, Images, Activity, ArrowLeftRight },
   data() {
     return {
       connectionStore: useConnectionStore(),
@@ -47,7 +47,11 @@ export default {
         { path: '/connect', label: 'nav.connect', icon: 'Plug' },
         { path: '/dashboard', label: 'nav.dashboard', icon: 'LayoutDashboard' },
         { path: '/files', label: 'nav.files', icon: 'FolderOpen' },
+        { path: '/gallery', label: 'nav.gallery', icon: 'Images' },
+        { path: '/permissions', label: 'nav.permissions', icon: 'ShieldCheck' },
         { path: '/terminal', label: 'nav.terminal', icon: 'TerminalSquare' },
+        { path: '/monitoring', label: 'nav.monitoring', icon: 'Activity' },
+        { path: '/sync', label: 'nav.sync', icon: 'ArrowLeftRight' },
         { path: '/history', label: 'nav.history', icon: 'Clock' },
         { path: '/favorites', label: 'nav.favorites', icon: 'Heart' },
         { path: '/log', label: 'nav.log', icon: 'ScrollText' },

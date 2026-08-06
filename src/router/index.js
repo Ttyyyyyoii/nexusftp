@@ -75,6 +75,26 @@ const routes = [
     path: '/terminal',
     name: 'Terminal',
     component: () => import('@/views/TerminalPage.vue')
+  },
+  {
+    path: '/permissions',
+    name: 'Permissions',
+    component: () => import('@/views/PermissionsPage.vue')
+  },
+  {
+    path: '/gallery',
+    name: 'Gallery',
+    component: () => import('@/views/GalleryPage.vue')
+  },
+  {
+    path: '/monitoring',
+    name: 'Monitoring',
+    component: () => import('@/views/MonitoringPage.vue')
+  },
+  {
+    path: '/sync',
+    name: 'Sync',
+    component: () => import('@/views/SyncPage.vue')
   }
 ]
 
