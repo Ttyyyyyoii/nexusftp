@@ -10,7 +10,8 @@ export const useSettingsStore = defineStore('settings', {
       maxSimultaneous: 2, timeout: 30, retries: 3,
       maxFileSize: 256, passiveMode: true, transferMode: 'binary'
     },
-    notifications: { transferComplete: true, connectionStatus: true, errors: true }
+    notifications: { transferComplete: true, connectionStatus: true, errors: true },
+    allowImageOptimization: false
   }),
 
   getters: {
@@ -71,6 +72,10 @@ export const useSettingsStore = defineStore('settings', {
     updateNotifications(notifications) {
       this.notifications = { ...this.notifications, ...notifications }
     },
+    setAllowImageOptimization(value) {
+      this.allowImageOptimization = value
+      this.persist()
+    },
     activatePremium() {
       this.isPremium = true
       localStorage.setItem('isPremium', 'true')
@@ -89,7 +94,8 @@ export const useSettingsStore = defineStore('settings', {
     persist() {
       localStorage.setItem('settings-store', JSON.stringify({
         theme: this.theme, locale: this.locale, sidebarCollapsed: this.sidebarCollapsed,
-        transferSettings: this.transferSettings, notifications: this.notifications
+        transferSettings: this.transferSettings, notifications: this.notifications,
+        allowImageOptimization: this.allowImageOptimization
       }))
     },
     restore() {

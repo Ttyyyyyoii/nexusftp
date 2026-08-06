@@ -83,6 +83,19 @@
             </label>
           </div>
         </div>
+        <div class="glass-panel rounded-2xl p-6 relative">
+          <h2 class="text-lg font-semibold text-surface-900 dark:text-white mb-4 flex items-center gap-2"><Image class="w-5 h-5 text-primary-500" />Optimisation d'Images</h2>
+          <div class="space-y-4">
+            <div class="flex items-center justify-between" :class="{'opacity-50': !settingsStore.isPremium}">
+              <div class="flex items-center gap-2">
+                <span class="font-medium text-surface-800 dark:text-surface-200">Autoriser l'écrasement des images (In-Place)</span>
+                <Lock v-if="!settingsStore.isPremium" class="w-3.5 h-3.5 text-surface-400" />
+              </div>
+              <input v-model="allowImageOptimization" type="checkbox" :disabled="!settingsStore.isPremium" class="w-5 h-5 rounded border-surface-300 text-primary-600 focus:ring-primary-500 disabled:opacity-50" />
+            </div>
+            <p class="text-xs text-surface-500 dark:text-surface-400">Si activé, l'optimisation GD va réduire le poids de vos images JPEG/PNG sans modifier le nom du fichier. Le fichier original sera écrasé.</p>
+          </div>
+        </div>
         <div class="flex justify-end gap-3">
           <button @click="resetSettings" class="btn-secondary">{{ $t('common.reset') }}</button>
           <button @click="saveSettings" class="btn-primary">{{ $t('common.save') }}</button>
@@ -98,16 +111,17 @@
 import AppLayout from '@/layouts/AppLayout.vue'
 import PremiumModal from '@/components/PremiumModal.vue'
 import { useSettingsStore } from '@/stores/settings'
-import { Palette, Sun, Moon, ArrowUpDown, Network, Bell, Star, Sparkles, Lock } from 'lucide-vue-next'
+import { Palette, Sun, Moon, ArrowUpDown, Network, Bell, Star, Sparkles, Lock, Image } from 'lucide-vue-next'
 export default {
   name: 'SettingsPage',
-  components: { AppLayout, PremiumModal, Palette, Sun, Moon, ArrowUpDown, Network, Bell, Star, Sparkles, Lock },
+  components: { AppLayout, PremiumModal, Palette, Sun, Moon, ArrowUpDown, Network, Bell, Star, Sparkles, Lock, Image },
   data() {
     return {
       settingsStore: useSettingsStore(),
       locale: 'en',
       transferSettings: { maxSimultaneous: 2, timeout: 30, retries: 0, maxFileSize: 256, passiveMode: true, transferMode: 'binary' },
       notifications: { transferComplete: true, connectionStatus: true, errors: true },
+      allowImageOptimization: false,
       showPremiumModal: false
     }
   },
@@ -126,6 +140,7 @@ export default {
     this.locale = this.settingsStore.locale
     this.transferSettings = { ...this.settingsStore.transferSettings }
     this.notifications = { ...this.settingsStore.notifications }
+    this.allowImageOptimization = this.settingsStore.allowImageOptimization
   },
   watch: {
     notifications: {
@@ -165,12 +180,14 @@ export default {
       
       this.settingsStore.updateTransferSettings(this.transferSettings); 
       this.settingsStore.updateNotifications(this.notifications); 
+      this.settingsStore.setAllowImageOptimization(this.allowImageOptimization);
       this.settingsStore.persist(); 
       this.showToast('Settings saved', 'success') 
     },
     resetSettings() { 
       this.transferSettings = { maxSimultaneous: 2, timeout: 30, retries: 0, maxFileSize: 256, passiveMode: true, transferMode: 'binary' }; 
-      this.notifications = { transferComplete: true, connectionStatus: true, errors: true } 
+      this.notifications = { transferComplete: true, connectionStatus: true, errors: true };
+      this.allowImageOptimization = false;
     },
     showToast(title, type) { window.dispatchEvent(new CustomEvent('show-toast', { detail: { title, type } })) }
   }

@@ -11,6 +11,9 @@
         <button @click="showSearch = true" :disabled="!connectionStore.isConnected" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-violet-600 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-all disabled:opacity-30">
           <SearchIcon class="w-4 h-4" /><span class="hidden sm:inline">Rechercher</span>
         </button>
+        <button @click="toggleAI" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all">
+          <Bot class="w-4 h-4" /><span class="hidden sm:inline">NexusBot IA</span>
+        </button>
         <button @click="openCreateModal('file')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all">
           <FilePlus class="w-4 h-4" /><span class="hidden sm:inline">Nouveau Fichier</span>
         </button>
@@ -39,7 +42,7 @@
               <FileList v-if="connectionStore.isConnected" :files="connectionStore.remoteFiles" :current-path="connectionStore.currentPath"
                 :is-remote="true" :loading="loading" @navigate="navigateRemote" @navigate-up="navigateUp" @refresh="refreshRemote"
                 @selection-change="remoteFilesSelected = $event"
-                @file-open="openFile" @upload="handleUpload" @download="handleDownload" @delete="handleDelete" @rename="handleRename" @edit="handleEdit" @share="handleShare" />
+                @file-open="openFile" @upload="handleUpload" @download="handleDownload" @delete="handleDelete" @rename="handleRename" @edit="handleEdit" @share="handleShare" @optimize="handleOptimize" />
               <div v-else class="flex flex-col items-center justify-center h-full text-center p-8">
                 <Unlink class="w-12 h-12 text-surface-300 dark:text-surface-700 mb-4" />
                 <p class="text-sm text-surface-500 dark:text-surface-400 mb-4">{{ $t('statusbar.notConnected') }}</p>
@@ -115,6 +118,12 @@
 
       <!-- Share Modal -->
       <ShareModal :visible="showShareModal" :file="shareFile" :remote-path="connectionStore.currentPath" @close="showShareModal = false" />
+      
+      <!-- Media Viewer -->
+      <MediaViewer :visible="showMediaViewer" :file="mediaViewerFile" :remote-path="connectionStore.currentPath" @close="showMediaViewer = false" />
+
+      <!-- AI Assistant -->
+      <AIAssistant :visible="showAI" :fileContext="aiContextFile" :fileContent="aiContextContent" @close="showAI = false" @clear-context="aiContextFile = null; aiContextContent = ''" />
     </div>
   </AppLayout>
 </template>
@@ -134,7 +143,9 @@ import BaseModal from '@/components/ui/BaseModal.vue'
 import MonacoEditor from '@/components/ui/MonacoEditor.vue'
 import SearchModal from '@/components/ftp/SearchModal.vue'
 import ShareModal from '@/components/ui/ShareModal.vue'
-import { Upload, Download, Trash2, Edit2, RefreshCw, FolderPlus, FilePlus, Monitor, Globe, Loader2, Unlink, Search as SearchIcon } from 'lucide-vue-next'
+import MediaViewer from '@/components/ui/MediaViewer.vue'
+import AIAssistant from '@/components/ftp/AIAssistant.vue'
+import { Upload, Download, Trash2, Edit2, RefreshCw, FolderPlus, FilePlus, Monitor, Globe, Loader2, Unlink, Search as SearchIcon, Bot } from 'lucide-vue-next'
 
 const LANG_MAP = {
   js: 'javascript', ts: 'typescript', vue: 'html', html: 'html', htm: 'html',
@@ -145,7 +156,7 @@ const LANG_MAP = {
 
 export default {
   name: 'FilesPage',
-  components: { AppLayout, Splitpanes, Pane, FileList, LocalFileBrowser, TransferPanel, BaseModal, MonacoEditor, SearchModal, ShareModal, Monitor, Globe, Loader2, Unlink, FolderPlus, FilePlus, Upload, Download, Trash2, Edit2, RefreshCw, SearchIcon },
+  components: { AppLayout, Splitpanes, Pane, FileList, LocalFileBrowser, TransferPanel, BaseModal, MonacoEditor, SearchModal, ShareModal, MediaViewer, AIAssistant, Monitor, Globe, Loader2, Unlink, FolderPlus, FilePlus, Upload, Download, Trash2, Edit2, RefreshCw, SearchIcon, Bot },
   data() {
     return {
       connectionStore: useConnectionStore(),
@@ -158,6 +169,8 @@ export default {
       showFileEditor: false, fileEditorFile: null, fileEditorContent: '', isEditingFile: false,
       showSearch: false,
       showShareModal: false, shareFile: null,
+      showMediaViewer: false, mediaViewerFile: null,
+      showAI: false, aiContextFile: null, aiContextContent: '',
       globalLoader: { show: false, title: '', message: '' }
     }
   },
@@ -191,7 +204,71 @@ export default {
     async navigateRemote(path) { this.loading = true; try { await this.connectionStore.listRemotePath(path); this.logStore.logInfo(`Navigated to ${path}`) } catch (err) { this.logStore.logError(`Navigation failed: ${err.message}`) } this.loading = false },
     async navigateUp() { const path = this.connectionStore.currentPath; const parent = path.split('/').filter(Boolean).slice(0, -1).join('/'); await this.navigateRemote('/' + parent) },
     async refreshRemote() { this.loading = true; try { await this.connectionStore.listRemotePath(this.connectionStore.currentPath) } catch (err) { console.error('Refresh error:', err) } this.loading = false; this.remoteFilesSelected = []; },
-    openFile(file) { if (file.isDirectory) { const newPath = this.connectionStore.currentPath.replace(/\/$/, '') + '/' + file.name; this.navigateRemote(newPath + '/') } },
+    openFile(file) { 
+      if (file.isDirectory) { 
+        const newPath = this.connectionStore.currentPath.replace(/\/$/, '') + '/' + file.name; 
+        this.navigateRemote(newPath + '/') 
+      } else {
+        const ext = file.name.split('.').pop().toLowerCase()
+        const mediaExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'mp4', 'webm', 'ogg', 'mov', 'mp3', 'wav', 'm4a']
+        if (mediaExts.includes(ext)) {
+          this.mediaViewerFile = file
+          this.showMediaViewer = true
+        } else {
+          this.handleEdit(file)
+        }
+      } 
+    },
+    handleShare(file) {
+      if (!this.settingsStore.isPremium) {
+        window.dispatchEvent(new CustomEvent('show-premium-modal'));
+        return;
+      }
+      this.shareFile = file;
+      this.showShareModal = true;
+    },
+    async handleOptimize(file) {
+      if (!this.settingsStore.isPremium) {
+        window.dispatchEvent(new CustomEvent('show-premium-modal'));
+        return;
+      }
+      if (!this.settingsStore.allowImageOptimization) {
+        this.showToast('L\'optimisation d\'images est désactivée dans vos paramètres. Veuillez l\'activer pour l\'utiliser.', 'warning');
+        return;
+      }
+      
+      this.globalLoader = { show: true, title: 'Optimisation en cours', message: `Compression in-place de ${file.name}...` };
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/optimize.php`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            sessionId: this.connectionStore.sessionId,
+            remotePath: this.connectionStore.currentPath,
+            remoteName: file.name
+          })
+        });
+        const data = await response.json();
+        if (data.success) {
+          this.showToast(`${file.name} optimisé (-${data.savedPercentage}%)`, 'success');
+          this.refreshRemote();
+        } else {
+          this.showToast(data.message || 'Erreur lors de l\'optimisation', 'error');
+        }
+      } catch (err) {
+        this.showToast('Erreur réseau', 'error');
+      } finally {
+        this.globalLoader.show = false;
+      }
+    },
+    toggleAI() {
+      if (!this.settingsStore.isPremium) {
+        window.dispatchEvent(new CustomEvent('show-premium-modal'));
+        return;
+      }
+      this.showAI = !this.showAI;
+    },
     async handleEdit(file) {
       if (file.isDirectory) return;
       this.globalLoader = { show: true, title: 'Ouverture en cours', message: `Téléchargement de ${file.name}...` };
@@ -200,6 +277,12 @@ export default {
         this.fileEditorContent = await blob.text();
         this.fileEditorFile = file;
         this.showFileEditor = true;
+        
+        // Also update AI context if AI is open
+        if (this.showAI) {
+          this.aiContextFile = file;
+          this.aiContextContent = this.fileEditorContent;
+        }
       } catch (err) {
         this.showToast(`Erreur de téléchargement: ${err.message}`, 'error');
       } finally {
