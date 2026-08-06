@@ -5,15 +5,39 @@ export const useSettingsStore = defineStore('settings', {
     theme: localStorage.getItem('theme') || 'light',
     locale: localStorage.getItem('locale') || 'en',
     sidebarCollapsed: false,
+    isPremium: localStorage.getItem('isPremium') === 'true',
     transferSettings: {
-      maxSimultaneous: 3, timeout: 30, retries: 3,
-      maxFileSize: 2048, passiveMode: true, transferMode: 'binary'
+      maxSimultaneous: 2, timeout: 30, retries: 0,
+      maxFileSize: 256, passiveMode: true, transferMode: 'binary'
     },
     notifications: { transferComplete: true, connectionStatus: true, errors: true }
   }),
 
   getters: {
-    isDark: (state) => state.theme === 'dark'
+    isDark: (state) => state.theme === 'dark',
+    planLimits: (state) => {
+      if (state.isPremium) {
+        return {
+          maxSimultaneous: 10,
+          maxFileSize: 512, // in MB
+          maxSavedConnections: 999, // unlimited
+          maxHistory: 999, // unlimited
+          allowRetry: true,
+          allowTimeoutChange: true,
+          allowTransferModeChange: true
+        }
+      } else {
+        return {
+          maxSimultaneous: 2,
+          maxFileSize: 256, // in MB
+          maxSavedConnections: 2,
+          maxHistory: 10,
+          allowRetry: false,
+          allowTimeoutChange: false,
+          allowTransferModeChange: false
+        }
+      }
+    }
   },
 
   actions: {
@@ -45,6 +69,21 @@ export const useSettingsStore = defineStore('settings', {
     updateNotifications(notifications) {
       this.notifications = { ...this.notifications, ...notifications }
     },
+    activatePremium() {
+      this.isPremium = true
+      localStorage.setItem('isPremium', 'true')
+    },
+    deactivatePremium() {
+      this.isPremium = false
+      localStorage.setItem('isPremium', 'false')
+      // Reset settings to free limits
+      this.transferSettings.maxSimultaneous = Math.min(this.transferSettings.maxSimultaneous, 2)
+      this.transferSettings.maxFileSize = Math.min(this.transferSettings.maxFileSize, 256)
+      this.transferSettings.retries = 0
+      this.transferSettings.timeout = 30
+      this.transferSettings.transferMode = 'binary'
+      this.persist()
+    },
     persist() {
       localStorage.setItem('settings-store', JSON.stringify({
         theme: this.theme, locale: this.locale, sidebarCollapsed: this.sidebarCollapsed,
@@ -53,7 +92,20 @@ export const useSettingsStore = defineStore('settings', {
     },
     restore() {
       const stored = localStorage.getItem('settings-store')
-      if (stored) Object.assign(this, JSON.parse(stored))
+      if (stored) {
+        const parsed = JSON.parse(stored)
+        if (parsed.transferSettings) {
+            // Apply free limits if not premium
+            if (!this.isPremium) {
+                parsed.transferSettings.maxSimultaneous = Math.min(parsed.transferSettings.maxSimultaneous || 2, 2)
+                parsed.transferSettings.maxFileSize = Math.min(parsed.transferSettings.maxFileSize || 256, 256)
+                parsed.transferSettings.retries = 0
+                parsed.transferSettings.timeout = 30
+                parsed.transferSettings.transferMode = 'binary'
+            }
+        }
+        Object.assign(this, parsed)
+      }
       this.applyTheme()
     }
   }

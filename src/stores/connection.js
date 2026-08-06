@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import CryptoJS from 'crypto-js'
+import { useSettingsStore } from './settings'
 
 const API_BASE = '/api'
 
@@ -261,6 +262,12 @@ export const useConnectionStore = defineStore('connection', {
     saveConnection(config) {
       const exists = this.savedConnections.find(c => c.host === config.host && c.username === config.username)
       if (!exists) {
+        // Enforce plan limits
+        const settingsStore = useSettingsStore()
+        if (this.savedConnections.length >= settingsStore.planLimits.maxSavedConnections) {
+          throw new Error('PREMIUM_REQUIRED_SAVED_CONNECTIONS')
+        }
+
         this.savedConnections.push({
           id: Date.now(), host: config.host, port: config.port,
           username: config.username, type: config.type,

@@ -16,6 +16,13 @@
             :class="$route.path === item.path ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400' : 'text-surface-600 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800'">
             {{ $t(item.label) }}
           </router-link>
+          <!-- Premium Link -->
+          <div v-if="settingsStore.isPremium" class="px-3 py-1 ml-2 bg-gradient-to-r from-amber-200 to-amber-400 dark:from-amber-600 dark:to-amber-500 rounded-lg text-amber-900 dark:text-amber-50 text-xs font-bold uppercase tracking-wider flex items-center gap-1 shadow-glow cursor-default">
+            <Star class="w-3 h-3" /> Premium
+          </div>
+          <button v-else @click="showPremiumModal = true" class="px-3 py-1.5 ml-2 bg-gradient-to-r from-primary-500 to-purple-500 hover:from-primary-600 hover:to-purple-600 rounded-lg text-white text-xs font-semibold flex items-center gap-1.5 shadow transition-all hover:scale-105">
+            <Sparkles class="w-3.5 h-3.5" /> Premium
+          </button>
         </div>
         <div class="flex items-center gap-3">
           <div class="relative" ref="langMenuRef">
@@ -41,20 +48,23 @@
         </div>
       </div>
     </div>
+    <PremiumModal :visible="showPremiumModal" @close="showPremiumModal = false" />
   </nav>
 </template>
 
 <script>
 import { useSettingsStore } from '@/stores/settings'
-import { HardDrive, LogIn, Sun, Moon } from 'lucide-vue-next'
+import { HardDrive, LogIn, Sun, Moon, Star, Sparkles } from 'lucide-vue-next'
+import PremiumModal from '@/components/PremiumModal.vue'
 
 export default {
   name: 'AppNavbar',
-  components: { HardDrive, LogIn, Sun, Moon },
+  components: { HardDrive, LogIn, Sun, Moon, Star, Sparkles, PremiumModal },
   data() {
     return {
       settingsStore: useSettingsStore(),
       showLangMenu: false,
+      showPremiumModal: false,
       languages: [{ code: 'en', label: 'English' }, { code: 'fr', label: 'Français' }],
       navItems: [
         { path: '/', label: 'nav.home' },
@@ -64,9 +74,18 @@ export default {
       ]
     }
   },
-  mounted() { document.addEventListener('click', this.handleClickOutside) },
-  beforeUnmount() { document.removeEventListener('click', this.handleClickOutside) },
+  mounted() { 
+    document.addEventListener('click', this.handleClickOutside)
+    window.addEventListener('show-premium-modal', this.handleShowPremiumModal)
+  },
+  beforeUnmount() { 
+    document.removeEventListener('click', this.handleClickOutside)
+    window.removeEventListener('show-premium-modal', this.handleShowPremiumModal)
+  },
   methods: {
+    handleShowPremiumModal() {
+      this.showPremiumModal = true
+    },
     changeLanguage(code) { this.settingsStore.setLocale(code); this.$i18n.locale = code; this.showLangMenu = false },
     handleClickOutside(e) { if (this.$refs.langMenuRef && !this.$refs.langMenuRef.contains(e.target)) this.showLangMenu = false }
   }

@@ -141,8 +141,19 @@ export default {
     async handleConnect() {
       this.error = ''
       const result = await this.connectionStore.connect({ host: this.form.host, port: parseInt(this.form.port) || this.defaultPort, username: this.form.username, password: this.form.password, type: this.form.type, saveConnection: this.form.saveConnection })
-      if (result.success) { this.logStore.logConnection(`Connected to ${this.form.host}`); this.$router.push('/files') }
-      else { this.error = result.error || 'Connection failed'; this.logStore.logError(`Connection failed: ${this.error}`) }
+      if (result.success) { 
+        this.logStore.logConnection(`Connected to ${this.form.host}`); 
+        this.$router.push('/files') 
+      }
+      else { 
+        if (result.error === 'PREMIUM_REQUIRED_SAVED_CONNECTIONS') {
+          this.error = "Limite de connexions sauvegardées atteinte. Veuillez passer en Premium."
+          window.dispatchEvent(new CustomEvent('show-premium-modal'))
+        } else {
+          this.error = result.error || 'Connection failed'
+        }
+        this.logStore.logError(`Connection failed: ${this.error}`) 
+      }
     },
     async testConnection() { this.testing = true; this.error = ''; try { const result = await this.connectionStore.connect({ host: this.form.host, port: parseInt(this.form.port) || this.defaultPort, username: this.form.username, password: this.form.password, type: this.form.type, saveConnection: false }); if (result.success) { await this.connectionStore.disconnect(); this.showToast('Connection test successful', 'success') } else this.error = result.error || 'Connection test failed' } finally { this.testing = false } },
     quickConnect(conn) { this.form = { host: conn.host, port: conn.port || '', username: conn.username, password: this.connectionStore.getDecryptedPassword(conn.password), type: conn.type, saveConnection: false } },

@@ -293,5 +293,23 @@
     "yes": "Yes",
     "no": "No",
     "ok": "OK"
+  },
+  "premium": {
+    "title": "Upgrade to Premium",
+    "subtitle": "Unlock Maximum Power",
+    "description": "Enjoy unlimited transfers, advanced options, and an uncompromised professional experience.",
+    "f1_title": "Multiple Transfers",
+    "f1_desc": "Send up to 10 files simultaneously",
+    "f2_title": "Large Files",
+    "f2_desc": "Transfer files up to 512 MB",
+    "f3_title": "Unlimited Connections",
+    "f3_desc": "Save as many connections as you want",
+    "f4_title": "Advanced Control",
+    "f4_desc": "Auto-retries and timeout configuration",
+    "activate": "Activate Premium Mode",
+    "deactivate": "Deactivate",
+    "note": "Note: This is a local simulation for demonstration.",
+    "success": "Premium Mode successfully activated",
+    "deactivated": "Premium Mode deactivated"
   }
 }

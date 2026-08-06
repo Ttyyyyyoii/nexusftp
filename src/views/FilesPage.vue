@@ -116,6 +116,7 @@ import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 import { useConnectionStore } from '@/stores/connection'
 import { useTransfersStore } from '@/stores/transfers'
+import { useSettingsStore } from '@/stores/settings'
 import { useLogStore } from '@/stores/log'
 import FileList from '@/components/ftp/FileList.vue'
 import LocalFileBrowser from '@/components/ftp/LocalFileBrowser.vue'
@@ -194,7 +195,27 @@ export default {
       }
     },
     async handleUpload(files) { 
-      const total = files.length;
+      const settingsStore = useSettingsStore()
+      const maxSimultaneous = settingsStore.planLimits.maxSimultaneous
+      const maxFileSizeMB = settingsStore.planLimits.maxFileSize
+      const maxFileSizeBytes = maxFileSizeMB * 1024 * 1024
+
+      // Filter files by size
+      const validFiles = []
+      for (const file of files) {
+        if (file.size > maxFileSizeBytes) {
+          this.showToast(`Le fichier ${file.name} dépasse la limite de ${maxFileSizeMB} MB`, 'error')
+        } else {
+          validFiles.push(file)
+        }
+      }
+
+      if (validFiles.length === 0) return;
+      if (validFiles.length < files.length && !settingsStore.isPremium) {
+        window.dispatchEvent(new CustomEvent('show-premium-modal'))
+      }
+
+      const total = validFiles.length;
       this.globalLoader = { 
         show: true, 
         title: 'Envoi en cours', 
@@ -204,7 +225,6 @@ export default {
       };
       
       let successCount = 0;
-      const maxConcurrent = 5;
       let activeUploads = 0;
       let currentIndex = 0;
       
@@ -218,10 +238,10 @@ export default {
             return;
           }
           
-          while (activeUploads < maxConcurrent && currentIndex < total) {
+          while (activeUploads < maxSimultaneous && currentIndex < total) {
             const i = currentIndex++;
             activeUploads++;
-            const file = files[i];
+            const file = validFiles[i];
             
             let targetPath = this.connectionStore.currentPath;
             let relativeDir = '';

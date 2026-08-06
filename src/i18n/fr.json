@@ -283,5 +283,23 @@
     "yes": "Oui",
     "no": "Non",
     "ok": "OK"
+  },
+  "premium": {
+    "title": "Passer en Premium",
+    "subtitle": "Débloquez la Puissance Maximale",
+    "description": "Bénéficiez de transferts illimités, d'options avancées et d'une expérience professionnelle sans compromis.",
+    "f1_title": "Transferts Multiples",
+    "f1_desc": "Envoyez jusqu'à 10 fichiers simultanément",
+    "f2_title": "Gros Fichiers",
+    "f2_desc": "Transférez des fichiers jusqu'à 512 MB",
+    "f3_title": "Connexions Illimitées",
+    "f3_desc": "Sauvegardez autant de connexions que vous voulez",
+    "f4_title": "Contrôle Avancé",
+    "f4_desc": "Délai d'attente et tentatives auto-configurables",
+    "activate": "Activer le Mode Premium",
+    "deactivate": "Désactiver",
+    "note": "Note : Ceci est une simulation locale pour la démonstration.",
+    "success": "Mode Premium activé avec succès",
+    "deactivated": "Mode Premium désactivé"
   }
 }
