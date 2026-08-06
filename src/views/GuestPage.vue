@@ -15,7 +15,7 @@
         {{ $t('guest.pageBadge') }}
       </span>
       <button @click="toggleTheme" class="p-2 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors">
-        <Sun v-if="isDark" class="w-5 h-5 text-amber-400" />
+        <Sun v-if="settingsStore.isDark" class="w-5 h-5 text-amber-400" />
         <Moon v-else class="w-5 h-5 text-surface-500" />
       </button>
     </header>
@@ -220,6 +220,8 @@ import ToastContainer from '@/components/ui/ToastContainer.vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
 import MonacoEditor from '@/components/ui/MonacoEditor.vue'
 
+import { useSettingsStore } from '@/stores/settings'
+
 const LANG_MAP = {
   js: 'javascript', ts: 'typescript', vue: 'html', html: 'html', htm: 'html',
   css: 'css', scss: 'scss', less: 'less', php: 'php', py: 'python',
@@ -237,6 +239,7 @@ export default {
   },
   data() {
     return {
+      settingsStore: useSettingsStore(),
       token: '',
       password: '',
       needsPassword: true,
@@ -246,7 +249,6 @@ export default {
       files: [],
       currentPath: '/',
       permission: 'read',
-      isDark: false,
       showFileEditor: false,
       fileEditorFile: null,
       fileEditorContent: '',
@@ -273,27 +275,13 @@ export default {
     }
     // Probe without password first
     this.loadFiles(true)
-
-    // Apply theme
-    const saved = localStorage.getItem('theme')
-    this.isDark = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)
-    this.applyTheme()
   },
   methods: {
     showToast(title, type = 'info') {
       window.dispatchEvent(new CustomEvent('show-toast', { detail: { title, type } }))
     },
-    applyTheme() {
-      if (this.isDark) {
-        document.documentElement.classList.add('dark')
-      } else {
-        document.documentElement.classList.remove('dark')
-      }
-    },
     toggleTheme() {
-      this.isDark = !this.isDark
-      localStorage.setItem('theme', this.isDark ? 'dark' : 'light')
-      this.applyTheme()
+      this.settingsStore.toggleTheme()
     },
     async authenticate() {
       this.authError = null
