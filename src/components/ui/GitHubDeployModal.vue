@@ -144,7 +144,15 @@
           </div>
         </div>
 
-        <!-- Confirm delete dialog -->
+        <!-- Bouton Actualiser les fichiers FTP -->
+        <div class="border-t border-surface-200 dark:border-surface-700 pt-4 mt-2">
+          <button @click="$emit('refresh-files')" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-surface-100 dark:bg-surface-800 hover:bg-surface-200 dark:hover:bg-surface-700 text-surface-600 dark:text-surface-300 text-sm font-medium transition-all">
+            <RefreshCw class="w-4 h-4" />
+            Actualiser la liste des fichiers FTP
+          </button>
+          <p class="text-xs text-surface-400 text-center mt-2">Cliquez ici pour voir les fichiers récemment déployés</p>
+        </div>
+
         <div v-if="deletingDep" class="bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 rounded-xl p-4 space-y-3">
           <p class="text-sm font-medium text-rose-700 dark:text-rose-300">⚠️ Supprimer le déploiement <strong>{{ deletingDep.githubRepo }}</strong> → <strong>{{ deletingDep.remotePath }}</strong> ?</p>
           <p class="text-xs text-rose-600 dark:text-rose-400">Le webhook GitHub sera également supprimé (si vous êtes connecté à GitHub).</p>
@@ -158,10 +166,6 @@
           </div>
         </div>
 
-        <div v-if="manageError" class="flex items-start gap-2 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 rounded-xl p-3">
-          <AlertCircle class="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
-          <p class="text-sm text-rose-700 dark:text-rose-300">{{ manageError }}</p>
-        </div>
       </template>
 
     </div>
@@ -196,7 +200,7 @@ export default {
     currentPath: { type: String,  default: '/'   },
     sessionId:   { type: String,  default: ''    }
   },
-  emits: ['close'],
+  emits: ['close', 'refresh-files'],
   data() {
     return {
       activeTab: 'new',

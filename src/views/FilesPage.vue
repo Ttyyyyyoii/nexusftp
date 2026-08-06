@@ -129,7 +129,7 @@
       <AIAssistant :visible="showAI" :fileContext="aiContextFile" :fileContent="aiContextContent" @close="showAI = false" @clear-context="aiContextFile = null; aiContextContent = ''" />
 
       <!-- GitHub Deploy Modal -->
-      <GitHubDeployModal :visible="showGitHub" :current-path="connectionStore.currentPath" :session-id="connectionStore.sessionId" @close="showGitHub = false" />
+      <GitHubDeployModal :visible="showGitHub" :current-path="connectionStore.currentPath" :session-id="connectionStore.sessionId" @close="showGitHub = false" @refresh-files="refreshRemote" />
     </div>
   </AppLayout>
 </template>
