@@ -162,6 +162,7 @@ export default {
       connectionStore: useConnectionStore(),
       transfersStore: useTransfersStore(),
       logStore: useLogStore(),
+      settingsStore: useSettingsStore(),
       loading: false, leftPanelSize: 50, localFilesSelected: [], remoteFilesSelected: [],
       showCreateModal: false, createType: 'folder', newItemName: '',
       showRename: false, renameOldName: '', renameNewName: '',
