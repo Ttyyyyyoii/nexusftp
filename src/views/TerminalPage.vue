@@ -10,19 +10,19 @@
             {{ $t('nav.terminal') }}
           </h1>
           <p class="text-surface-400 text-sm mt-1">
-            Console SSH Interactive
+            {{ $t('terminal.title') }}
           </p>
         </div>
         <div class="flex items-center gap-3">
           <span v-if="connectionStore.isConnected && connectionInfo?.type === 'sftp'" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs font-medium border border-emerald-500/20">
             <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            Connecté (SSH)
+            {{ $t('terminal.connectedSsh') }}
           </span>
           <span v-else-if="connectionStore.isConnected" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-500/10 text-amber-400 text-xs font-medium border border-amber-500/20">
             <AlertCircle class="w-3.5 h-3.5" />
-            Limité ({{ connectionInfo?.type?.toUpperCase() || 'FTP' }})
+            {{ $t('terminal.limitedMode', { type: connectionInfo?.type?.toUpperCase() || 'FTP' }) }}
           </span>
-          <button @click="clearTerminal" class="p-2 rounded-lg bg-surface-900 text-surface-400 hover:text-white hover:bg-surface-800 transition-colors" title="Effacer l'écran">
+          <button @click="clearTerminal" class="p-2 rounded-lg bg-surface-900 text-surface-400 hover:text-white hover:bg-surface-800 transition-colors" :title="$t('terminal.clearTitle')">
             <Trash2 class="w-4 h-4" />
           </button>
         </div>
@@ -50,14 +50,13 @@
           <div class="mb-4 text-surface-500">
             <div>Welcome to NexusFTP Web Terminal v1.0.0</div>
             <div v-if="!connectionStore.isConnected" class="text-rose-400 mt-2">
-              Erreur: Vous devez d'abord vous connecter à un serveur.
+              {{ $t('terminal.notConnectedErr') }}
             </div>
             <div v-else-if="connectionInfo?.type !== 'sftp'" class="text-amber-400 mt-2">
-              Attention: Le terminal complet nécessite une connexion SFTP (SSH). 
-              La connexion actuelle ({{ connectionInfo?.type?.toUpperCase() || 'FTP' }}) ne supporte pas l'exécution de commandes système directes.
+              {{ $t('terminal.limitedWarning', { type: connectionInfo?.type?.toUpperCase() || 'FTP' }) }}
             </div>
             <div v-else class="text-emerald-400 mt-2">
-              Connexion SSH établie avec {{ connectionInfo?.host }}. Tapez vos commandes ci-dessous.
+              {{ $t('terminal.sshEstablished', { host: connectionInfo?.host }) }}
             </div>
           </div>
 
@@ -90,7 +89,7 @@
 
           <!-- Executing indicator -->
           <div v-if="executing" class="text-surface-500 mt-2 flex items-center gap-2">
-            <Loader2 class="w-4 h-4 animate-spin" /> Exécution...
+            <Loader2 class="w-4 h-4 animate-spin" /> {{ $t('terminal.executing') }}
           </div>
         </div>
       </div>
