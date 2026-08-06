@@ -9,71 +9,99 @@ if (!$prompt) {
     sendError('Prompt is required');
 }
 
-// Les clés API Gemini fournies par l'utilisateur
+// Clés API Gemini (avec fallback automatique si quota épuisé)
 $apiKeys = [
     'AQ.Ab8RN6K7AchGxt5fOv3hEhR5LukoAjfOK7MH_oU188SMKCNk7g',
     'AQ.Ab8RN6JAmBWhmplVzUVtYj6GhcssecJZIDYbcDQRiPgeyz09sA',
     'AQ.Ab8RN6KV03CBLyMDKbUEP9d34LRuVdUrdV6bIiAvQHU-Z87RGQ'
 ];
 
+$modelName = 'gemini-2.5-flash'; // Modèle actuel stable
+
+// Construction du prompt complet
 $fullPrompt = $prompt;
 if ($fileContent) {
-    // Si un contexte de fichier est fourni, on demande à l'IA de l'analyser
-    $fullPrompt .= "\n\n--- FILE CONTEXT ---\n" . substr($fileContent, 0, 50000) . "\n--- END OF FILE CONTEXT ---\n";
+    $fullPrompt .= "\n\n--- FILE CONTEXT ---\n" . substr($fileContent, 0, 50000) . "\n--- END OF FILE CONTEXT ---";
 }
 
-$success = false;
-$responseContent = '';
-$lastError = '';
-
-// Rotation et Fallback sur les clés API
-foreach ($apiKeys as $key) {
-    // Note: The provided keys look like Google Cloud API keys, they might need to be used with the correct Gemini endpoint.
-    // We will use the standard Gemini endpoint. If they are OAuth tokens, they might not work here.
-    // Assuming they are standard Gemini API keys:
-    $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=" . $key;
-    
-    $payload = [
-        "contents" => [
-            [
-                "parts" => [
-                    ["text" => $fullPrompt]
-                ]
-            ]
-        ],
-        "systemInstruction" => [
+$payload = [
+    "contents" => [
+        [
             "parts" => [
-                ["text" => "Tu es NexusBot, un assistant IA expert en programmation intégré dans le client FTP 'NexusFTP'. Réponds toujours de manière concise et utile. Tu aides l'utilisateur à comprendre ses fichiers, trouver des bugs ou optimiser son code. Si on te donne un contexte de fichier, base ta réponse dessus."]
+                ["text" => $fullPrompt]
             ]
         ]
-    ];
-    
+    ],
+    "systemInstruction" => [
+        "parts" => [
+            ["text" => "Tu es NexusBot, un assistant IA expert en développement web intégré dans NexusFTP, un client FTP premium. Tu aides l'utilisateur à comprendre ses fichiers, trouver des bugs, optimiser son code ou expliquer des concepts. Réponds toujours de manière concise, claire et structurée. Si un contexte de fichier est fourni, base ta réponse dessus. Utilise du markdown pour les blocs de code."]
+        ]
+    ]
+];
+
+// Fonction d'appel à Gemini (inspirée du projet de référence)
+function callGemini($apiKey, $modelName, $payload) {
+    $cleanKey = trim($apiKey);
+    $url = 'https://generativelanguage.googleapis.com/v1beta/models/' . urlencode($modelName) . ':generateContent?key=' . urlencode($cleanKey);
+
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json', 'Expect:']);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-    
-    $result = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 45);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+
+    $body    = curl_exec($ch);
+    $curlErr = curl_error($ch);
+    $status  = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
-    
-    if ($httpCode === 200 && $result) {
-        $json = json_decode($result, true);
-        if (isset($json['candidates'][0]['content']['parts'][0]['text'])) {
-            $responseContent = $json['candidates'][0]['content']['parts'][0]['text'];
-            $success = true;
-            break; // Succès ! On arrête d'essayer les autres clés.
+
+    if ($body === false) {
+        return ['ok' => false, 'status' => 0, 'error' => $curlErr ?: 'Erreur cURL', 'raw' => null];
+    }
+
+    $decoded = json_decode($body, true);
+
+    if ($status < 200 || $status >= 300 || (is_array($decoded) && isset($decoded['error']))) {
+        return [
+            'ok'     => false,
+            'status' => $status,
+            'error'  => is_array($decoded) && isset($decoded['error']['message'])
+                ? $decoded['error']['message']
+                : ('Gemini HTTP ' . $status),
+            'raw'    => $decoded ?: $body
+        ];
+    }
+
+    return ['ok' => true, 'status' => $status, 'data' => $decoded];
+}
+
+// Rotation des clés avec fallback
+$lastError = null;
+
+foreach ($apiKeys as $apiKey) {
+    $result = callGemini($apiKey, $modelName, $payload);
+
+    if ($result['ok']) {
+        $text = $result['data']['candidates'][0]['content']['parts'][0]['text'] ?? null;
+        if ($text) {
+            sendSuccess(['reply' => $text]);
+            exit;
         }
-    } else {
-        $lastError = $result;
+    }
+
+    $lastError = $result;
+
+    // Si l'erreur est liée à la clé (quota, auth, bad request), on essaie la suivante
+    // Sinon (panne réseau) on sort de la boucle
+    if (!in_array($result['status'], [400, 401, 403, 429, 500, 503])) {
+        break;
     }
 }
 
-if ($success) {
-    sendSuccess(['reply' => $responseContent]);
-} else {
-    sendError('Toutes les clés API ont échoué ou les quotas sont épuisés. Dernière erreur : ' . $lastError);
-}
+// Toutes les clés ont échoué
+$debugMsg = isset($lastError['error']) ? $lastError['error'] : 'Erreur inconnue';
+sendError('NexusBot indisponible. ' . $debugMsg);
 ?>
