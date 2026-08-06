@@ -14,11 +14,9 @@ export default {
     readOnly: { type: Boolean, default: false }
   },
   emits: ['update:modelValue'],
-  data() {
-    return {
-      editor: null,
-      monaco: null
-    }
+  created() {
+    this.editor = null;
+    this.monaco = null;
   },
   mounted() {
     this.initEditor()
