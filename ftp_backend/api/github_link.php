@@ -32,7 +32,8 @@ $webhookToken = bin2hex(random_bytes(16));
 $webhookSecret = bin2hex(random_bytes(16)); // Pour valider les payloads GitHub
 
 // L'URL publique du webhook (sur Render)
-$scheme = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+$isHttps = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
+$scheme = $isHttps ? 'https' : 'http';
 $host   = $_SERVER['HTTP_HOST'] ?? 'nexusftp.onrender.com';
 $webhookUrl = $scheme . '://' . $host . '/api/github_webhook.php?token=' . $webhookToken;
 
