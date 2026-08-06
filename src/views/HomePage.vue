@@ -1,7 +1,7 @@
 <template>
   <DefaultLayout>
     <!-- Hero Section -->
-    <section class="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
+    <section class="relative min-h-screen flex items-center justify-center overflow-hidden pt-32 pb-16">
       <div class="absolute inset-0">
         <div class="absolute inset-0 bg-gradient-to-br from-surface-0 via-primary-50/30 to-surface-0 dark:from-surface-950 dark:via-primary-900/10 dark:to-surface-950" />
         <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-400/20 rounded-full blur-3xl animate-pulse" />
@@ -10,9 +10,8 @@
           <div v-for="i in 20" :key="i" class="absolute w-1 h-1 bg-primary-400/40 rounded-full" :style="{ left: `${(i*5)%100}%`, top: `${(i*7)%100}%`, animation: `floatParticle ${6+(i%8)}s linear infinite`, animationDelay: `${i%5}s` }" />
         </div>
       </div>
-      <div class="relative z-10 max-w-6xl mx-auto px-6 text-center">
-        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 mb-8">
-          <Sparkles class="w-4 h-4 text-primary-500" />
+      <div class="relative z-10 max-w-6xl mx-auto px-6 text-center mt-12">
+        <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 mb-8">
           <span class="text-sm font-medium text-primary-700 dark:text-primary-300">{{ $t('home.hero.badge') }}</span>
         </div>
         <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
