@@ -229,8 +229,13 @@ export default {
             // Si on avait déjà enregistré un timestamp (pas le premier chargement de page)
             if (this.lastDeployTimestamp > 0) {
               this.showToast(`Déploiement GitHub ${deploy.repo} détecté. Actualisation...`, 'success')
-              // On rafraîchit si on est dans le même dossier ou un dossier parent
-              if (this.connectionStore.currentPath === deploy.remotePath || this.connectionStore.currentPath === '/') {
+              
+              // Nettoyer les slashes de fin pour la comparaison
+              const current = this.connectionStore.currentPath.replace(/\/$/, '') || '/'
+              const target = deploy.remotePath.replace(/\/$/, '') || '/'
+              
+              // On rafraîchit si on est dans le même dossier ou à la racine
+              if (current === target || current === '/') {
                 await this.refreshRemote()
               }
             }
