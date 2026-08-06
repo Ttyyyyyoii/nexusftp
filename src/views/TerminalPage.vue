@@ -14,13 +14,13 @@
           </p>
         </div>
         <div class="flex items-center gap-3">
-          <span v-if="connectionStore.isConnected && connectionStore.type === 'sftp'" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs font-medium border border-emerald-500/20">
+          <span v-if="connectionStore.isConnected && connectionInfo?.type === 'sftp'" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs font-medium border border-emerald-500/20">
             <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             Connecté (SSH)
           </span>
           <span v-else-if="connectionStore.isConnected" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-500/10 text-amber-400 text-xs font-medium border border-amber-500/20">
             <AlertCircle class="w-3.5 h-3.5" />
-            Mode Limité (Pas SSH)
+            Limité ({{ connectionInfo?.type?.toUpperCase() || 'FTP' }})
           </span>
           <button @click="clearTerminal" class="p-2 rounded-lg bg-surface-900 text-surface-400 hover:text-white hover:bg-surface-800 transition-colors" title="Effacer l'écran">
             <Trash2 class="w-4 h-4" />
@@ -39,7 +39,7 @@
           <div class="w-3 h-3 rounded-full bg-amber-500/80"></div>
           <div class="w-3 h-3 rounded-full bg-emerald-500/80"></div>
           <div class="flex-1 text-center text-xs text-surface-500 font-sans">
-            {{ connectionStore.isConnected ? `${connectionStore.username}@${connectionStore.host}` : 'nexus-terminal' }}
+                      Connecté à {{ connectionInfo?.username }}@{{ connectionInfo?.host }}
           </div>
         </div>
 
@@ -52,12 +52,12 @@
             <div v-if="!connectionStore.isConnected" class="text-rose-400 mt-2">
               Erreur: Vous devez d'abord vous connecter à un serveur.
             </div>
-            <div v-else-if="connectionStore.type !== 'sftp'" class="text-amber-400 mt-2">
+            <div v-else-if="connectionInfo?.type !== 'sftp'" class="text-amber-400 mt-2">
               Attention: Le terminal complet nécessite une connexion SFTP (SSH). 
-              La connexion actuelle ({{ connectionStore.type.toUpperCase() }}) ne supporte pas l'exécution de commandes système directes.
+              La connexion actuelle ({{ connectionInfo?.type?.toUpperCase() || 'FTP' }}) ne supporte pas l'exécution de commandes système directes.
             </div>
             <div v-else class="text-emerald-400 mt-2">
-              Connexion SSH établie avec {{ connectionStore.host }}.
+              Connexion SSH établie avec {{ connectionInfo?.host }}. Tapez vos commandes ci-dessous.
             </div>
           </div>
 
@@ -69,7 +69,7 @@
           </div>
 
           <!-- Current Input Line -->
-          <div v-if="connectionStore.isConnected && connectionStore.type === 'sftp'" class="flex items-center mt-2 group relative">
+          <div v-if="connectionStore.isConnected && connectionInfo?.type === 'sftp'" class="flex items-center mt-2 group relative">
             <span class="text-primary-500 mr-2 shrink-0">➜</span>
             <span class="text-emerald-400 mr-2 shrink-0">~</span>
             <input 
@@ -117,6 +117,9 @@ export default {
     }
   },
   computed: {
+    connectionInfo() {
+      return this.connectionStore.connectionInfo
+    },
     cursorOffset() {
       // Very basic approximation for monospace char width + the prompt width
       const promptWidth = 40 // roughly the width of "➜ ~ "
