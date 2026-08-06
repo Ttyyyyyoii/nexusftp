@@ -17,6 +17,9 @@
         <button @click="openGitHub" :disabled="!connectionStore.isConnected" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all disabled:opacity-30">
           <Github class="w-4 h-4" /><span class="hidden sm:inline">{{ $t('files.githubBtn') }}</span>
         </button>
+        <button @click="showGuestShare = true" :disabled="!connectionStore.isConnected" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all disabled:opacity-30">
+          <Users class="w-4 h-4" /><span class="hidden sm:inline">Inviter</span>
+        </button>
         <button @click="openCreateModal('file')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all">
           <FilePlus class="w-4 h-4" /><span class="hidden sm:inline">{{ $t('files.newFile') }}</span>
         </button>
@@ -130,6 +133,9 @@
 
       <!-- GitHub Deploy Modal -->
       <GitHubDeployModal :visible="showGitHub" :current-path="connectionStore.currentPath" :session-id="connectionStore.sessionId" @close="showGitHub = false" @refresh-files="refreshRemote" />
+      <!-- Guest Share Modal -->
+      <GuestShareModal :visible="showGuestShare" :current-path="connectionStore.currentPath" :session-id="connectionStore.activeSessionId" @close="showGuestShare = false" />
+      
     </div>
   </AppLayout>
 </template>
@@ -152,7 +158,8 @@ import ShareModal from '@/components/ui/ShareModal.vue'
 import MediaViewer from '@/components/ui/MediaViewer.vue'
 import AIAssistant from '@/components/ftp/AIAssistant.vue'
 import GitHubDeployModal from '@/components/ui/GitHubDeployModal.vue'
-import { Upload, Download, Trash2, Edit2, RefreshCw, FolderPlus, FilePlus, Monitor, Globe, Loader2, Unlink, Search as SearchIcon, Bot, Github } from 'lucide-vue-next'
+import GuestShareModal from '@/components/ui/GuestShareModal.vue'
+import { Upload, Download, Trash2, Edit2, RefreshCw, FolderPlus, FilePlus, Monitor, Globe, Loader2, Unlink, Search as SearchIcon, Bot, Github, Users } from 'lucide-vue-next'
 
 const LANG_MAP = {
   js: 'javascript', ts: 'typescript', vue: 'html', html: 'html', htm: 'html',
@@ -163,7 +170,7 @@ const LANG_MAP = {
 
 export default {
   name: 'FilesPage',
-  components: { AppLayout, Splitpanes, Pane, FileList, LocalFileBrowser, TransferPanel, BaseModal, MonacoEditor, SearchModal, ShareModal, MediaViewer, AIAssistant, GitHubDeployModal, Monitor, Globe, Loader2, Unlink, FolderPlus, FilePlus, Upload, Download, Trash2, Edit2, RefreshCw, SearchIcon, Bot, Github },
+  components: { AppLayout, Splitpanes, Pane, FileList, LocalFileBrowser, TransferPanel, BaseModal, MonacoEditor, SearchModal, ShareModal, MediaViewer, AIAssistant, GitHubDeployModal, GuestShareModal, Monitor, Globe, Loader2, Unlink, FolderPlus, FilePlus, Upload, Download, Trash2, Edit2, RefreshCw, SearchIcon, Bot, Github, Users },
   data() {
     return {
       connectionStore: useConnectionStore(),
@@ -179,6 +186,7 @@ export default {
       lastDeployTimestamp: 0,
       showSearch: false,
       showShareModal: false, shareFile: null,
+      showGuestShare: false,
       showMediaViewer: false, mediaViewerFile: null,
       showAI: false, aiContextFile: null, aiContextContent: '',
       showGitHub: false,
