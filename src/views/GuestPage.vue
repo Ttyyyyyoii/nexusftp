@@ -159,7 +159,7 @@
 
               <!-- Badge: folder -->
               <span v-if="file.isDirectory" class="hidden sm:inline text-xs px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 font-medium">
-                Dossier
+                {{ $t('files.newFolder').replace('Nouveau ', '').replace('New ', '') || 'Dossier' }}
               </span>
 
               <!-- Actions -->

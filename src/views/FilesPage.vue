@@ -18,7 +18,7 @@
           <Github class="w-4 h-4" /><span class="hidden sm:inline">{{ $t('files.githubBtn') }}</span>
         </button>
         <button @click="showGuestShare = true" :disabled="!connectionStore.isConnected" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all disabled:opacity-30">
-          <Users class="w-4 h-4" /><span class="hidden sm:inline">Inviter</span>
+          <Users class="w-4 h-4" /><span class="hidden sm:inline">{{ $t('guest.inviteBtn') }}</span>
         </button>
         <button @click="openCreateModal('file')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all">
           <FilePlus class="w-4 h-4" /><span class="hidden sm:inline">{{ $t('files.newFile') }}</span>
