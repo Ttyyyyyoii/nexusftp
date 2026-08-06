@@ -11,7 +11,7 @@
               {{ $t('nav.gallery') }}
             </h1>
             <p class="text-surface-400 mt-1 text-sm">
-              {{ $t('gallery.subtitle') }} — {{ connectionStore.currentPath || '/' }}
+              {{ $t('gallery.subtitle') }}
             </p>
           </div>
           <div class="flex items-center gap-3">
@@ -25,6 +25,33 @@
               <Grid3x3 v-else class="w-4 h-4" />
             </button>
           </div>
+        </div>
+
+        <!-- Folder navigation bar -->
+        <div v-if="connectionStore.isConnected" class="flex items-center gap-2 bg-surface-900 border border-surface-800 rounded-xl px-3 py-2">
+          <button @click="navigateUp" :disabled="currentPath === '/'" class="p-1.5 rounded-lg hover:bg-surface-800 disabled:opacity-30 transition-colors">
+            <ChevronLeft class="w-4 h-4 text-surface-400" />
+          </button>
+          <div class="flex items-center gap-1 flex-1 overflow-x-auto">
+            <button @click="navigateTo('/')" class="flex items-center gap-1 text-xs text-surface-500 hover:text-violet-400 transition-colors shrink-0">
+              <HomeIcon class="w-3.5 h-3.5" />
+            </button>
+            <span v-for="(seg, i) in pathSegments" :key="i" class="flex items-center gap-1 shrink-0">
+              <ChevronRight class="w-3 h-3 text-surface-600" />
+              <button @click="navigateTo(seg.path)" class="text-xs font-medium transition-colors" :class="i === pathSegments.length - 1 ? 'text-white' : 'text-surface-400 hover:text-violet-400'">{{ seg.name }}</button>
+            </span>
+          </div>
+          <!-- Subfolder list -->
+          <div class="flex items-center gap-1 ml-2">
+            <button v-for="folder in subfolders.slice(0,4)" :key="folder.name" @click="navigateTo(currentPath.replace(/\/$/,'') + '/' + folder.name)"
+              class="px-2 py-1 text-xs bg-surface-800 text-surface-300 hover:bg-violet-900/40 hover:text-violet-300 rounded-lg transition-colors truncate max-w-[80px]">
+              📁 {{ folder.name }}
+            </button>
+            <span v-if="subfolders.length > 4" class="text-xs text-surface-500">+{{ subfolders.length - 4 }}</span>
+          </div>
+          <button @click="refreshDir" class="p-1.5 rounded-lg hover:bg-surface-800 transition-colors">
+            <RefreshCwIcon class="w-3.5 h-3.5 text-surface-400" :class="navigating ? 'animate-spin' : ''" />
+          </button>
         </div>
 
         <!-- Not connected -->
@@ -120,21 +147,31 @@
 <script>
 import AppLayout from '@/layouts/AppLayout.vue'
 import { useConnectionStore } from '@/stores/connection'
-import { Image as ImageIcon, ImageOff, LayoutGrid, Grid3x3, Maximize2, X, ChevronLeft, ChevronRight, Download } from 'lucide-vue-next'
+import { Image as ImageIcon, ImageOff, LayoutGrid, Grid3x3, Maximize2, X, ChevronLeft, ChevronRight, Download, Home as HomeIcon, RefreshCw as RefreshCwIcon } from 'lucide-vue-next'
 
 const IMAGE_EXTS = new Set(['jpg','jpeg','png','gif','webp','svg','bmp','ico','avif','tiff','tif'])
 
 export default {
   name: 'GalleryPage',
-  components: { AppLayout, ImageIcon, ImageOff, LayoutGrid, Grid3x3, Maximize2, X, ChevronLeft, ChevronRight, Download },
+  components: { AppLayout, ImageIcon, ImageOff, LayoutGrid, Grid3x3, Maximize2, X, ChevronLeft, ChevronRight, Download, HomeIcon, RefreshCwIcon },
   data() {
     return {
       connectionStore: useConnectionStore(),
       gridSize: 'sm',
+      navigating: false,
       lightbox: { open: false, index: 0 }
     }
   },
   computed: {
+    currentPath() { return this.connectionStore.currentPath || '/' },
+    pathSegments() {
+      const parts = this.currentPath.split('/').filter(Boolean)
+      let accum = ''
+      return parts.map(p => { accum += '/' + p; return { name: p, path: accum } })
+    },
+    subfolders() {
+      return (this.connectionStore.remoteFiles || []).filter(f => f.isDirectory && f.name !== '.' && f.name !== '..')
+    },
     images() {
       return (this.connectionStore.remoteFiles || []).filter(f => {
         if (f.isDirectory) return false
@@ -159,6 +196,18 @@ export default {
       const path = (this.connectionStore.currentPath || '/').replace(/\/$/, '') + '/' + img.name
       return `${API_BASE}/download.php?sessionId=${this.connectionStore.sessionId}&path=${encodeURIComponent(path)}&inline=1`
     },
+    async navigateTo(path) {
+      this.navigating = true
+      this.closeLightbox()
+      await this.connectionStore.listRemotePath(path)
+      this.navigating = false
+    },
+    async navigateUp() {
+      const parts = this.currentPath.split('/').filter(Boolean)
+      parts.pop()
+      await this.navigateTo('/' + parts.join('/') || '/')
+    },
+    async refreshDir() { await this.navigateTo(this.currentPath) },
     openLightbox(idx) {
       this.lightbox = { open: true, index: idx }
       this.$nextTick(() => { this.$refs.lightboxEl?.focus() })

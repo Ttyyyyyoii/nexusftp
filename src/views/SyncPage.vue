@@ -14,6 +14,25 @@
           </div>
         </div>
 
+        <!-- Folder navigation bar -->
+        <div v-if="connectionStore.isConnected" class="flex items-center gap-2 bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-800 rounded-xl px-3 py-2 shadow-sm">
+          <button @click="navigateUp" :disabled="currentPath === '/'" class="p-1.5 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-700 disabled:opacity-30 transition-colors">
+            <ChevronLeft class="w-4 h-4 text-surface-500" />
+          </button>
+          <div class="flex items-center gap-1 flex-1 overflow-x-auto">
+            <button @click="navigateTo('/')" class="flex items-center gap-1 text-xs text-surface-500 hover:text-primary-500 transition-colors shrink-0">
+              <Home class="w-3.5 h-3.5" />
+            </button>
+            <span v-for="(seg, i) in pathSegments" :key="i" class="flex items-center gap-1 shrink-0">
+              <ChevronRight class="w-3 h-3 text-surface-300" />
+              <button @click="navigateTo(seg.path)" class="text-xs font-medium transition-colors" :class="i === pathSegments.length - 1 ? 'text-surface-900 dark:text-white' : 'text-surface-500 hover:text-primary-500'">{{ seg.name }}</button>
+            </span>
+          </div>
+          <button @click="refreshDir" class="p-1.5 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors">
+            <RefreshCw class="w-3.5 h-3.5 text-surface-400" :class="navigating ? 'animate-spin' : ''" />
+          </button>
+        </div>
+
         <!-- Not connected -->
         <div v-if="!connectionStore.isConnected" class="flex flex-col items-center justify-center h-72 bg-white dark:bg-surface-900 rounded-2xl border border-surface-200 dark:border-surface-800 shadow-sm">
           <ArrowLeftRight class="w-14 h-14 text-surface-300 dark:text-surface-600 mb-4" />
@@ -144,11 +163,11 @@
 <script>
 import AppLayout from '@/layouts/AppLayout.vue'
 import { useConnectionStore } from '@/stores/connection'
-import { ArrowLeftRight, Upload, FileText, GitCompare, Loader2, Check } from 'lucide-vue-next'
+import { ArrowLeftRight, Upload, FileText, GitCompare, Loader2, Check, ChevronLeft, ChevronRight, Home, RefreshCw } from 'lucide-vue-next'
 
 export default {
   name: 'SyncPage',
-  components: { AppLayout, ArrowLeftRight, Upload, FileText, GitCompare, Loader2, Check },
+  components: { AppLayout, ArrowLeftRight, Upload, FileText, GitCompare, Loader2, Check, ChevronLeft, ChevronRight, Home, RefreshCw },
   data() {
     return {
       connectionStore: useConnectionStore(),
@@ -156,10 +175,17 @@ export default {
       dragging: false,
       comparing: false,
       uploading: false,
+      navigating: false,
       results: null
     }
   },
   computed: {
+    currentPath() { return this.connectionStore.currentPath || '/' },
+    pathSegments() {
+      const parts = this.currentPath.split('/').filter(Boolean)
+      let accum = ''
+      return parts.map(p => { accum += '/' + p; return { name: p, path: accum } })
+    },
     remoteFilesFiltered() {
       return (this.connectionStore.remoteFiles || []).filter(f => !f.isDirectory)
     },
@@ -182,6 +208,23 @@ export default {
       const k = 1024, s = ['B','KB','MB','GB']
       const i = Math.floor(Math.log(bytes) / Math.log(k))
       return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + s[i]
+    },
+    showToast(title, type) {
+      window.dispatchEvent(new CustomEvent('show-toast', { detail: { title, type } }))
+    },
+    async navigateTo(path) {
+      this.navigating = true
+      this.results = null
+      await this.connectionStore.listRemotePath(path)
+      this.navigating = false
+    },
+    async navigateUp() {
+      const parts = this.currentPath.split('/').filter(Boolean)
+      parts.pop()
+      await this.navigateTo('/' + parts.join('/') || '/')
+    },
+    async refreshDir() {
+      await this.navigateTo(this.currentPath)
     },
     onDrop(e) {
       this.dragging = false
@@ -240,12 +283,24 @@ export default {
         const API_BASE = import.meta.env.VITE_API_URL || '/api'
         const formData = new FormData()
         formData.append('sessionId', this.connectionStore.sessionId)
-        formData.append('path', this.connectionStore.currentPath || '/')
+        formData.append('remotePath', this.connectionStore.currentPath || '/')
+        formData.append('remoteName', item._file.name)
         formData.append('file', item._file)
         const res = await fetch(`${API_BASE}/upload.php`, { method: 'POST', credentials: 'include', body: formData })
         const data = await res.json()
-        if (data.success) { item.uploaded = true; item.status = 'identical' }
-      } catch (e) {}
+        if (data.success) {
+          item.uploaded = true
+          item.status = 'identical'
+          this.showToast(`${item.name} uploaded successfully`, 'success')
+          // Refresh remote file listing
+          await this.connectionStore.listRemotePath(this.connectionStore.currentPath || '/')
+          this.results = null
+        } else {
+          this.showToast(data.message || 'Upload failed', 'error')
+        }
+      } catch (e) {
+        this.showToast('Network error during upload', 'error')
+      }
       item.uploading = false
     },
     async uploadAll() {
