@@ -71,6 +71,14 @@
               </div>
             </div>
 
+            <!-- Code Example -->
+            <div v-if="endpoint.example" class="mb-5">
+              <h4 class="text-xs font-semibold uppercase tracking-wider text-surface-500 mb-3">Exemple d'utilisation (JavaScript)</h4>
+              <div class="bg-surface-900 rounded-xl p-4 font-mono text-xs text-blue-300 overflow-x-auto">
+                <pre>{{ endpoint.example }}</pre>
+              </div>
+            </div>
+
             <!-- Exemple de réponse -->
             <div>
               <h4 class="text-xs font-semibold uppercase tracking-wider text-surface-500 mb-3">Réponse (exemple)</h4>
@@ -105,7 +113,17 @@ export default {
             { name: 'type', type: 'string', required: true, desc: 'Protocole : ftp | ftps | ftpse | sftp' },
             { name: 'passive', type: 'boolean', required: false, desc: 'Mode passif FTP (défaut : true)' },
           ],
-          response: `{\n  "success": true,\n  "sessionId": "abc123def456...",\n  "timestamp": "2026-08-06T00:00:00+00:00"\n}`
+          response: `{\n  "success": true,\n  "sessionId": "abc123def456...",\n  "timestamp": "2026-08-06T00:00:00+00:00"\n}`,
+          example: `const response = await fetch('https://nexusftp.onrender.com/api/connect.php', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    host: 'ftp.example.com', port: 21,
+    username: 'user', password: 'password', type: 'ftp'
+  })
+});
+const data = await response.json();
+const sessionId = data.sessionId;`
         },
         {
           method: 'POST', path: 'list.php', desc: 'Lister le contenu d\'un dossier distant',
@@ -113,7 +131,17 @@ export default {
             { name: 'sessionId', type: 'string', required: true, desc: 'Session de connexion active' },
             { name: 'path', type: 'string', required: true, desc: 'Chemin du dossier à lister (ex: /public_html)' },
           ],
-          response: `{\n  "success": true,\n  "files": [\n    { "name": "index.php", "size": 2048, "isDirectory": false, "modified": "...", "permissions": "rw-r--r--" },\n    { "name": "images", "size": 0, "isDirectory": true, "modified": "..." }\n  ]\n}`
+          response: `{\n  "success": true,\n  "files": [\n    { "name": "index.php", "size": 2048, "isDirectory": false, "modified": "...", "permissions": "rw-r--r--" },\n    { "name": "images", "size": 0, "isDirectory": true, "modified": "..." }\n  ]\n}`,
+          example: `const response = await fetch('https://nexusftp.onrender.com/api/list.php', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    sessionId: 'abc123def456...',
+    path: '/public_html'
+  })
+});
+const data = await response.json();
+console.log(data.files);`
         },
         {
           method: 'POST', path: 'upload.php', desc: 'Envoyer un fichier sur le serveur distant',
@@ -123,7 +151,17 @@ export default {
             { name: 'remoteName', type: 'string', required: false, desc: 'Nom du fichier sur le serveur (défaut : nom original)' },
             { name: 'file', type: 'file', required: true, desc: 'Le fichier à envoyer (multipart/form-data)' },
           ],
-          response: `{\n  "success": true,\n  "file": "mon-fichier.zip",\n  "size": 1048576\n}`
+          response: `{\n  "success": true,\n  "file": "mon-fichier.zip",\n  "size": 1048576\n}`,
+          example: `const formData = new FormData();
+formData.append('sessionId', 'abc123def456...');
+formData.append('remotePath', '/public_html/images');
+formData.append('file', fileInputElement.files[0]);
+
+const response = await fetch('https://nexusftp.onrender.com/api/upload.php', {
+  method: 'POST',
+  body: formData // Content-Type est géré automatiquement
+});
+const data = await response.json();`
         },
         {
           method: 'POST', path: 'delete.php', desc: 'Supprimer un ou plusieurs fichiers/dossiers',
@@ -133,7 +171,16 @@ export default {
             { name: 'items', type: 'array', required: true, desc: 'Tableau d\'objets [{name, isDirectory}] à supprimer' },
             { name: 'stream', type: 'boolean', required: false, desc: 'Si true, renvoie un flux SSE de progression' },
           ],
-          response: `{\n  "success": true,\n  "message": "Items deleted",\n  "timestamp": "2026-08-06T00:00:00+00:00"\n}`
+          response: `{\n  "success": true,\n  "message": "Items deleted",\n  "timestamp": "2026-08-06T00:00:00+00:00"\n}`,
+          example: `const response = await fetch('https://nexusftp.onrender.com/api/delete.php', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    sessionId: 'abc123def456...',
+    path: '/public_html',
+    items: [ { name: 'old_backup.zip', isDirectory: false } ]
+  })
+});`
         },
         {
           method: 'POST', path: 'download.php', desc: 'Télécharger un fichier ou dossier distant',
@@ -143,7 +190,23 @@ export default {
             { name: 'remoteName', type: 'string', required: true, desc: 'Nom du fichier ou dossier à télécharger' },
             { name: 'isDirectory', type: 'boolean', required: false, desc: 'Si true, compresse le dossier en .zip avant l\'envoi' },
           ],
-          response: `// Réponse binaire (application/octet-stream ou application/zip)\n// Le contenu du fichier est renvoyé directement en flux binaire.`
+          response: `// Réponse binaire (application/octet-stream ou application/zip)\n// Le contenu du fichier est renvoyé directement en flux binaire.`,
+          example: `const response = await fetch('https://nexusftp.onrender.com/api/download.php', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    sessionId: 'abc123def456...',
+    remotePath: '/public_html',
+    remoteName: 'config.php',
+    isDirectory: false
+  })
+});
+const blob = await response.blob();
+const url = URL.createObjectURL(blob);
+// Créer un lien pour forcer le téléchargement
+const a = document.createElement('a');
+a.href = url; a.download = 'config.php';
+a.click();`
         },
         {
           method: 'POST', path: 'rename.php', desc: 'Renommer un fichier ou dossier',
@@ -153,14 +216,31 @@ export default {
             { name: 'oldName', type: 'string', required: true, desc: 'Nom actuel de l\'élément' },
             { name: 'newName', type: 'string', required: true, desc: 'Nouveau nom souhaité' },
           ],
-          response: `{\n  "success": true,\n  "message": "Renamed successfully"\n}`
+          response: `{\n  "success": true,\n  "message": "Renamed successfully"\n}`,
+          example: `const response = await fetch('https://nexusftp.onrender.com/api/rename.php', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    sessionId: 'abc123def456...',
+    path: '/public_html',
+    oldName: 'index.htm',
+    newName: 'index.html'
+  })
+});`
         },
         {
           method: 'POST', path: 'disconnect.php', desc: 'Fermer et supprimer la session active',
           params: [
             { name: 'sessionId', type: 'string', required: true, desc: 'Session à fermer' },
           ],
-          response: `{\n  "success": true,\n  "message": "Disconnected"\n}`
+          response: `{\n  "success": true,\n  "message": "Disconnected"\n}`,
+          example: `const response = await fetch('https://nexusftp.onrender.com/api/disconnect.php', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    sessionId: 'abc123def456...'
+  })
+});`
         },
       ]
     }
