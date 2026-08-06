@@ -14,6 +14,9 @@
         <button @click="toggleAI" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all">
           <Bot class="w-4 h-4" /><span class="hidden sm:inline">NexusBot IA</span>
         </button>
+        <button @click="openGitHub" :disabled="!connectionStore.isConnected" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all disabled:opacity-30">
+          <Github class="w-4 h-4" /><span class="hidden sm:inline">GitHub CI/CD</span>
+        </button>
         <button @click="openCreateModal('file')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all">
           <FilePlus class="w-4 h-4" /><span class="hidden sm:inline">Nouveau Fichier</span>
         </button>
@@ -124,6 +127,9 @@
 
       <!-- AI Assistant -->
       <AIAssistant :visible="showAI" :fileContext="aiContextFile" :fileContent="aiContextContent" @close="showAI = false" @clear-context="aiContextFile = null; aiContextContent = ''" />
+
+      <!-- GitHub Deploy Modal -->
+      <GitHubDeployModal :visible="showGitHub" :current-path="connectionStore.currentPath" :session-id="connectionStore.sessionId" @close="showGitHub = false" />
     </div>
   </AppLayout>
 </template>
@@ -145,7 +151,8 @@ import SearchModal from '@/components/ftp/SearchModal.vue'
 import ShareModal from '@/components/ui/ShareModal.vue'
 import MediaViewer from '@/components/ui/MediaViewer.vue'
 import AIAssistant from '@/components/ftp/AIAssistant.vue'
-import { Upload, Download, Trash2, Edit2, RefreshCw, FolderPlus, FilePlus, Monitor, Globe, Loader2, Unlink, Search as SearchIcon, Bot } from 'lucide-vue-next'
+import GitHubDeployModal from '@/components/ui/GitHubDeployModal.vue'
+import { Upload, Download, Trash2, Edit2, RefreshCw, FolderPlus, FilePlus, Monitor, Globe, Loader2, Unlink, Search as SearchIcon, Bot, Github } from 'lucide-vue-next'
 
 const LANG_MAP = {
   js: 'javascript', ts: 'typescript', vue: 'html', html: 'html', htm: 'html',
@@ -156,7 +163,7 @@ const LANG_MAP = {
 
 export default {
   name: 'FilesPage',
-  components: { AppLayout, Splitpanes, Pane, FileList, LocalFileBrowser, TransferPanel, BaseModal, MonacoEditor, SearchModal, ShareModal, MediaViewer, AIAssistant, Monitor, Globe, Loader2, Unlink, FolderPlus, FilePlus, Upload, Download, Trash2, Edit2, RefreshCw, SearchIcon, Bot },
+  components: { AppLayout, Splitpanes, Pane, FileList, LocalFileBrowser, TransferPanel, BaseModal, MonacoEditor, SearchModal, ShareModal, MediaViewer, AIAssistant, GitHubDeployModal, Monitor, Globe, Loader2, Unlink, FolderPlus, FilePlus, Upload, Download, Trash2, Edit2, RefreshCw, SearchIcon, Bot, Github },
   data() {
     return {
       connectionStore: useConnectionStore(),
@@ -172,6 +179,7 @@ export default {
       showShareModal: false, shareFile: null,
       showMediaViewer: false, mediaViewerFile: null,
       showAI: false, aiContextFile: null, aiContextContent: '',
+      showGitHub: false,
       globalLoader: { show: false, title: '', message: '' }
     }
   },
@@ -219,6 +227,13 @@ export default {
           this.handleEdit(file)
         }
       } 
+    },
+    openGitHub() {
+      if (!this.settingsStore.isPremium) {
+        window.dispatchEvent(new CustomEvent('show-premium-modal'));
+        return;
+      }
+      this.showGitHub = true;
     },
     handleShare(file) {
       if (!this.settingsStore.isPremium) {
