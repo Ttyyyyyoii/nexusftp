@@ -28,6 +28,14 @@
               <button @click="navigateTo(seg.path)" class="text-xs font-medium transition-colors" :class="i === pathSegments.length - 1 ? 'text-surface-900 dark:text-white' : 'text-surface-500 hover:text-primary-500'">{{ seg.name }}</button>
             </span>
           </div>
+          <!-- Subfolder list -->
+          <div class="flex items-center gap-1 ml-2">
+            <button v-for="folder in subfolders.slice(0,4)" :key="folder.name" @click="navigateTo(currentPath.replace(/\/$/,'') + '/' + folder.name)"
+              class="px-2 py-1 text-xs bg-surface-100 dark:bg-surface-800 text-surface-600 dark:text-surface-300 hover:bg-primary-100 dark:hover:bg-primary-900/40 hover:text-primary-600 dark:hover:text-primary-400 rounded-lg transition-colors truncate max-w-[80px]">
+              📁 {{ folder.name }}
+            </button>
+            <span v-if="subfolders.length > 4" class="text-xs text-surface-500">+{{ subfolders.length - 4 }}</span>
+          </div>
           <button @click="refreshDir" class="p-1.5 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors">
             <RefreshCw class="w-3.5 h-3.5 text-surface-400" :class="navigating ? 'animate-spin' : ''" />
           </button>
@@ -185,6 +193,9 @@ export default {
       const parts = this.currentPath.split('/').filter(Boolean)
       let accum = ''
       return parts.map(p => { accum += '/' + p; return { name: p, path: accum } })
+    },
+    subfolders() {
+      return (this.connectionStore.remoteFiles || []).filter(f => f.isDirectory && f.name !== '.' && f.name !== '..')
     },
     remoteFilesFiltered() {
       return (this.connectionStore.remoteFiles || []).filter(f => !f.isDirectory)
