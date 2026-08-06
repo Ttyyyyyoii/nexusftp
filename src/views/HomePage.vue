@@ -23,9 +23,6 @@
           <router-link to="/connect" class="btn-primary flex items-center gap-2 text-lg px-8 py-4">
             <Zap class="w-5 h-5" /> {{ $t('home.hero.ctaPrimary') }}
           </router-link>
-          <a href="/nexusftp-setup.exe" class="btn-secondary flex items-center gap-2 text-lg px-8 py-4 bg-surface-100 dark:bg-surface-800 border-surface-200 dark:border-surface-700 hover:bg-surface-200 dark:hover:bg-surface-700">
-            <Monitor class="w-5 h-5" /> {{ $t('home.hero.ctaDesktop') }}
-          </a>
           <router-link to="/faq" class="btn-secondary flex items-center gap-2 text-lg px-8 py-4">
             <BookOpen class="w-5 h-5" /> {{ $t('home.hero.ctaSecondary') }}
           </router-link>
