@@ -75,9 +75,13 @@ COPY --from=builder /app/dist/ /var/www/html/
 # S'assurer que les dossiers sessions et deployments sont accessibles en écriture
 RUN mkdir -p /var/www/html/api/sessions \
     && mkdir -p /var/www/html/api/deployments \
+    && mkdir -p /var/www/html/api/guests \
+    && mkdir -p /var/www/html/api/shares \
     && chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html \
     && chmod -R 775 /var/www/html/api/sessions \
-    && chmod -R 775 /var/www/html/api/deployments
+    && chmod -R 775 /var/www/html/api/deployments \
+    && chmod -R 775 /var/www/html/api/guests \
+    && chmod -R 775 /var/www/html/api/shares
 
 EXPOSE 80
