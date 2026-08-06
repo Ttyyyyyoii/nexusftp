@@ -19,19 +19,10 @@ try {
         ssh2_auth_password($connection, $session['username'], $password);
         $sftp = ssh2_sftp($connection);
         
-        // Creation recursive des dossiers si necessaire pour SFTP
-        $parts = explode('/', trim($remotePath, '/'));
-        $current = '';
-        foreach ($parts as $part) {
-            if (empty($part)) continue;
-            $current .= '/' . $part;
-            $sftpUrl = "ssh2.sftp://" . intval($sftp) . $current;
-            if (!file_exists($sftpUrl)) {
-                @ssh2_sftp_mkdir($sftp, $current, 0777, true);
-            }
-        }
+        // Create remote directory tree if needed (silent, ignore if already exists)
+        @ssh2_sftp_mkdir($sftp, $remotePath, 0755, true);
         
-        $remoteFile = $remotePath . '/' . $remoteName;
+        $remoteFile = rtrim($remotePath, '/') . '/' . $remoteName;
         $stream = @fopen("ssh2.sftp://" . intval($sftp) . $remoteFile, 'w');
         if (!$stream) sendError("Cannot create remote file: " . $remoteFile);
         $local = fopen($file['tmp_name'], 'r');
