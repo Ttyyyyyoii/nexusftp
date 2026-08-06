@@ -22,12 +22,18 @@ RUN npm run build
 # ================================================================
 FROM php:8.2-apache
 
-# Installer les dépendances système pour ssh2 et ftp
+# Installer les dépendances système pour ssh2, ftp, GD et zip
 RUN apt-get update && apt-get install -y \
     libssh2-1-dev \
     libssh2-1 \
     libcurl4-openssl-dev \
     pkg-config \
+    libpng-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
+    libzip-dev \
+    zip \
+    unzip \
     && rm -rf /var/lib/apt/lists/*
 
 # Installer l'extension PHP ssh2 via PECL
@@ -36,6 +42,13 @@ RUN pecl install ssh2-1.4 \
 
 # Activer l'extension ftp (intégrée à PHP, juste besoin d'activer)
 RUN docker-php-ext-install ftp
+
+# Installer GD pour l'optimisation d'images (JPEG + PNG)
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd
+
+# Installer zip pour l'extraction des archives GitHub
+RUN docker-php-ext-install zip
 
 # Activer les modules Apache nécessaires
 RUN a2enmod rewrite headers
@@ -59,10 +72,12 @@ COPY ftp_backend/ /var/www/html/api/
 # Copier le frontend Vue.js compilé (résultat du builder)
 COPY --from=builder /app/dist/ /var/www/html/
 
-# S'assurer que le dossier sessions est accessible en écriture
+# S'assurer que les dossiers sessions et deployments sont accessibles en écriture
 RUN mkdir -p /var/www/html/api/sessions \
+    && mkdir -p /var/www/html/api/deployments \
     && chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html \
-    && chmod -R 775 /var/www/html/api/sessions
+    && chmod -R 775 /var/www/html/api/sessions \
+    && chmod -R 775 /var/www/html/api/deployments
 
 EXPOSE 80
