@@ -66,7 +66,7 @@
                 <Lock v-if="!settingsStore.planLimits.allowTransferModeChange" class="w-3.5 h-3.5 text-surface-400" />
               </div>
               <div class="flex gap-2">
-                <button v-for="mode in ['binary', 'ascii']" :key="mode" @click="if(settingsStore.planLimits.allowTransferModeChange) transferSettings.transferMode = mode" :disabled="!settingsStore.planLimits.allowTransferModeChange" class="px-4 py-2 rounded-xl text-sm border-2 transition-all capitalize" :class="transferSettings.transferMode === mode ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-600' : 'border-surface-200 dark:border-surface-700 text-surface-600 disabled:opacity-50'">{{ mode }}</button>
+                <button v-for="mode in ['binary', 'ascii']" :key="mode" @click="settingsStore.planLimits.allowTransferModeChange ? transferSettings.transferMode = mode : null" :disabled="!settingsStore.planLimits.allowTransferModeChange" class="px-4 py-2 rounded-xl text-sm border-2 transition-all capitalize" :class="transferSettings.transferMode === mode ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-600' : 'border-surface-200 dark:border-surface-700 text-surface-600 disabled:opacity-50'">{{ mode }}</button>
               </div>
             </div>
           </div>
