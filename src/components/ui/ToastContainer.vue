@@ -44,14 +44,10 @@ export default {
       const notifs = this.settingsStore.notifications;
       let shouldSend = false;
 
-      // Simplistic mapping based on type or title keywords
       if (type === 'error' && notifs.errors) shouldSend = true;
-      if (type === 'success' && title.toLowerCase().includes('envoyé') && notifs.transferComplete) shouldSend = true;
-      if (type === 'success' && title.toLowerCase().includes('téléchargé') && notifs.transferComplete) shouldSend = true;
+      if (type === 'success' && notifs.transferComplete) shouldSend = true;
+      if (type === 'info' && notifs.connectionStatus) shouldSend = true;
       if (title.toLowerCase().includes('connect') && notifs.connectionStatus) shouldSend = true;
-      
-      // Fallback if not matched but it's important
-      if (type === 'error' && notifs.errors) shouldSend = true;
 
       if (shouldSend) {
         new Notification('NexusFTP - ' + title, {

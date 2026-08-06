@@ -17,7 +17,7 @@
       <div class="w-36 text-right hidden md:block">{{ $t('files.modified') }}</div>
       <div v-if="isRemote" class="w-32 text-right hidden xl:block">{{ $t('files.permissions') }}</div>
     </div>
-    <div class="flex-1 overflow-y-auto" @dragover.prevent="dragOver = true" @dragleave="dragOver = false" @drop.prevent="handleDrop">
+    <div class="flex-1 overflow-y-auto pb-24" @dragover.prevent="dragOver = true" @dragleave="dragOver = false" @drop.prevent="handleDrop">
       <div v-if="dragOver" class="absolute inset-0 z-10 bg-primary-500/10 border-2 border-dashed border-primary-500 rounded-xl m-2 flex items-center justify-center pointer-events-none">
         <div class="text-center">
           <Upload class="w-12 h-12 text-primary-500 mx-auto mb-2" />

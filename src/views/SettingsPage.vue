@@ -118,7 +118,7 @@ export default {
         { key: 'maxSimultaneous', label: 'settings.maxConnections', readonly: true, value: limits.maxSimultaneous, premiumOnly: false },
         { key: 'maxFileSize', label: 'settings.maxFileSize', readonly: true, value: limits.maxFileSize, premiumOnly: false },
         { key: 'timeout', label: 'settings.timeout', min: 5, max: 120, premiumOnly: !limits.allowTimeoutChange },
-        { key: 'retries', label: 'settings.retries', min: 0, max: 10, premiumOnly: !limits.allowRetry }
+        { key: 'retries', label: 'settings.retries', min: 0, max: limits.maxRetries, premiumOnly: !limits.allowRetry }
       ]
     }
   },
@@ -150,7 +150,7 @@ export default {
       if (!limits.allowRetry) {
         this.transferSettings.retries = 0;
       } else {
-        if (this.transferSettings.retries > 10) this.transferSettings.retries = 10;
+        if (this.transferSettings.retries > limits.maxRetries) this.transferSettings.retries = limits.maxRetries;
         if (this.transferSettings.retries < 0) this.transferSettings.retries = 0;
       }
 

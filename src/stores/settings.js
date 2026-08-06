@@ -7,7 +7,7 @@ export const useSettingsStore = defineStore('settings', {
     sidebarCollapsed: false,
     isPremium: localStorage.getItem('isPremium') === 'true',
     transferSettings: {
-      maxSimultaneous: 2, timeout: 30, retries: 0,
+      maxSimultaneous: 2, timeout: 30, retries: 3,
       maxFileSize: 256, passiveMode: true, transferMode: 'binary'
     },
     notifications: { transferComplete: true, connectionStatus: true, errors: true }
@@ -22,6 +22,7 @@ export const useSettingsStore = defineStore('settings', {
           maxFileSize: 512, // in MB
           maxSavedConnections: 999, // unlimited
           maxHistory: 999, // unlimited
+          maxRetries: 10,
           allowRetry: true,
           allowTimeoutChange: true,
           allowTransferModeChange: true
@@ -32,7 +33,8 @@ export const useSettingsStore = defineStore('settings', {
           maxFileSize: 256, // in MB
           maxSavedConnections: 2,
           maxHistory: 10,
-          allowRetry: false,
+          maxRetries: 3,
+          allowRetry: true, // changed to true for free tier too
           allowTimeoutChange: false,
           allowTransferModeChange: false
         }
@@ -79,7 +81,7 @@ export const useSettingsStore = defineStore('settings', {
       // Reset settings to free limits
       this.transferSettings.maxSimultaneous = Math.min(this.transferSettings.maxSimultaneous, 2)
       this.transferSettings.maxFileSize = Math.min(this.transferSettings.maxFileSize, 256)
-      this.transferSettings.retries = 0
+      this.transferSettings.retries = Math.min(this.transferSettings.retries || 3, 3)
       this.transferSettings.timeout = 30
       this.transferSettings.transferMode = 'binary'
       this.persist()
@@ -99,7 +101,7 @@ export const useSettingsStore = defineStore('settings', {
             if (!this.isPremium) {
                 parsed.transferSettings.maxSimultaneous = Math.min(parsed.transferSettings.maxSimultaneous || 2, 2)
                 parsed.transferSettings.maxFileSize = Math.min(parsed.transferSettings.maxFileSize || 256, 256)
-                parsed.transferSettings.retries = 0
+                parsed.transferSettings.retries = Math.min(parsed.transferSettings.retries || 3, 3)
                 parsed.transferSettings.timeout = 30
                 parsed.transferSettings.transferMode = 'binary'
             }
