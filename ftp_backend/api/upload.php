@@ -40,7 +40,7 @@ try {
             }
             if ($conn && @ftp_login($conn, $session['username'], $password)) break;
             if ($conn) { @ftp_close($conn); $conn = false; }
-            if ($attempt < $maxRetries - 1) usleep(600000 * ($attempt + 1)); // 0.6s, 1.2s
+            if ($attempt < $maxRetries - 1) usleep(200000); // 200ms flat retry
         }
         if (!$conn) sendError('Failed to connect for upload (server may be busy, try again)');
         
