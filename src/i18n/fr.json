@@ -43,7 +43,8 @@
       "titleHighlight": "depuis votre navigateur",
       "subtitle": "NexusFTP est un client de transfert de fichiers 100% en ligne. Connectez-vous à n'importe quel serveur FTP ou SFTP et transférez vos fichiers sans installer de logiciel sur votre ordinateur.",
       "ctaPrimary": "Se connecter à un serveur",
-      "ctaSecondary": "Voir la FAQ"
+      "ctaSecondary": "Voir la FAQ",
+      "ctaDesktop": "Télécharger pour Windows"
     },
     "mock": {
       "connected": "Connecté",
