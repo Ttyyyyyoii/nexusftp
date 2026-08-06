@@ -367,10 +367,10 @@ export default {
     },
     async handleUpload(files) { 
       const settingsStore = useSettingsStore()
-      // FTP servers don't handle many parallel connections well → force sequential
+      // FTP servers can struggle with many parallel connections → cap at 2 (retry handles failures)
       const connType = this.connectionStore.connectionInfo?.type || 'ftp'
       const isFtp = connType !== 'sftp'
-      const maxSimultaneous = isFtp ? 1 : settingsStore.planLimits.maxSimultaneous
+      const maxSimultaneous = isFtp ? 2 : settingsStore.planLimits.maxSimultaneous
       const maxFileSizeMB = settingsStore.planLimits.maxFileSize
       const maxFileSizeBytes = maxFileSizeMB * 1024 * 1024
 
