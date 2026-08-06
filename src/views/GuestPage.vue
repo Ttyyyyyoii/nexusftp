@@ -162,14 +162,23 @@
                 Dossier
               </span>
 
-              <!-- Download action -->
-              <button
-                v-if="!file.isDirectory"
-                @click.stop="downloadFile(file)"
-                class="opacity-0 group-hover:opacity-100 p-2 rounded-lg bg-surface-100 dark:bg-surface-800 hover:bg-primary-50 dark:hover:bg-primary-900/30 text-surface-500 hover:text-primary-600 dark:hover:text-primary-400 transition-all shrink-0"
-                :title="$t('guest.download')">
-                <Download class="w-4 h-4" />
-              </button>
+              <!-- Actions -->
+              <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all shrink-0">
+                <button
+                  v-if="!file.isDirectory && permission === 'upload' && isEditable(file.name)"
+                  @click.stop="editFile(file)"
+                  class="p-2 rounded-lg bg-surface-100 dark:bg-surface-800 hover:bg-primary-50 dark:hover:bg-primary-900/30 text-surface-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                  :title="$t('files.edit')">
+                  <Edit2 class="w-4 h-4" />
+                </button>
+                <button
+                  v-if="!file.isDirectory"
+                  @click.stop="downloadFile(file)"
+                  class="p-2 rounded-lg bg-surface-100 dark:bg-surface-800 hover:bg-primary-50 dark:hover:bg-primary-900/30 text-surface-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                  :title="$t('guest.download')">
+                  <Download class="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -182,6 +191,20 @@
 
     </div>
 
+    <!-- Edit File Modal with Monaco Editor -->
+    <BaseModal :visible="showFileEditor" :title="'✏️ ' + $t('common.edit') + ': ' + (fileEditorFile?.name || '')" @close="showFileEditor = false" maxWidth="max-w-5xl">
+      <div class="h-[65vh] -mx-2 -mt-2 rounded-xl overflow-hidden border border-surface-200 dark:border-surface-700">
+        <MonacoEditor v-if="showFileEditor" v-model="fileEditorContent" :language="editorLanguage" />
+      </div>
+      <template #footer>
+        <button @click="showFileEditor = false" class="btn-secondary text-sm" :disabled="fileEditorSaving">{{ $t('common.cancel') }}</button>
+        <button @click="saveFileEdit" class="btn-primary text-sm flex items-center gap-2" :disabled="fileEditorSaving">
+          <Loader2 v-if="fileEditorSaving" class="w-4 h-4 animate-spin" />
+          {{ $t('common.save') }}
+        </button>
+      </template>
+    </BaseModal>
+
     <!-- Toast notifications (reuse app's system) -->
     <ToastContainer />
   </div>
@@ -191,16 +214,26 @@
 import {
   HardDrive, Users, Sun, Moon, Lock, Key, Unlock, Loader2, AlertCircle,
   Home, ChevronRight, RefreshCw, Upload, FolderOpen, Folder,
-  File as FileIcon, Download, CornerLeftUp
+  File as FileIcon, Download, CornerLeftUp, Edit2
 } from 'lucide-vue-next'
 import ToastContainer from '@/components/ui/ToastContainer.vue'
+import BaseModal from '@/components/ui/BaseModal.vue'
+import MonacoEditor from '@/components/ui/MonacoEditor.vue'
+
+const LANG_MAP = {
+  js: 'javascript', ts: 'typescript', vue: 'html', html: 'html', htm: 'html',
+  css: 'css', scss: 'scss', less: 'less', php: 'php', py: 'python',
+  json: 'json', xml: 'xml', md: 'markdown', sh: 'shell', bash: 'shell',
+  sql: 'sql', yaml: 'yaml', yml: 'yaml', txt: 'plaintext', env: 'plaintext'
+}
 
 export default {
   name: 'GuestPage',
   components: {
     HardDrive, Users, Sun, Moon, Lock, Key, Unlock, Loader2, AlertCircle,
     Home, ChevronRight, RefreshCw, Upload, FolderOpen, Folder,
-    FileIcon, Download, CornerLeftUp, ToastContainer
+    FileIcon, Download, CornerLeftUp, Edit2, ToastContainer,
+    BaseModal, MonacoEditor
   },
   data() {
     return {
@@ -213,7 +246,12 @@ export default {
       files: [],
       currentPath: '/',
       permission: 'read',
-      isDark: false
+      isDark: false,
+      showFileEditor: false,
+      fileEditorFile: null,
+      fileEditorContent: '',
+      fileEditorSaving: false,
+      editorLanguage: 'plaintext'
     }
   },
   computed: {
@@ -346,6 +384,68 @@ export default {
         this.loadFiles()
       }
       this.$refs.fileInput.value = ''
+    },
+    isEditable(filename) {
+      if (!filename) return false
+      const ext = filename.split('.').pop().toLowerCase()
+      return Object.keys(LANG_MAP).includes(ext) || ['env', 'gitignore'].includes(filename)
+    },
+    async editFile(file) {
+      this.fileEditorFile = file
+      this.fileEditorContent = ''
+      
+      const ext = file.name.split('.').pop().toLowerCase()
+      this.editorLanguage = LANG_MAP[ext] || 'plaintext'
+      
+      try {
+        const API_BASE = import.meta.env.VITE_API_URL || '/api'
+        const sep = this.currentPath === '/' ? '' : '/'
+        const filePath = this.currentPath + sep + file.name
+        const url = `${API_BASE}/guest_download.php?token=${encodeURIComponent(this.token)}&path=${encodeURIComponent(filePath)}&password=${encodeURIComponent(this.password)}`
+        
+        this.showToast('Chargement du fichier...', 'info')
+        const res = await fetch(url)
+        if (!res.ok) throw new Error('Erreur de téléchargement')
+        
+        const text = await res.text()
+        this.fileEditorContent = text
+        this.showFileEditor = true
+      } catch (err) {
+        this.showToast(`Erreur d'ouverture: ${err.message}`, 'error')
+      }
+    },
+    async saveFileEdit() {
+      if (!this.fileEditorFile) return
+      this.fileEditorSaving = true
+      
+      try {
+        const API_BASE = import.meta.env.VITE_API_URL || '/api'
+        
+        const blob = new Blob([this.fileEditorContent], { type: 'text/plain' })
+        const newFile = new File([blob], this.fileEditorFile.name, { type: 'text/plain' })
+        
+        const fd = new FormData()
+        fd.append('file', newFile)
+        fd.append('token', this.token)
+        fd.append('password', this.password)
+        fd.append('path', this.currentPath)
+        fd.append('remoteName', newFile.name)
+        
+        const res = await fetch(`${API_BASE}/guest_upload.php`, { method: 'POST', body: fd })
+        const data = await res.json()
+        
+        if (data.success) {
+          this.showToast(this.$t('common.success'), 'success')
+          this.showFileEditor = false
+          this.loadFiles()
+        } else {
+          throw new Error(data.message || 'Erreur inconnue')
+        }
+      } catch (err) {
+        this.showToast(`Erreur lors de la sauvegarde: ${err.message}`, 'error')
+      } finally {
+        this.fileEditorSaving = false
+      }
     },
     formatSize(bytes) {
       if (!bytes) return '0 B'
