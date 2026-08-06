@@ -186,6 +186,9 @@ export default {
     recalcOctal(file) {
       file.permOctal = this.octalFromPerm(file.perm)
     },
+    showToast(title, type) { 
+      window.dispatchEvent(new CustomEvent('show-toast', { detail: { title, type } })) 
+    },
     loadFiles() {
       this.loading = true
       const remoteFiles = this.connectionStore.remoteFiles || []
@@ -221,9 +224,14 @@ export default {
         if (data.success) {
           file.originalOctal = file.permOctal
           file.success = true
+          this.showToast(this.$t('permissions.applied'), 'success')
           setTimeout(() => { file.success = false }, 2000)
+        } else {
+          this.showToast(data.message || 'Error applying permissions', 'error')
         }
-      } catch (e) {}
+      } catch (e) {
+        this.showToast('Network error applying permissions', 'error')
+      }
       file.applying = false
     }
   },

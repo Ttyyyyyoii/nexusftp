@@ -1,15 +1,29 @@
 <?php
 require_once __DIR__ . '/../config.php';
 $data = getInput();
+if (empty($data['sessionId']) && !empty($_GET['sessionId'])) {
+    $data = $_GET;
+}
+
 $sessionId = $data['sessionId'] ?? '';
 $remotePath = $data['remotePath'] ?? '/';
 $remoteName = $data['remoteName'] ?? '';
+
+// Support for full 'path' parameter (used by Gallery)
+if (!empty($data['path'])) {
+    $parts = explode('/', ltrim($data['path'], '/'));
+    $remoteName = array_pop($parts);
+    $remotePath = '/' . implode('/', $parts);
+}
+
 if (empty($sessionId) || empty($remoteName)) sendError('Session ID and remote name are required');
 $session = loadSession($sessionId);
 if (!$session) sendError('Invalid or expired session', 401);
 
 $password = decryptPassword($session['password']);
 $tempFile = tempnam(sys_get_temp_dir(), 'nexusdl_');
+
+$inline = !empty($data['inline']) && $data['inline'] == '1';
 
 try {
     if ($session['type'] === 'sftp') {
@@ -83,8 +97,19 @@ try {
         if (!$success) sendError('Failed to download file');
     }
     
-    header('Content-Type: application/octet-stream');
-    header('Content-Disposition: attachment; filename="' . $remoteName . '"');
+    $mime = 'application/octet-stream';
+    if ($inline) {
+        $ext = strtolower(pathinfo($remoteName, PATHINFO_EXTENSION));
+        $mimes = ['jpg'=>'image/jpeg','jpeg'=>'image/jpeg','png'=>'image/png','gif'=>'image/gif','svg'=>'image/svg+xml','webp'=>'image/webp'];
+        if (isset($mimes[$ext])) $mime = $mimes[$ext];
+    }
+    
+    header('Content-Type: ' . $mime);
+    if (!$inline) {
+        header('Content-Disposition: attachment; filename="' . $remoteName . '"');
+    } else {
+        header('Content-Disposition: inline; filename="' . $remoteName . '"');
+    }
     header('Content-Length: ' . filesize($tempFile));
     header('Cache-Control: no-cache');
     readfile($tempFile);
