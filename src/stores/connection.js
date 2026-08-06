@@ -151,11 +151,17 @@ export const useConnectionStore = defineStore('connection', {
       formData.append('sessionId', this.activeSessionId)
       formData.append('remotePath', remotePath)
       formData.append('remoteName', file.name)
-      const response = await axios.post(`${API_BASE}/upload.php`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
-      if (!response.data.success) throw new Error(response.data.message || 'Upload failed')
-      return response.data
+      try {
+        const response = await axios.post(`${API_BASE}/upload.php`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        })
+        if (!response.data.success) throw new Error(response.data.message || 'Upload failed')
+        return response.data
+      } catch (err) {
+        // Extract the actual PHP error message from the response body (4xx errors)
+        const phpMessage = err.response?.data?.message
+        throw new Error(phpMessage || err.message || 'Upload failed')
+      }
     },
 
     async downloadFile(remoteFile) {
