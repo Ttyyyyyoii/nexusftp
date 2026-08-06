@@ -59,7 +59,6 @@ export default {
       navItems: [
         { path: '/', label: 'nav.home' },
         { path: '/docs', label: 'nav.docs' },
-        { path: '/api', label: 'nav.api' },
         { path: '/faq', label: 'nav.faq' },
         { path: '/contact', label: 'nav.contact' }
       ]

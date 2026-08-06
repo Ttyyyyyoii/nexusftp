@@ -50,11 +50,6 @@ const routes = [
     path: '/docs',
     name: 'Docs',
     component: () => import('@/views/DocsPage.vue')
-  },
-  {
-    path: '/api',
-    name: 'Api',
-    component: () => import('@/views/ApiPage.vue')
   }
 ]
 
