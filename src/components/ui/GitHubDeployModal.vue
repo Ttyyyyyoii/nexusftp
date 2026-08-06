@@ -201,9 +201,9 @@ export default {
     return {
       activeTab: 'new',
       // New deployment flow
-      step: 'connect',
-      oauthToken: '',
-      username: '',
+      step: localStorage.getItem('nexus_github_token') ? 'select' : 'connect',
+      oauthToken: localStorage.getItem('nexus_github_token') || '',
+      username: localStorage.getItem('nexus_github_username') || '',
       repos: [],
       repoSearch: '',
       selectedRepo: null,
@@ -233,6 +233,9 @@ export default {
       if (val) {
         this.remotePath = this.currentPath
         this.loadDeployments()
+        if (this.oauthToken && this.step === 'select' && this.repos.length === 0) {
+          this.loadRepos()
+        }
       }
     }
   },
@@ -252,6 +255,7 @@ export default {
         if (event.data?.type === 'GITHUB_OAUTH_SUCCESS') {
           window.removeEventListener('message', messageHandler)
           this.oauthToken = event.data.token
+          localStorage.setItem('nexus_github_token', this.oauthToken)
           await this.loadRepos()
         } else if (event.data?.type === 'GITHUB_OAUTH_ERROR') {
           window.removeEventListener('message', messageHandler)
@@ -269,8 +273,17 @@ export default {
       try {
         const res  = await fetch(`${API_BASE}/github_repos.php`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: this.oauthToken }) })
         const data = await res.json()
-        if (data.success) { this.repos = data.repos; this.username = data.username }
-        else { this.error = data.message || 'Impossible de charger vos dépôts.' }
+        if (data.success) { 
+          this.repos = data.repos; 
+          this.username = data.username;
+          localStorage.setItem('nexus_github_username', this.username)
+        }
+        else { 
+          this.error = data.message || 'Impossible de charger vos dépôts.' 
+          if (data.message && data.message.toLowerCase().includes('token')) {
+            this.disconnect() // Invalid token
+          }
+        }
       } catch { this.error = 'Erreur réseau.' }
       finally { this.loadingRepos = false }
     },
@@ -311,7 +324,15 @@ export default {
       } catch { this.manageError = 'Erreur réseau.' }
       finally { this.deleting = false }
     },
-    disconnect() { this.oauthToken = ''; this.repos = []; this.username = ''; this.selectedRepo = null; this.step = 'connect' },
+    disconnect() { 
+      this.oauthToken = ''; 
+      this.repos = []; 
+      this.username = ''; 
+      this.selectedRepo = null; 
+      this.step = 'connect';
+      localStorage.removeItem('nexus_github_token');
+      localStorage.removeItem('nexus_github_username');
+    },
     reset() { this.step = 'connect'; this.selectedRepo = null; this.error = ''; this.deployResult = {} }
   }
 }
