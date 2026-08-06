@@ -91,6 +91,7 @@ $deployConfig = [
     'remotePath'    => $remotePath,
     'githubRepo'    => $githubRepo,
     'githubBranch'  => $githubBranch,
+    'githubToken'   => encryptPassword($githubToken), // requis pour les dépôts privés
     'webhookSecret' => $webhookSecret,
     'hookId'        => $hookId,
     'createdAt'     => date('c')

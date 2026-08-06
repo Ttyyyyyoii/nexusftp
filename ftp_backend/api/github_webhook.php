@@ -9,7 +9,16 @@ $jsonPayload = file_get_contents('php://input');
 $payload = json_decode($jsonPayload, true);
 
 $token = $_GET['token'] ?? '';
+
+// Debug log function
+function logWebhook($msg) {
+    $logFile = __DIR__ . '/../deployments/webhook_log.txt';
+    file_put_contents($logFile, date('Y-m-d H:i:s') . " - " . $msg . "\n", FILE_APPEND);
+}
+logWebhook("Received webhook for token: " . $token);
+
 if (!$token) {
+    logWebhook("Error: Missing token");
     http_response_code(400);
     die('Missing token');
 }
@@ -33,11 +42,13 @@ $deploymentsDir = __DIR__ . '/../deployments/';
 $configFile = $deploymentsDir . $token . '.json';
 
 if (!file_exists($configFile)) {
+    logWebhook("Error: Invalid deployment token (file not found)");
     http_response_code(404);
     die('Invalid deployment token');
 }
 
 $config = json_decode(file_get_contents($configFile), true);
+logWebhook("Loaded config for repo: " . $config['githubRepo']);
 
 // Vérifier la branche
 $ref = $payload['ref'] ?? ''; // ex: refs/heads/main
@@ -71,9 +82,11 @@ $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
 
 if ($httpCode !== 200 || !$zipContent) {
+    logWebhook("Error downloading zip: HTTP $httpCode");
     http_response_code(500);
     die("Échec du téléchargement du dépôt (Code: $httpCode). Vérifiez que le dépôt est public ou que le token PAT est correct.");
 }
+logWebhook("Zip downloaded successfully (" . strlen($zipContent) . " bytes)");
 
 // Sauvegarder le Zip localement
 $tempZip = tempnam(sys_get_temp_dir(), 'nexus_github_');
@@ -105,15 +118,19 @@ $sourceDir = $extractedDirs[0]; // C'est ici que sont les vrais fichiers
 // Se connecter au FTP
 $ftp = ftp_connect($config['host'], $config['port']);
 if (!$ftp) {
+    logWebhook("FTP connection failed to " . $config['host']);
     http_response_code(500);
     die('Impossible de se connecter au serveur FTP.');
 }
+logWebhook("FTP connected. Attempting login...");
 
 $password = decryptPassword($config['password']);
 if (!ftp_login($ftp, $config['username'], $password)) {
+    logWebhook("FTP login failed for user " . $config['username']);
     http_response_code(401);
     die('Échec de l\'authentification FTP.');
 }
+logWebhook("FTP login success.");
 
 if ($config['passive']) ftp_pasv($ftp, true);
 
