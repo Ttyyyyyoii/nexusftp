@@ -65,6 +65,16 @@ const routes = [
     path: '/guest/:token',
     name: 'Guest',
     component: () => import('@/views/GuestPage.vue')
+  },
+  {
+    path: '/dashboard',
+    name: 'Dashboard',
+    component: () => import('@/views/DashboardPage.vue')
+  },
+  {
+    path: '/terminal',
+    name: 'Terminal',
+    component: () => import('@/views/TerminalPage.vue')
   }
 ]
 

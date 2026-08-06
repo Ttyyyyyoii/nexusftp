@@ -27,7 +27,9 @@
   "nav": {
     "home": "Accueil",
     "connect": "Connexion",
+    "dashboard": "Tableau de Bord",
     "files": "Gestionnaire de Fichiers",
+    "terminal": "Terminal Web",
     "history": "Historique",
     "settings": "Paramètres",
     "log": "Journal d'Activité",

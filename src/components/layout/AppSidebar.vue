@@ -34,18 +34,20 @@
 
 <script>
 import { useConnectionStore } from '@/stores/connection'
-import { Home, Plug, FolderOpen, Clock, Settings, ScrollText, Star, Heart } from 'lucide-vue-next'
+import { Home, Plug, FolderOpen, Clock, Settings, ScrollText, Star, Heart, LayoutDashboard, TerminalSquare } from 'lucide-vue-next'
 
 export default {
   name: 'AppSidebar',
-  components: { Home, Plug, FolderOpen, Clock, Settings, ScrollText, Star, Heart },
+  components: { Home, Plug, FolderOpen, Clock, Settings, ScrollText, Star, Heart, LayoutDashboard, TerminalSquare },
   data() {
     return {
       connectionStore: useConnectionStore(),
       menuItems: [
         { path: '/', label: 'nav.home', icon: 'Home' },
         { path: '/connect', label: 'nav.connect', icon: 'Plug' },
+        { path: '/dashboard', label: 'nav.dashboard', icon: 'LayoutDashboard' },
         { path: '/files', label: 'nav.files', icon: 'FolderOpen' },
+        { path: '/terminal', label: 'nav.terminal', icon: 'TerminalSquare' },
         { path: '/history', label: 'nav.history', icon: 'Clock' },
         { path: '/favorites', label: 'nav.favorites', icon: 'Heart' },
         { path: '/log', label: 'nav.log', icon: 'ScrollText' },

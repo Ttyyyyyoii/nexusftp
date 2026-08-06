@@ -27,7 +27,9 @@
   "nav": {
     "home": "Home",
     "connect": "Connect",
+    "dashboard": "Dashboard",
     "files": "File Manager",
+    "terminal": "Web Terminal",
     "history": "History",
     "settings": "Settings",
     "log": "Activity Log",
