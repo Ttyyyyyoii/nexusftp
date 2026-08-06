@@ -18,9 +18,22 @@ try {
         $connection = ssh2_connect($session['host'], $session['port']);
         ssh2_auth_password($connection, $session['username'], $password);
         $sftp = ssh2_sftp($connection);
+        
+        // Creation recursive des dossiers si necessaire pour SFTP
+        $parts = explode('/', trim($remotePath, '/'));
+        $current = '';
+        foreach ($parts as $part) {
+            if (empty($part)) continue;
+            $current .= '/' . $part;
+            $sftpUrl = "ssh2.sftp://" . intval($sftp) . $current;
+            if (!file_exists($sftpUrl)) {
+                @ssh2_sftp_mkdir($sftp, $current, 0777, true);
+            }
+        }
+        
         $remoteFile = $remotePath . '/' . $remoteName;
         $stream = @fopen("ssh2.sftp://" . intval($sftp) . $remoteFile, 'w');
-        if (!$stream) sendError('Cannot create remote file');
+        if (!$stream) sendError("Cannot create remote file: " . $remoteFile);
         $local = fopen($file['tmp_name'], 'r');
         while (!feof($local)) fwrite($stream, fread($local, CHUNK_SIZE));
         fclose($local); fclose($stream);
