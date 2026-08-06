@@ -127,6 +127,18 @@ export default {
     this.transferSettings = { ...this.settingsStore.transferSettings }
     this.notifications = { ...this.settingsStore.notifications }
   },
+  watch: {
+    notifications: {
+      deep: true,
+      handler(newVal) {
+        if (newVal.transferComplete || newVal.connectionStatus || newVal.errors) {
+          if ('Notification' in window && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+            Notification.requestPermission();
+          }
+        }
+      }
+    }
+  },
   methods: {
     changeLanguage() { this.settingsStore.setLocale(this.locale); this.$i18n.locale = this.locale },
     saveSettings() { 
@@ -134,8 +146,21 @@ export default {
       const limits = this.settingsStore.planLimits;
       if (this.transferSettings.maxSimultaneous > limits.maxSimultaneous) this.transferSettings.maxSimultaneous = limits.maxSimultaneous;
       if (this.transferSettings.maxFileSize > limits.maxFileSize) this.transferSettings.maxFileSize = limits.maxFileSize;
-      if (!limits.allowRetry) this.transferSettings.retries = 0;
-      if (!limits.allowTimeoutChange) this.transferSettings.timeout = 30;
+      
+      if (!limits.allowRetry) {
+        this.transferSettings.retries = 0;
+      } else {
+        if (this.transferSettings.retries > 10) this.transferSettings.retries = 10;
+        if (this.transferSettings.retries < 0) this.transferSettings.retries = 0;
+      }
+
+      if (!limits.allowTimeoutChange) {
+        this.transferSettings.timeout = 30;
+      } else {
+        if (this.transferSettings.timeout > 120) this.transferSettings.timeout = 120;
+        if (this.transferSettings.timeout < 5) this.transferSettings.timeout = 5;
+      }
+
       if (!limits.allowTransferModeChange) this.transferSettings.transferMode = 'binary';
       
       this.settingsStore.updateTransferSettings(this.transferSettings); 

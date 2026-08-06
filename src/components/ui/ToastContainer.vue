@@ -19,10 +19,12 @@
 
 <script>
 import { CheckCircle, AlertCircle, AlertTriangle, Info, X } from 'lucide-vue-next'
+import { useSettingsStore } from '@/stores/settings'
+
 export default {
   name: 'ToastContainer',
   components: { CheckCircle, AlertCircle, AlertTriangle, Info, X },
-  data() { return { toasts: [] } },
+  data() { return { toasts: [], settingsStore: useSettingsStore() } },
   mounted() { window.addEventListener('show-toast', this.handleToastEvent) },
   beforeUnmount() { window.removeEventListener('show-toast', this.handleToastEvent) },
   methods: {
@@ -31,6 +33,32 @@ export default {
       const id = Date.now() + Math.random()
       this.toasts.push({ id, type, title, message })
       setTimeout(() => this.removeToast(id), duration)
+
+      // Web Push Notification Logic
+      this.sendPushNotification(title, message, type)
+    },
+    sendPushNotification(title, message, type) {
+      if (!('Notification' in window)) return;
+      if (Notification.permission !== 'granted') return;
+
+      const notifs = this.settingsStore.notifications;
+      let shouldSend = false;
+
+      // Simplistic mapping based on type or title keywords
+      if (type === 'error' && notifs.errors) shouldSend = true;
+      if (type === 'success' && title.toLowerCase().includes('envoyé') && notifs.transferComplete) shouldSend = true;
+      if (type === 'success' && title.toLowerCase().includes('téléchargé') && notifs.transferComplete) shouldSend = true;
+      if (title.toLowerCase().includes('connect') && notifs.connectionStatus) shouldSend = true;
+      
+      // Fallback if not matched but it's important
+      if (type === 'error' && notifs.errors) shouldSend = true;
+
+      if (shouldSend) {
+        new Notification('NexusFTP - ' + title, {
+          body: message || '',
+          icon: '/favicon.ico'
+        });
+      }
     },
     removeToast(id) { this.toasts = this.toasts.filter(t => t.id !== id) },
     toastClass(type) {
