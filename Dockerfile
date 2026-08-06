@@ -11,6 +11,7 @@ RUN npm ci
 
 # Copier le reste du code source Vue
 COPY src/ ./src/
+COPY public/ ./public/
 COPY index.html vite.config.js vite.config.ts postcss.config.js tailwind.config.js components.json tsconfig*.json ./
 
 # Builder pour la production
