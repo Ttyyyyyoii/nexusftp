@@ -514,7 +514,23 @@ export default {
     triggerDownload() { const selected = this.connectionStore.remoteFiles.filter(f => this.remoteFilesSelected.includes(f.name)); if (selected.length > 0) this.handleDownload(selected) },
     triggerDelete() { const selected = this.connectionStore.remoteFiles.filter(f => this.remoteFilesSelected.includes(f.name)); if (selected.length > 0) this.handleDelete(selected) },
     handleShare(file) { this.shareFile = file; this.showShareModal = true },
-    handleSearchNavigate(path) { this.navigateRemote(path) },
+    async handleSearchNavigate(path, targetFile) {
+      await this.navigateRemote(path)
+      if (targetFile) {
+        setTimeout(() => {
+          const id = 'file-item-' + targetFile.name.replace(/[^a-zA-Z0-9]/g, '_')
+          const el = document.getElementById(id)
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            const highlightClasses = ['bg-primary-100', 'dark:bg-primary-900/50', 'duration-1000']
+            el.classList.add(...highlightClasses)
+            setTimeout(() => {
+              el.classList.remove(...highlightClasses)
+            }, 3000)
+          }
+        }, 500)
+      }
+    },
     showToast(title, type) { window.dispatchEvent(new CustomEvent('show-toast', { detail: { title, type } })) }
   }
 }

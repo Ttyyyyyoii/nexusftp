@@ -36,7 +36,7 @@
         <p class="text-surface-500 dark:text-surface-400 text-sm">{{ $t('files.empty') }}</p>
       </div>
       <template v-else>
-        <FileItem v-for="file in sortedFiles" :key="file.name" :file="file" :is-remote="isRemote"
+        <FileItem v-for="file in sortedFiles" :key="file.name" :id="'file-item-' + file.name.replace(/[^a-zA-Z0-9]/g, '_')" :file="file" :is-remote="isRemote"
           :selected="selectedFiles.includes(file.name)"
           @select="toggleSelect(file.name, $event)" @dblclick="$emit('file-open', file)"
           @contextmenu="showContextMenu($event, file)" />
