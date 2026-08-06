@@ -129,7 +129,6 @@
 
 <script>
 import { Users, X, Folder, Eye, Upload, Lock, Check, Copy, AlertCircle, Loader2 } from 'lucide-vue-next'
-import { useToast } from 'vue-toastification'
 import { useConnectionStore } from '@/stores/connection'
 
 export default {
@@ -163,9 +162,12 @@ export default {
     }
   },
   setup() {
-    return { toast: useToast(), connectionStore: useConnectionStore() }
+    return { connectionStore: useConnectionStore() }
   },
   methods: {
+    showToast(title, type = 'info') {
+      window.dispatchEvent(new CustomEvent('show-toast', { detail: { title, type } }))
+    },
     reset() {
       this.generatedUrl = null
       this.error = null
@@ -194,7 +196,7 @@ export default {
         const data = await res.json()
         if (data.success) {
           this.generatedUrl = data.guestUrl
-          this.toast.success('Espace collaboratif créé avec succès !')
+          this.showToast('Espace collaboratif créé avec succès !', 'success')
         } else {
           throw new Error(data.message || 'Erreur lors de la création')
         }
@@ -207,9 +209,9 @@ export default {
     async copyUrl() {
       try {
         await navigator.clipboard.writeText(this.generatedUrl)
-        this.toast.success('Lien copié dans le presse-papier')
+        this.showToast('Lien copié dans le presse-papier', 'success')
       } catch (e) {
-        this.toast.error('Erreur lors de la copie')
+        this.showToast('Erreur lors de la copie', 'error')
       }
     }
   }

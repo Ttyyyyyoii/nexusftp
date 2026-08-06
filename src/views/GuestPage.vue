@@ -142,7 +142,6 @@ import {
   Server, Moon, Sun, Lock, Key, Unlock, Loader2, Home, ChevronRight, 
   RefreshCw, Upload, FolderOpen, Folder, File as FileIcon, Download, CornerLeftUp 
 } from 'lucide-vue-next'
-import { useToast } from 'vue-toastification'
 
 export default {
   name: 'GuestPage',
@@ -180,7 +179,7 @@ export default {
   mounted() {
     this.token = this.$route.params.token
     if (!this.token) {
-      this.toast.error('Jeton invalide')
+      this.showToast('Jeton invalide', 'error')
       return
     }
     
@@ -197,6 +196,9 @@ export default {
     }
   },
   methods: {
+    showToast(title, type = 'info') {
+      window.dispatchEvent(new CustomEvent('show-toast', { detail: { title, type } }))
+    },
     toggleTheme() {
       if (this.isDark) {
         document.documentElement.classList.remove('dark')
@@ -235,13 +237,13 @@ export default {
         } else {
           if (res.status === 401) {
             this.needsPassword = true
-            if (!initialTest) this.toast.error('Mot de passe incorrect')
+            if (!initialTest) this.showToast('Mot de passe incorrect', 'error')
           } else {
             throw new Error(data.message || 'Erreur lors du chargement')
           }
         }
       } catch (err) {
-        if (!initialTest) this.toast.error(err.message)
+        if (!initialTest) this.showToast(err.message, 'error')
       } finally {
         this.loading = false
       }
@@ -273,7 +275,7 @@ export default {
       const files = event.target.files
       if (!files.length) return
       
-      this.toast.info(`Upload de ${files.length} fichier(s) en cours...`)
+      this.showToast(`Upload de ${files.length} fichier(s) en cours...`, 'info')
       
       const API_BASE = import.meta.env.VITE_API_URL || '/api'
       let successCount = 0
@@ -298,17 +300,17 @@ export default {
           if (data.success) {
             successCount++
           } else {
-            this.toast.error(`Échec pour ${file.name}: ${data.message}`)
+            this.showToast(`Échec pour ${file.name}: ${data.message}`, 'error')
             failCount++
           }
         } catch (err) {
-          this.toast.error(`Erreur pour ${file.name}`)
+          this.showToast(`Erreur pour ${file.name}`, 'error')
           failCount++
         }
       }
       
       if (successCount > 0) {
-        this.toast.success(`${successCount} fichier(s) envoyé(s) avec succès !`)
+        this.showToast(`${successCount} fichier(s) envoyé(s) avec succès !`, 'success')
         this.loadFiles()
       }
       
