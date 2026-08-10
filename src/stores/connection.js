@@ -105,6 +105,39 @@ export const useConnectionStore = defineStore('connection', {
       }
     },
 
+    async reconnect() {
+      const activeSession = this.activeSession
+      if (!activeSession) throw new Error("Aucune session active")
+      
+      const info = activeSession.connectionInfo
+      if (info && info.password) {
+        const pass = this.getDecryptedPassword(info.password)
+        if (pass) {
+          try {
+            const reconnectRes = await axios.post(`${API_BASE}/connect.php`, {
+              host: info.host, port: info.port, username: info.username,
+              password: pass, type: info.type, passive: true
+            })
+            if (reconnectRes.data.success) {
+              activeSession.sessionId = reconnectRes.data.sessionId
+              this.activeSessionId = activeSession.sessionId
+              this.persist()
+              return true
+            } else {
+              throw new Error(reconnectRes.data.message || 'Reconnect failed')
+            }
+          } catch (err) {
+            console.error('Manual reconnect failed', err)
+            throw err
+          }
+        } else {
+          throw new Error("Mot de passe introuvable")
+        }
+      } else {
+        throw new Error("Informations de connexion incomplètes")
+      }
+    },
+
     async disconnect(id = null) {
       const sessionIdToDisconnect = id || this.activeSessionId
       if (!sessionIdToDisconnect) return

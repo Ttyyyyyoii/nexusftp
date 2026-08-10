@@ -195,6 +195,46 @@
             </Transition>
           </div>
         </Transition>
+      <Teleport to="body">
+        <Transition name="modal-scale">
+          <div v-if="showSessionExpiredModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-slate-900/40 dark:bg-slate-900/60 backdrop-blur-sm transition-opacity" @click="showSessionExpiredModal = false"></div>
+            
+            <Transition name="modal-scale">
+              <div v-if="showSessionExpiredModal" class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden ring-1 ring-slate-200 dark:ring-white/10" style="transform-origin: center center;">
+                
+                <div class="px-6 pt-6 pb-4">
+                  <div class="flex items-center gap-3 mb-4">
+                    <div class="w-11 h-11 flex items-center justify-center shadow-lg flex-shrink-0 rounded-xl bg-amber-500">
+                      <Unlink class="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 class="text-slate-900 dark:text-slate-100 font-bold" style="font-size:17px;line-height:1.2;">Session expirée</h3>
+                      <p class="text-slate-500 dark:text-slate-500" style="font-size:12px;margin-top:2px;">La connexion au serveur a été perdue.</p>
+                    </div>
+                  </div>
+
+                  <div class="rounded-xl bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08]" style="padding:14px 16px;">
+                    <p class="text-sm text-slate-600 dark:text-slate-300">
+                      Le téléchargement a échoué car votre session FTP semble avoir expiré. Veuillez vous reconnecter pour continuer.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="px-6 pb-6 flex gap-3 pt-2">
+                  <button @click="showSessionExpiredModal = false"
+                    class="flex-1 py-2.5 rounded-xl text-sm font-semibold border bg-transparent border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 transition-all cursor-pointer">
+                    Annuler
+                  </button>
+                  <button @click="reconnectSession"
+                    class="flex-[1.5] py-2.5 rounded-xl text-sm font-bold text-white flex items-center justify-center gap-2 transition-all cursor-pointer hover:opacity-90 bg-amber-500 shadow-[0_4px_15px_rgba(245,158,11,0.4)]">
+                    <RefreshCw class="w-4 h-4"/> Se reconnecter
+                  </button>
+                </div>
+              </div>
+            </Transition>
+          </div>
+        </Transition>
       </Teleport>
       
     </div>
@@ -260,7 +300,8 @@ export default {
       showGitHub: false,
       globalLoader: { show: false, title: '', message: '' },
       showUploadConfirm: false,
-      uploadConfirmData: { folderName: '', fileCount: 0, totalSize: '0 KB', pendingFiles: [] }
+      uploadConfirmData: { folderName: '', fileCount: 0, totalSize: '0 KB', pendingFiles: [] },
+      showSessionExpiredModal: false
     }
   },
   computed: {
@@ -431,6 +472,9 @@ export default {
         await this.refreshRemote();
       } catch (err) {
         this.showToast(`Erreur lors de la sauvegarde: ${err.message}`, 'error');
+        if (err.message.toLowerCase().match(/(session|connect|login|authentification|401)/)) {
+          this.showSessionExpiredModal = true;
+        }
       } finally {
         this.isEditingFile = false;
       }
@@ -530,6 +574,9 @@ export default {
             }).catch((err) => {
               this.transfersStore.failTransfer(transferId, err.message); 
               this.showToast(`Échec de l'envoi (${file.name}): ${err.message}`, 'error') 
+              if (err.message.toLowerCase().match(/(session|connect|login|authentification|401)/)) {
+                this.showSessionExpiredModal = true;
+              }
             }).finally(() => {
               activeUploads--;
               this.globalLoader.progress = successCount;
@@ -540,6 +587,19 @@ export default {
         };
         nextUpload();
       });
+    },
+    async reconnectSession() {
+      this.showSessionExpiredModal = false;
+      this.globalLoader = { show: true, title: 'Reconnexion', message: 'Rétablissement de la session FTP...' };
+      try {
+        await this.connectionStore.reconnect();
+        this.showToast('Session rétablie avec succès ! Vous pouvez réessayer.', 'success');
+        await this.refreshRemote();
+      } catch (err) {
+        this.showToast(`Échec de la reconnexion: ${err.message}`, 'error');
+      } finally {
+        this.globalLoader.show = false;
+      }
     },
     async handleDownload(files) { for (const file of files) { if (file.isDirectory) continue; const transferId = this.transfersStore.addTransfer({ name: file.name, size: file.size, path: '' }, 'download', this.connectionStore.currentPath); try { const blob = await this.connectionStore.downloadFile(file); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = file.name; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); this.transfersStore.completeTransfer(transferId); this.showToast(`Downloaded ${file.name}`, 'success') } catch (err) { this.transfersStore.failTransfer(transferId, err.message); this.showToast(`Download failed: ${file.name}`, 'error') } } },
     handleDelete(files) { this.filesToDelete = files; this.showDelete = true },
