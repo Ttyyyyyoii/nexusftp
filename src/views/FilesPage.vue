@@ -415,16 +415,18 @@ export default {
             const file = validFiles[i];
             
             let targetPath = this.connectionStore.currentPath;
-            let relativeDir = '';
-            const relativePath = file.customPath || file.webkitRelativePath;
-            if (relativePath) {
-              const parts = relativePath.split('/');
-              if (parts.length > 1) {
-                parts.pop();
-                relativeDir = '/' + parts.join('/');
-                targetPath = (targetPath === '/' ? '' : targetPath) + relativeDir;
-              }
+            // webkitRelativePath = "jona/subdir/fichier.php" pour les fichiers dans un dossier uploadé
+            // On doit reconstruire le chemin complet du dossier parent distant
+            const webkitPath = file.webkitRelativePath || file.customPath || '';
+            if (webkitPath && webkitPath.includes('/')) {
+              // On retire le nom du fichier pour n'avoir que le chemin du dossier
+              const pathParts = webkitPath.split('/');
+              pathParts.pop(); // Retire le nom du fichier
+              const relativeDir = pathParts.join('/'); // ex: "jona" ou "jona/subdir"
+              const base = targetPath === '/' ? '' : targetPath;
+              targetPath = base + '/' + relativeDir;
             }
+            // Si webkitRelativePath est vide (fichier simple sans dossier), targetPath reste inchangé
             
             this.globalLoader.message = `Envoi de ${successCount} sur ${total}: ${file.name}`;
             
