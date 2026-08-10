@@ -98,10 +98,12 @@
           <div v-else class="space-y-2">
             <button v-for="conn in recentConnections.slice(0, 5)" :key="conn.host + conn.username" @click="loadConnection(conn)"
               class="w-full text-left p-3 rounded-xl bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 hover:shadow-md transition-all">
-              <div class="font-medium text-sm text-surface-800 dark:text-surface-200">{{ conn.username }}@{{ conn.host }}</div>
-              <div class="flex items-center gap-2 mt-1">
-                <span class="px-1.5 py-0.5 rounded bg-surface-100 dark:bg-surface-700 text-xs font-mono uppercase">{{ conn.type }}</span>
-                <span class="text-xs text-surface-400">{{ formatDate(conn.date) }}</span>
+              <div class="font-medium text-sm text-surface-800 dark:text-surface-200 truncate" :title="conn.username + '@' + conn.host">{{ conn.username }}@{{ conn.host }}</div>
+              <div class="flex items-center justify-between mt-1">
+                <div class="flex items-center gap-2 min-w-0">
+                  <span class="px-1.5 py-0.5 rounded bg-surface-100 dark:bg-surface-700 text-xs font-mono uppercase flex-shrink-0">{{ conn.type }}</span>
+                </div>
+                <span class="text-xs text-surface-400 whitespace-nowrap">{{ formatDate(conn.date) }}</span>
               </div>
             </button>
           </div>
