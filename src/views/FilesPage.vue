@@ -139,58 +139,55 @@
       <!-- Upload Folder Confirmation Modal -->
       <Teleport to="body">
         <Transition name="modal-fade">
-          <div v-if="showUploadConfirm" class="fixed inset-0 z-[200] flex items-center justify-center p-4" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(6px);" @click.self="showUploadConfirm = false">
+          <div v-if="showUploadConfirm" class="fixed inset-0 z-[200] flex items-center justify-center p-4" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(6px);" @click.self="showUploadConfirm = false">
             <Transition name="modal-scale">
-              <div v-if="showUploadConfirm" class="relative w-full max-w-md rounded-2xl overflow-hidden shadow-2xl" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border: 1px solid rgba(99,102,241,0.3);">
+              <div v-if="showUploadConfirm" class="relative w-full max-w-md rounded-2xl overflow-hidden shadow-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-indigo-500/30">
                 
-                <!-- Glow accent -->
-                <div style="position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(99,102,241,0.3),transparent 70%);pointer-events:none;"></div>
+                <!-- Glow accent (dark only) -->
+                <div class="hidden dark:block" style="position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(99,102,241,0.25),transparent 70%);pointer-events:none;"></div>
 
                 <!-- Header -->
                 <div class="px-6 pt-6 pb-4">
                   <div class="flex items-center gap-3 mb-4">
-                    <div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:12px;" class="w-11 h-11 flex items-center justify-center shadow-lg flex-shrink-0">
+                    <div class="w-11 h-11 flex items-center justify-center shadow-lg flex-shrink-0 rounded-xl" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">
                       <FolderPlus class="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h3 style="color:#f1f5f9;font-size:17px;font-weight:700;line-height:1.2;">Envoyer ce dossier ?</h3>
-                      <p style="color:#64748b;font-size:12px;margin-top:2px;">L'envoi est irréversible, vérifiez le chemin cible</p>
+                      <h3 class="text-slate-900 dark:text-slate-100 font-bold" style="font-size:17px;line-height:1.2;">Envoyer ce dossier ?</h3>
+                      <p class="text-slate-500 dark:text-slate-500" style="font-size:12px;margin-top:2px;">L'envoi est irréversible, vérifiez le chemin cible</p>
                     </div>
                   </div>
 
                   <!-- Folder info card -->
-                  <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px 16px;" class="space-y-3">
+                  <div class="rounded-xl space-y-3 bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08]" style="padding:14px 16px;">
                     <div class="flex items-center justify-between">
-                      <span style="color:#64748b;font-size:12px;display:flex;align-items:center;gap:6px;"><Folder class="w-3.5 h-3.5"/> Dossier</span>
-                      <span style="color:#e2e8f0;font-size:13px;font-weight:600;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" :title="uploadConfirmData.folderName">{{ uploadConfirmData.folderName }}</span>
+                      <span class="text-slate-500 dark:text-slate-500 flex items-center gap-1.5" style="font-size:12px;"><Folder class="w-3.5 h-3.5"/> Dossier</span>
+                      <span class="text-slate-800 dark:text-slate-200 font-semibold truncate max-w-[220px]" style="font-size:13px;" :title="uploadConfirmData.folderName">{{ uploadConfirmData.folderName }}</span>
                     </div>
                     <div class="flex items-center justify-between">
-                      <span style="color:#64748b;font-size:12px;display:flex;align-items:center;gap:6px;"><File class="w-3.5 h-3.5"/> Fichiers</span>
-                      <span style="color:#a78bfa;font-size:13px;font-weight:700;">{{ uploadConfirmData.fileCount }} fichier{{ uploadConfirmData.fileCount > 1 ? 's' : '' }}</span>
+                      <span class="text-slate-500 dark:text-slate-500 flex items-center gap-1.5" style="font-size:12px;"><File class="w-3.5 h-3.5"/> Fichiers</span>
+                      <span class="text-violet-600 dark:text-violet-400 font-bold" style="font-size:13px;">{{ uploadConfirmData.fileCount }} fichier{{ uploadConfirmData.fileCount > 1 ? 's' : '' }}</span>
                     </div>
                     <div class="flex items-center justify-between">
-                      <span style="color:#64748b;font-size:12px;display:flex;align-items:center;gap:6px;"><HardDrive class="w-3.5 h-3.5"/> Taille totale</span>
-                      <span style="color:#34d399;font-size:13px;font-weight:600;">{{ uploadConfirmData.totalSize }}</span>
+                      <span class="text-slate-500 dark:text-slate-500 flex items-center gap-1.5" style="font-size:12px;"><HardDrive class="w-3.5 h-3.5"/> Taille totale</span>
+                      <span class="text-emerald-600 dark:text-emerald-400 font-semibold" style="font-size:13px;">{{ uploadConfirmData.totalSize }}</span>
                     </div>
-                    <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:10px;" class="flex items-start justify-between gap-2">
-                      <span style="color:#64748b;font-size:12px;flex-shrink:0;display:flex;align-items:center;gap:6px;"><MapPin class="w-3.5 h-3.5"/> Destination</span>
-                      <span style="color:#60a5fa;font-size:12px;font-family:monospace;text-align:right;word-break:break-all;">{{ connectionStore.currentPath || '/' }}</span>
+                    <div class="flex items-start justify-between gap-2 border-t border-slate-200 dark:border-white/[0.06]" style="padding-top:10px;">
+                      <span class="text-slate-500 dark:text-slate-500 flex-shrink-0 flex items-center gap-1.5" style="font-size:12px;"><MapPin class="w-3.5 h-3.5"/> Destination</span>
+                      <span class="text-blue-600 dark:text-blue-400 text-right break-all" style="font-size:12px;font-family:monospace;">{{ connectionStore.currentPath || '/' }}</span>
                     </div>
                   </div>
                 </div>
 
                 <!-- Footer -->
-                <div style="padding:16px 24px 24px;display:flex;gap:10px;">
+                <div class="px-6 pb-6 flex gap-3 pt-2">
                   <button @click="showUploadConfirm = false"
-                    style="flex:1;padding:11px;border-radius:12px;font-size:14px;font-weight:600;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#94a3b8;cursor:pointer;transition:all 0.2s;"
-                    @mouseover="e => e.target.style.background='rgba(255,255,255,0.1)'"
-                    @mouseleave="e => e.target.style.background='rgba(255,255,255,0.06)'">
+                    class="flex-1 py-2.5 rounded-xl text-sm font-semibold border bg-transparent border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 transition-all cursor-pointer">
                     Annuler
                   </button>
                   <button @click="confirmFolderUpload"
-                    style="flex:1.5;padding:11px;border-radius:12px;font-size:14px;font-weight:700;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;color:white;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 15px rgba(99,102,241,0.4);display:flex;align-items:center;justify-content:center;gap:8px;"
-                    @mouseover="e => e.currentTarget.style.boxShadow='0 6px 20px rgba(99,102,241,0.6)'"
-                    @mouseleave="e => e.currentTarget.style.boxShadow='0 4px 15px rgba(99,102,241,0.4)'">
+                    class="flex-[1.5] py-2.5 rounded-xl text-sm font-bold text-white flex items-center justify-center gap-2 transition-all cursor-pointer hover:opacity-90"
+                    style="background:linear-gradient(135deg,#6366f1,#8b5cf6);box-shadow:0 4px 15px rgba(99,102,241,0.4);">
                     <Send class="w-4 h-4"/> Envoyer
                   </button>
                 </div>

@@ -10,7 +10,6 @@
       @drop.prevent="handleDrop"
     >
       <input ref="fileInput" type="file" multiple class="hidden" @change="handleFileSelect" />
-      <input ref="folderInput" type="file" webkitdirectory directory multiple class="hidden" @change="handleFolderSelect" />
       
       <div class="w-20 h-20 mb-6 rounded-3xl bg-white dark:bg-surface-800 shadow-sm border border-surface-100 dark:border-surface-700 flex items-center justify-center transform transition-all duration-300" :class="{ 'scale-110 shadow-md ring-4 ring-primary-100 dark:ring-primary-900/30': isDragging }">
         <UploadCloud class="w-10 h-10 text-primary-500" />
@@ -29,7 +28,7 @@
         <button @click="$refs.fileInput.click()" class="flex-1 btn-primary py-3 flex items-center justify-center gap-2 shadow-glow">
           <FilePlus class="w-4 h-4" /> Fichiers
         </button>
-        <button @click="$refs.folderInput.click()" class="flex-1 btn-secondary py-3 flex items-center justify-center gap-2 border-2">
+        <button @click="pickFolder()" class="flex-1 btn-secondary py-3 flex items-center justify-center gap-2 border-2">
           <FolderPlus class="w-4 h-4" /> Dossier
         </button>
       </div>
@@ -58,10 +57,46 @@ export default {
       if (files.length > 0) this.$emit('upload-direct', files)
       event.target.value = '' 
     },
-    handleFolderSelect(event) {
-      const files = Array.from(event.target.files || [])
-      if (files.length > 0) this.$emit('upload-direct', files)
-      event.target.value = '' 
+    async pickFolder() {
+      // Utilise l'API moderne showDirectoryPicker (Chrome/Edge 86+)
+      // Avantage : pas d'alerte native du navigateur, acces direct au dossier
+      if (!window.showDirectoryPicker) {
+        // Fallback pour Firefox : input webkitdirectory classique
+        const input = document.createElement('input')
+        input.type = 'file'
+        input.setAttribute('webkitdirectory', '')
+        input.multiple = true
+        input.onchange = (e) => {
+          const files = Array.from(e.target.files || [])
+          if (files.length > 0) this.$emit('upload-direct', files)
+        }
+        input.click()
+        return
+      }
+      try {
+        const dirHandle = await window.showDirectoryPicker({ mode: 'read' })
+        const files = []
+        await this._readDirHandle(dirHandle, dirHandle.name, files)
+        if (files.length > 0) this.$emit('upload-direct', files)
+      } catch (err) {
+        // L'utilisateur a annule le selecteur, on ne fait rien
+        if (err.name !== 'AbortError') console.error('Erreur lecteur dossier:', err)
+      }
+    },
+    async _readDirHandle(dirHandle, relativePath, files) {
+      for await (const entry of dirHandle.values()) {
+        if (entry.kind === 'file') {
+          const file = await entry.getFile()
+          // Attacher webkitRelativePath manuellement
+          Object.defineProperty(file, 'webkitRelativePath', {
+            value: relativePath + '/' + entry.name,
+            writable: false
+          })
+          files.push(file)
+        } else if (entry.kind === 'directory') {
+          await this._readDirHandle(entry, relativePath + '/' + entry.name, files)
+        }
+      }
     },
     handleDrop(event) {
       this.isDragging = false
