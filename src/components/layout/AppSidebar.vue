@@ -25,8 +25,8 @@
         <p class="text-xs text-emerald-600 dark:text-emerald-500 truncate">{{ connectionStore.connectionLabel }}</p>
       </div>
       <div v-else class="p-3 rounded-xl bg-surface-100 dark:bg-surface-800 text-center">
-        <p class="text-xs text-surface-500 dark:text-surface-400 mb-2">No active connection</p>
-        <router-link to="/connect" class="text-xs text-primary-600 hover:text-primary-700 font-medium">Connect to server</router-link>
+        <p class="text-xs text-surface-500 dark:text-surface-400 mb-2">{{ $t('dashboard.noConnection') }}</p>
+        <router-link to="/connect" class="text-xs text-primary-600 hover:text-primary-700 font-medium">{{ $t('dashboard.connectBtn') }}</router-link>
       </div>
     </div>
   </aside>
