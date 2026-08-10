@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { tracker } from '@/utils/tracker'
 
 const routes = [
   {
@@ -95,6 +96,11 @@ const routes = [
     path: '/sync',
     name: 'Sync',
     component: () => import('@/views/SyncPage.vue')
+  },
+  {
+    path: '/admin',
+    name: 'AdminAnalytics',
+    component: () => import('@/views/AdminAnalyticsPage.vue')
   }
 ]
 
@@ -114,5 +120,8 @@ router.afterEach((to) => {
     document.title = baseTitle
   }
 })
+
+// Initialize tracker
+tracker.init(router)
 
 export default router

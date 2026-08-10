@@ -77,16 +77,16 @@
           <div v-if="savedConnections.length === 0" class="text-center py-8"><Bookmark class="w-10 h-10 text-surface-300 mx-auto mb-2" /><p class="text-sm text-surface-400">No saved connections</p></div>
           <div v-else class="space-y-2">
             <div v-for="conn in savedConnections" :key="conn.id" class="group p-3 rounded-xl bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 hover:shadow-md transition-all">
-              <div class="flex items-center justify-between mb-1">
-                <span class="font-medium text-sm text-surface-800 dark:text-surface-200">{{ conn.label }}</span>
-                <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div class="flex items-center justify-between mb-1 gap-2">
+                <span class="font-medium text-sm text-surface-800 dark:text-surface-200 truncate min-w-0" :title="conn.label">{{ conn.label }}</span>
+                <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
                   <button @click="loadConnection(conn)" class="p-1 rounded hover:bg-surface-100 dark:hover:bg-surface-700"><Edit2 class="w-3 h-3 text-surface-400" /></button>
                   <button @click="removeSaved(conn.id)" class="p-1 rounded hover:bg-rose-100 dark:hover:bg-rose-900/20"><Trash2 class="w-3 h-3 text-rose-400" /></button>
                 </div>
               </div>
-              <div class="flex items-center gap-2 text-xs text-surface-500">
-                <span class="px-1.5 py-0.5 rounded bg-surface-100 dark:bg-surface-700 font-mono uppercase">{{ conn.type }}</span>
-                <span>{{ conn.host }}:{{ conn.port }}</span>
+              <div class="flex items-center gap-2 text-xs text-surface-500 min-w-0">
+                <span class="px-1.5 py-0.5 rounded bg-surface-100 dark:bg-surface-700 font-mono uppercase flex-shrink-0">{{ conn.type }}</span>
+                <span class="truncate" :title="conn.host + ':' + conn.port">{{ conn.host }}:{{ conn.port }}</span>
               </div>
               <button @click="quickConnect(conn)" class="mt-2 w-full py-1.5 text-xs font-medium text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors">{{ $t('connection.connect') }}</button>
             </div>
