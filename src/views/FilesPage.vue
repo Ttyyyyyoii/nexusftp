@@ -161,19 +161,19 @@
                   <!-- Folder info card -->
                   <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px 16px;" class="space-y-3">
                     <div class="flex items-center justify-between">
-                      <span style="color:#64748b;font-size:12px;">📁 Dossier</span>
+                      <span style="color:#64748b;font-size:12px;display:flex;align-items:center;gap:6px;"><Folder class="w-3.5 h-3.5"/> Dossier</span>
                       <span style="color:#e2e8f0;font-size:13px;font-weight:600;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" :title="uploadConfirmData.folderName">{{ uploadConfirmData.folderName }}</span>
                     </div>
                     <div class="flex items-center justify-between">
-                      <span style="color:#64748b;font-size:12px;">📄 Fichiers</span>
+                      <span style="color:#64748b;font-size:12px;display:flex;align-items:center;gap:6px;"><File class="w-3.5 h-3.5"/> Fichiers</span>
                       <span style="color:#a78bfa;font-size:13px;font-weight:700;">{{ uploadConfirmData.fileCount }} fichier{{ uploadConfirmData.fileCount > 1 ? 's' : '' }}</span>
                     </div>
                     <div class="flex items-center justify-between">
-                      <span style="color:#64748b;font-size:12px;">⚖️ Taille totale</span>
+                      <span style="color:#64748b;font-size:12px;display:flex;align-items:center;gap:6px;"><HardDrive class="w-3.5 h-3.5"/> Taille totale</span>
                       <span style="color:#34d399;font-size:13px;font-weight:600;">{{ uploadConfirmData.totalSize }}</span>
                     </div>
                     <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:10px;" class="flex items-start justify-between gap-2">
-                      <span style="color:#64748b;font-size:12px;flex-shrink:0;">🎯 Destination</span>
+                      <span style="color:#64748b;font-size:12px;flex-shrink:0;display:flex;align-items:center;gap:6px;"><MapPin class="w-3.5 h-3.5"/> Destination</span>
                       <span style="color:#60a5fa;font-size:12px;font-family:monospace;text-align:right;word-break:break-all;">{{ connectionStore.currentPath || '/' }}</span>
                     </div>
                   </div>
@@ -188,10 +188,10 @@
                     Annuler
                   </button>
                   <button @click="confirmFolderUpload"
-                    style="flex:1.5;padding:11px;border-radius:12px;font-size:14px;font-weight:700;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;color:white;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 15px rgba(99,102,241,0.4);"
+                    style="flex:1.5;padding:11px;border-radius:12px;font-size:14px;font-weight:700;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;color:white;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 15px rgba(99,102,241,0.4);display:flex;align-items:center;justify-content:center;gap:8px;"
                     @mouseover="e => e.currentTarget.style.boxShadow='0 6px 20px rgba(99,102,241,0.6)'"
                     @mouseleave="e => e.currentTarget.style.boxShadow='0 4px 15px rgba(99,102,241,0.4)'">
-                    ✈️ Envoyer
+                    <Send class="w-4 h-4"/> Envoyer
                   </button>
                 </div>
               </div>
@@ -230,7 +230,7 @@ import MediaViewer from '@/components/ui/MediaViewer.vue'
 import AIAssistant from '@/components/ftp/AIAssistant.vue'
 import GitHubDeployModal from '@/components/ui/GitHubDeployModal.vue'
 import GuestShareModal from '@/components/ui/GuestShareModal.vue'
-import { Upload, Download, Trash2, Edit2, RefreshCw, FolderPlus, FilePlus, Monitor, Globe, Loader2, Unlink, Search as SearchIcon, Bot, Github, Users } from 'lucide-vue-next'
+import { Upload, Download, Trash2, Edit2, RefreshCw, FolderPlus, FilePlus, Monitor, Globe, Loader2, Unlink, Search as SearchIcon, Bot, Github, Users, Folder, File, HardDrive, MapPin, Send } from 'lucide-vue-next'
 
 const LANG_MAP = {
   js: 'javascript', ts: 'typescript', vue: 'html', html: 'html', htm: 'html',
@@ -241,7 +241,7 @@ const LANG_MAP = {
 
 export default {
   name: 'FilesPage',
-  components: { AppLayout, Splitpanes, Pane, FileList, LocalFileBrowser, TransferPanel, BaseModal, MonacoEditor, SearchModal, ShareModal, MediaViewer, AIAssistant, GitHubDeployModal, GuestShareModal, Monitor, Globe, Loader2, Unlink, FolderPlus, FilePlus, Upload, Download, Trash2, Edit2, RefreshCw, SearchIcon, Bot, Github, Users },
+  components: { AppLayout, Splitpanes, Pane, FileList, LocalFileBrowser, TransferPanel, BaseModal, MonacoEditor, SearchModal, ShareModal, MediaViewer, AIAssistant, GitHubDeployModal, GuestShareModal, Monitor, Globe, Loader2, Unlink, FolderPlus, FilePlus, Upload, Download, Trash2, Edit2, RefreshCw, SearchIcon, Bot, Github, Users, Folder, File, HardDrive, MapPin, Send },
   data() {
     return {
       connectionStore: useConnectionStore(),
