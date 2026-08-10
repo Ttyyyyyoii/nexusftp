@@ -195,6 +195,8 @@
             </Transition>
           </div>
         </Transition>
+      </Teleport>
+      
       <Teleport to="body">
         <Transition name="modal-scale">
           <div v-if="showSessionExpiredModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
