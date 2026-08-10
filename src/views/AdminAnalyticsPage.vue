@@ -15,16 +15,16 @@
           <span style="background: rgba(139,92,246,0.15); color: #a78bfa; border: 1px solid rgba(139,92,246,0.3); border-radius: 20px; padding: 2px 10px; font-size: 11px; font-weight: 600;">ADMIN</span>
         </div>
         <div class="flex items-center gap-4">
-          <span style="color: #64748b; font-size: 13px;">DerniÃ¨re mise Ã  jour : {{ lastRefresh }}</span>
+          <span style="color: #64748b; font-size: 13px;">Dernière mise à jour : {{ lastRefresh }}</span>
           <button @click="fetchStats" style="background: rgba(139,92,246,0.1); border: 1px solid rgba(139,92,246,0.3); color: #a78bfa; border-radius: 8px; padding: 6px 14px; font-size: 13px; cursor: pointer; transition: all 0.2s;" 
             @mouseover="e => e.target.style.background='rgba(139,92,246,0.25)'"
             @mouseleave="e => e.target.style.background='rgba(139,92,246,0.1)'">
-            â†» Actualiser
+            ↻ Actualiser
           </button>
           <button @click="logout" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #f87171; border-radius: 8px; padding: 6px 14px; font-size: 13px; cursor: pointer; transition: all 0.2s;"
             @mouseover="e => e.target.style.background='rgba(239,68,68,0.25)'"
             @mouseleave="e => e.target.style.background='rgba(239,68,68,0.1)'">
-            DÃ©connexion
+            Déconnexion
           </button>
         </div>
       </div>
@@ -33,7 +33,7 @@
     <!-- Loader -->
     <div v-if="loading" class="flex flex-col justify-center items-center" style="height: calc(100vh - 64px); gap: 16px;">
       <div style="width: 48px; height: 48px; border: 3px solid rgba(139,92,246,0.2); border-top: 3px solid #8b5cf6; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
-      <p style="color: #64748b; font-size: 14px;">Chargement des donnÃ©es...</p>
+      <p style="color: #64748b; font-size: 14px;">Chargement des données...</p>
     </div>
 
     <main v-else-if="stats" class="max-w-screen-2xl mx-auto px-6 py-8 space-y-8">
@@ -62,7 +62,7 @@
         <!-- Top Pages -->
         <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 24px;" class="lg:col-span-1">
           <h3 style="font-size: 15px; font-weight: 700; color: #f1f5f9; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
-            <span>ðŸ“„</span> Pages populaires
+            <span>📄</span> Pages populaires
           </h3>
           <div class="space-y-3">
             <div v-for="(page, i) in stats.top_pages" :key="i" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
@@ -72,14 +72,14 @@
               </div>
               <span style="color: #a78bfa; font-size: 13px; font-weight: 700; margin-left: 8px; flex-shrink: 0;">{{ page.views }}</span>
             </div>
-            <div v-if="!stats.top_pages.length" style="color: #475569; font-size: 13px; text-align: center; padding: 20px;">Aucune donnÃ©e</div>
+            <div v-if="!stats.top_pages.length" style="color: #475569; font-size: 13px; text-align: center; padding: 20px;">Aucune donnée</div>
           </div>
         </div>
 
         <!-- Pays -->
         <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 24px;">
           <h3 style="font-size: 15px; font-weight: 700; color: #f1f5f9; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
-            <span>ðŸŒ</span> Top Pays
+            <span>🌍</span> Top Pays
           </h3>
           <div class="space-y-3">
             <div v-for="c in stats.countries" :key="c.country" style="display: flex; align-items: center; justify-content: space-between;">
@@ -89,14 +89,14 @@
                 <span style="color: #a78bfa; font-size: 13px; font-weight: 700; width: 24px; text-align: right;">{{ c.count }}</span>
               </div>
             </div>
-            <div v-if="!stats.countries.length" style="color: #475569; font-size: 13px; text-align: center; padding: 20px;">Aucune donnÃ©e</div>
+            <div v-if="!stats.countries.length" style="color: #475569; font-size: 13px; text-align: center; padding: 20px;">Aucune donnée</div>
           </div>
         </div>
 
         <!-- Navigateurs & Appareils -->
         <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 24px;">
           <h3 style="font-size: 15px; font-weight: 700; color: #f1f5f9; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
-            <span>ðŸ–¥ï¸</span> Navigateurs & Appareils
+            <span>🖥️</span> Navigateurs & Appareils
           </h3>
           <p style="font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; margin-top: 4px;">Navigateurs</p>
           <div class="space-y-2">
@@ -108,7 +108,7 @@
           <p style="font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; margin-top: 16px;">Appareils</p>
           <div class="space-y-2">
             <div v-for="d in stats.devices" :key="d.device_type" style="display: flex; justify-content: space-between; padding: 4px 0;">
-              <span style="color: #94a3b8; font-size: 13px;">{{ d.device_type === 'Mobile' ? 'ðŸ“± Mobile' : 'ðŸ’» Desktop' }}</span>
+              <span style="color: #94a3b8; font-size: 13px;">{{ d.device_type === 'Mobile' ? '📱 Mobile' : '💻 Desktop' }}</span>
               <span style="color: #a78bfa; font-size: 13px; font-weight: 700;">{{ d.count }}</span>
             </div>
           </div>
@@ -116,21 +116,21 @@
       </div>
 
 
-      <!-- Navigation dans l'App (FonctionnalitÃ©s utilisÃ©es) -->
+      <!-- Navigation dans l'App (Fonctionnalités utilisées) -->
       <div v-if="stats.app_pages && stats.app_pages.length" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; overflow: hidden;">
         <div style="padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.07); display: flex; align-items: center; justify-content: space-between;">
           <div>
             <h3 style="font-size: 15px; font-weight: 700; color: #f1f5f9; display: flex; align-items: center; gap: 8px;">
-              <span>âš¡</span> Navigation dans l'App â€” FonctionnalitÃ©s utilisÃ©es
+              <span>⚡</span> Navigation dans l'App — Fonctionnalités utilisées
             </h3>
-            <p style="color: #64748b; font-size: 12px; margin-top: 4px;">Pages visitÃ©es par les utilisateurs connectÃ©s ({{ stats.app_sessions }} sessions actives)</p>
+            <p style="color: #64748b; font-size: 12px; margin-top: 4px;">Pages visitées par les utilisateurs connectés ({{ stats.app_sessions }} sessions actives)</p>
           </div>
-          <div style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); color: #34d399; border-radius: 8px; padding: 4px 12px; font-size: 12px; font-weight: 600;">{{ stats.app_sessions }} utilisateurs connectÃ©s</div>
+          <div style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); color: #34d399; border-radius: 8px; padding: 4px 12px; font-size: 12px; font-weight: 600;">{{ stats.app_sessions }} utilisateurs connectés</div>
         </div>
         
-        <!-- En-tÃªtes -->
+        <!-- En-têtes -->
         <div style="display: grid; grid-template-columns: 1fr 80px 100px 100px; padding: 10px 24px; border-bottom: 1px solid rgba(255,255,255,0.07); background: rgba(0,0,0,0.2);">
-          <span style="color: #475569; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Page / FonctionnalitÃ©</span>
+          <span style="color: #475569; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Page / Fonctionnalité</span>
           <span style="color: #475569; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Vues</span>
           <span style="color: #475569; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Utilisateurs</span>
           <span style="color: #475569; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Temps moy.</span>
@@ -143,7 +143,7 @@
             @mouseleave="e => e.currentTarget.style.background='transparent'">
             
             <div style="display: flex; align-items: center; gap: 10px;">
-              <!-- IcÃ´ne selon la page -->
+              <!-- Icône selon la page -->
               <span style="font-size: 16px;">{{ appPageIcon(page.page_url) }}</span>
               <div>
                 <div style="color: #e2e8f0; font-size: 13px; font-weight: 600;">{{ appPageLabel(page.page_url) }}</div>
@@ -158,7 +158,7 @@
             
             <div style="color: #a78bfa; font-size: 13px; font-weight: 700;">{{ page.views }}</div>
             <div style="color: #64748b; font-size: 13px;">{{ page.unique_users }} users</div>
-            <div style="color: #34d399; font-size: 13px;">{{ page.avg_time ? formatTime(page.avg_time) : 'â€”' }}</div>
+            <div style="color: #34d399; font-size: 13px;">{{ page.avg_time ? formatTime(page.avg_time) : '—' }}</div>
           </div>
         </div>
       </div>
@@ -167,7 +167,7 @@
       <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; overflow: hidden;">
         <div style="padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.07); display: flex; align-items: center; justify-content: space-between;">
           <h3 style="font-size: 15px; font-weight: 700; color: #f1f5f9; display: flex; align-items: center; gap: 8px;">
-            <span>ðŸ‘¥</span> Visiteurs individuels <span style="color: #64748b; font-size: 13px; font-weight: 400;">({{ filteredVisitors.length }} sessions)</span>
+            <span>👥</span> Visiteurs individuels <span style="color: #64748b; font-size: 13px; font-weight: 400;">({{ filteredVisitors.length }} sessions)</span>
           </h3>
           <div class="flex items-center gap-3">
             <!-- Filtre pays -->
@@ -186,7 +186,7 @@
           </div>
         </div>
 
-        <!-- En-tÃªtes du tableau -->
+        <!-- En-têtes du tableau -->
         <div style="display: grid; grid-template-columns: 140px 100px 130px 100px 90px 80px 100px 80px 1fr; padding: 10px 24px; border-bottom: 1px solid rgba(255,255,255,0.07); background: rgba(0,0,0,0.2);">
           <span style="color: #475569; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Date</span>
           <span style="color: #475569; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Pays / Ville</span>
@@ -222,7 +222,7 @@
             
             <div>
               <span :style="{ background: v.device_type === 'Mobile' ? 'rgba(59,130,246,0.15)' : 'rgba(16,185,129,0.15)', color: v.device_type === 'Mobile' ? '#60a5fa' : '#34d399' }" style="font-size: 11px; font-weight: 600; border-radius: 6px; padding: 2px 8px;">
-                {{ v.device_type === 'Mobile' ? 'ðŸ“± Mobile' : 'ðŸ’» Desktop' }}
+                {{ v.device_type === 'Mobile' ? '📱 Mobile' : '💻 Desktop' }}
               </span>
             </div>
             
@@ -235,27 +235,27 @@
             
             <div style="color: #475569; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" :title="v.pages_path">{{ v.pages_path }}</div>
           </div>
-          <div v-if="!paginatedVisitors.length" style="padding: 40px; text-align: center; color: #475569; font-size: 14px;">Aucun visiteur trouvÃ©</div>
+          <div v-if="!paginatedVisitors.length" style="padding: 40px; text-align: center; color: #475569; font-size: 14px;">Aucun visiteur trouvé</div>
         </div>
 
         <!-- Pagination -->
         <div v-if="totalPages > 1" style="padding: 14px 24px; border-top: 1px solid rgba(255,255,255,0.07); display: flex; align-items: center; justify-content: space-between;">
           <span style="color: #475569; font-size: 13px;">Page {{ currentPage }} / {{ totalPages }}</span>
           <div class="flex gap-2">
-            <button @click="currentPage = Math.max(1, currentPage - 1)" :disabled="currentPage === 1" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #94a3b8; border-radius: 6px; padding: 5px 12px; font-size: 13px; cursor: pointer;" :style="{ opacity: currentPage === 1 ? 0.4 : 1 }">â† PrÃ©c.</button>
-            <button @click="currentPage = Math.min(totalPages, currentPage + 1)" :disabled="currentPage === totalPages" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #94a3b8; border-radius: 6px; padding: 5px 12px; font-size: 13px; cursor: pointer;" :style="{ opacity: currentPage === totalPages ? 0.4 : 1 }">Suiv. â†’</button>
+            <button @click="currentPage = Math.max(1, currentPage - 1)" :disabled="currentPage === 1" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #94a3b8; border-radius: 6px; padding: 5px 12px; font-size: 13px; cursor: pointer;" :style="{ opacity: currentPage === 1 ? 0.4 : 1 }">← Préc.</button>
+            <button @click="currentPage = Math.min(totalPages, currentPage + 1)" :disabled="currentPage === totalPages" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #94a3b8; border-radius: 6px; padding: 5px 12px; font-size: 13px; cursor: pointer;" :style="{ opacity: currentPage === totalPages ? 0.4 : 1 }">Suiv. →</button>
           </div>
         </div>
       </div>
 
-      <!-- Modal DÃ©tail Visiteur -->
+      <!-- Modal Détail Visiteur -->
       <div v-if="selectedVisitor" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 24px;" @click.self="selectedVisitor = null">
         <div style="background: #111827; border: 1px solid rgba(139,92,246,0.3); border-radius: 20px; padding: 32px; max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.5);">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
             <h2 style="font-size: 18px; font-weight: 700; color: #f1f5f9; display: flex; align-items: center; gap: 10px;">
-              <span>ðŸ‘¤</span> DÃ©tail du visiteur
+              <span>👤</span> Détail du visiteur
             </h2>
-            <button @click="selectedVisitor = null" style="background: rgba(255,255,255,0.07); border: none; color: #94a3b8; border-radius: 8px; width: 32px; height: 32px; cursor: pointer; font-size: 16px;">âœ•</button>
+            <button @click="selectedVisitor = null" style="background: rgba(255,255,255,0.07); border: none; color: #94a3b8; border-radius: 8px; width: 32px; height: 32px; cursor: pointer; font-size: 16px;">✕</button>
           </div>
           
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
@@ -266,9 +266,9 @@
           </div>
 
           <div style="background: rgba(255,255,255,0.03); border-radius: 10px; padding: 16px;">
-            <p style="color: #475569; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px;">ðŸ“ Parcours de navigation</p>
+            <p style="color: #475569; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px;">📍 Parcours de navigation</p>
             <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-              <span v-for="(page, i) in (selectedVisitor.pages_path || '').split(' â†’ ')" :key="i" style="background: rgba(139,92,246,0.1); border: 1px solid rgba(139,92,246,0.2); color: #a78bfa; border-radius: 6px; padding: 4px 10px; font-size: 12px;">
+              <span v-for="(page, i) in (selectedVisitor.pages_path || '').split(' → ')" :key="i" style="background: rgba(139,92,246,0.1); border: 1px solid rgba(139,92,246,0.2); color: #a78bfa; border-radius: 6px; padding: 4px 10px; font-size: 12px;">
                 {{ page }}
               </span>
             </div>
@@ -328,10 +328,10 @@ export default {
     const kpis = computed(() => {
       if (!stats.value) return []
       return [
-        { label: 'Sessions uniques', value: stats.value.total_sessions, icon: 'ðŸ‘¤', bg: 'rgba(139,92,246,0.15)' },
-        { label: 'Pages vues', value: stats.value.total_page_views, icon: 'ðŸ‘ï¸', bg: 'rgba(99,102,241,0.15)' },
-        { label: 'Temps moyen / page', value: formatTime(stats.value.average_time_spent), icon: 'â±ï¸', bg: 'rgba(16,185,129,0.15)' },
-        { label: 'Pays distincts', value: stats.value.countries?.length || 0, icon: 'ðŸŒ', bg: 'rgba(245,158,11,0.15)' },
+        { label: 'Sessions uniques', value: stats.value.total_sessions, icon: '👤', bg: 'rgba(139,92,246,0.15)' },
+        { label: 'Pages vues', value: stats.value.total_page_views, icon: '👁️', bg: 'rgba(99,102,241,0.15)' },
+        { label: 'Temps moyen / page', value: formatTime(stats.value.average_time_spent), icon: '⏱️', bg: 'rgba(16,185,129,0.15)' },
+        { label: 'Pays distincts', value: stats.value.countries?.length || 0, icon: '🌍', bg: 'rgba(245,158,11,0.15)' },
       ]
     })
 
@@ -369,11 +369,11 @@ export default {
         { label: 'OS', value: v.os },
         { label: 'Navigateur', value: v.browser },
         { label: 'Langue', value: v.language || '?' },
-        { label: 'RÃ©solution', value: v.screen_res || '?' },
-        { label: 'Pages visitÃ©es', value: v.pages_visited },
+        { label: 'Résolution', value: v.screen_res || '?' },
+        { label: 'Pages visitées', value: v.pages_visited },
         { label: 'Temps total', value: formatTime(v.total_time_spent) },
-        { label: 'RÃ©fÃ©rent', value: v.referrer || 'Direct' },
-        { label: 'PremiÃ¨re visite', value: formatDate(v.first_visit) + ' ' + formatHour(v.first_visit) },
+        { label: 'Référent', value: v.referrer || 'Direct' },
+        { label: 'Première visite', value: formatDate(v.first_visit) + ' ' + formatHour(v.first_visit) },
       ]
     })
 
