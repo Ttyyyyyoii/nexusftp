@@ -135,10 +135,81 @@
       <GitHubDeployModal :visible="showGitHub" :current-path="connectionStore.currentPath" :session-id="connectionStore.sessionId" @close="showGitHub = false" @refresh-files="refreshRemote" />
       <!-- Guest Share Modal -->
       <GuestShareModal :visible="showGuestShare" :current-path="connectionStore.currentPath" :session-id="connectionStore.activeSessionId" @close="showGuestShare = false" />
+
+      <!-- Upload Folder Confirmation Modal -->
+      <Teleport to="body">
+        <Transition name="modal-fade">
+          <div v-if="showUploadConfirm" class="fixed inset-0 z-[200] flex items-center justify-center p-4" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(6px);" @click.self="showUploadConfirm = false">
+            <Transition name="modal-scale">
+              <div v-if="showUploadConfirm" class="relative w-full max-w-md rounded-2xl overflow-hidden shadow-2xl" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border: 1px solid rgba(99,102,241,0.3);">
+                
+                <!-- Glow accent -->
+                <div style="position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(99,102,241,0.3),transparent 70%);pointer-events:none;"></div>
+
+                <!-- Header -->
+                <div class="px-6 pt-6 pb-4">
+                  <div class="flex items-center gap-3 mb-4">
+                    <div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:12px;" class="w-11 h-11 flex items-center justify-center shadow-lg flex-shrink-0">
+                      <FolderPlus class="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 style="color:#f1f5f9;font-size:17px;font-weight:700;line-height:1.2;">Envoyer ce dossier ?</h3>
+                      <p style="color:#64748b;font-size:12px;margin-top:2px;">L'envoi est irréversible, vérifiez le chemin cible</p>
+                    </div>
+                  </div>
+
+                  <!-- Folder info card -->
+                  <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px 16px;" class="space-y-3">
+                    <div class="flex items-center justify-between">
+                      <span style="color:#64748b;font-size:12px;">📁 Dossier</span>
+                      <span style="color:#e2e8f0;font-size:13px;font-weight:600;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" :title="uploadConfirmData.folderName">{{ uploadConfirmData.folderName }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <span style="color:#64748b;font-size:12px;">📄 Fichiers</span>
+                      <span style="color:#a78bfa;font-size:13px;font-weight:700;">{{ uploadConfirmData.fileCount }} fichier{{ uploadConfirmData.fileCount > 1 ? 's' : '' }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <span style="color:#64748b;font-size:12px;">⚖️ Taille totale</span>
+                      <span style="color:#34d399;font-size:13px;font-weight:600;">{{ uploadConfirmData.totalSize }}</span>
+                    </div>
+                    <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:10px;" class="flex items-start justify-between gap-2">
+                      <span style="color:#64748b;font-size:12px;flex-shrink:0;">🎯 Destination</span>
+                      <span style="color:#60a5fa;font-size:12px;font-family:monospace;text-align:right;word-break:break-all;">{{ connectionStore.currentPath || '/' }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Footer -->
+                <div style="padding:16px 24px 24px;display:flex;gap:10px;">
+                  <button @click="showUploadConfirm = false"
+                    style="flex:1;padding:11px;border-radius:12px;font-size:14px;font-weight:600;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#94a3b8;cursor:pointer;transition:all 0.2s;"
+                    @mouseover="e => e.target.style.background='rgba(255,255,255,0.1)'"
+                    @mouseleave="e => e.target.style.background='rgba(255,255,255,0.06)'">
+                    Annuler
+                  </button>
+                  <button @click="confirmFolderUpload"
+                    style="flex:1.5;padding:11px;border-radius:12px;font-size:14px;font-weight:700;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;color:white;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 15px rgba(99,102,241,0.4);"
+                    @mouseover="e => e.currentTarget.style.boxShadow='0 6px 20px rgba(99,102,241,0.6)'"
+                    @mouseleave="e => e.currentTarget.style.boxShadow='0 4px 15px rgba(99,102,241,0.4)'">
+                    ✈️ Envoyer
+                  </button>
+                </div>
+              </div>
+            </Transition>
+          </div>
+        </Transition>
+      </Teleport>
       
     </div>
   </AppLayout>
 </template>
+
+<style scoped>
+.modal-fade-enter-active, .modal-fade-leave-active { transition: opacity 0.25s ease; }
+.modal-fade-enter-from, .modal-fade-leave-to { opacity: 0; }
+.modal-scale-enter-active, .modal-scale-leave-active { transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s ease; }
+.modal-scale-enter-from, .modal-scale-leave-to { transform: scale(0.88) translateY(16px); opacity: 0; }
+</style>
 
 <script>
 import AppLayout from '@/layouts/AppLayout.vue'
@@ -190,7 +261,9 @@ export default {
       showMediaViewer: false, mediaViewerFile: null,
       showAI: false, aiContextFile: null, aiContextContent: '',
       showGitHub: false,
-      globalLoader: { show: false, title: '', message: '' }
+      globalLoader: { show: false, title: '', message: '' },
+      showUploadConfirm: false,
+      uploadConfirmData: { folderName: '', fileCount: 0, totalSize: '0 KB', pendingFiles: [] }
     }
   },
   computed: {
@@ -365,7 +438,29 @@ export default {
         this.isEditingFile = false;
       }
     },
-    async handleUpload(files) { 
+    async handleUpload(files) {
+      // Détecter si c'est un upload de dossier
+      const hasFolder = files.length > 0 && files[0].webkitRelativePath && files[0].webkitRelativePath.includes('/')
+      if (hasFolder) {
+        // Extraire le nom du dossier racine
+        const folderName = files[0].webkitRelativePath.split('/')[0]
+        const totalBytes = files.reduce((s, f) => s + f.size, 0)
+        const totalSize = totalBytes > 1024 * 1024
+          ? (totalBytes / (1024 * 1024)).toFixed(1) + ' MB'
+          : (totalBytes / 1024).toFixed(0) + ' KB'
+        this.uploadConfirmData = { folderName, fileCount: files.length, totalSize, pendingFiles: files }
+        this.showUploadConfirm = true
+        return
+      }
+      await this._doUpload(files)
+    },
+    async confirmFolderUpload() {
+      this.showUploadConfirm = false
+      const files = this.uploadConfirmData.pendingFiles
+      this.uploadConfirmData = { folderName: '', fileCount: 0, totalSize: '0 KB', pendingFiles: [] }
+      await this._doUpload(files)
+    },
+    async _doUpload(files) { 
       const settingsStore = useSettingsStore()
       const maxSimultaneous = settingsStore.planLimits.maxSimultaneous
       const maxFileSizeMB = settingsStore.planLimits.maxFileSize
