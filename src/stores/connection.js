@@ -76,7 +76,8 @@ export const useConnectionStore = defineStore('connection', {
             host: config.host,
             port: config.port || this.getDefaultPort(config.type),
             username: config.username,
-            type: config.type
+            type: config.type,
+            password: encrypt(config.password)
           }
 
           this.sessions.push({
@@ -138,6 +139,31 @@ export const useConnectionStore = defineStore('connection', {
           return response.data.files || []
         }
       } catch (err) {
+        if (err.response && err.response.status === 401) {
+          // Session expiree ! Reconnexion automatique transparente
+          const info = activeSession.connectionInfo
+          if (info && info.password) {
+            const pass = this.getDecryptedPassword(info.password)
+            if (pass) {
+              try {
+                const reconnectRes = await axios.post(`${API_BASE}/connect.php`, {
+                  host: info.host, port: info.port, username: info.username,
+                  password: pass, type: info.type, passive: true
+                })
+                if (reconnectRes.data.success) {
+                  // Mettre a jour le sessionId existant
+                  activeSession.sessionId = reconnectRes.data.sessionId
+                  this.activeSessionId = activeSession.sessionId
+                  this.persist()
+                  // Retenter le listing
+                  return await this.listRemotePath(path)
+                }
+              } catch (reconnectErr) {
+                console.error('Auto-reconnect failed', reconnectErr)
+              }
+            }
+          }
+        }
         console.error('List error:', err)
         this.error = err.message
       }
