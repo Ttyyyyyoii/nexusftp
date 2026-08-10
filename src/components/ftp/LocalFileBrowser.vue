@@ -20,8 +20,8 @@
       </h3>
       
       <p v-if="!isDragging" class="text-surface-500 dark:text-surface-400 max-w-sm mb-8 text-sm leading-relaxed">
-        Pour des raisons de sécurité, le navigateur ne peut pas afficher vos fichiers locaux. <br/><br/>
-        <b>Glissez-déposez</b> vos fichiers ici pour les envoyer sur le serveur, ou utilisez les boutons ci-dessous.
+        <b>Glissez-déposez</b> fichiers ou dossiers ici — aucune alerte, envoi direct.<br/><br/>
+        Ou utilisez les boutons ci-dessous pour parcourir.
       </p>
       
       <div v-if="!isDragging" class="flex flex-col sm:flex-row gap-4 w-full max-w-sm">
@@ -57,11 +57,22 @@ export default {
       if (files.length > 0) this.$emit('upload-direct', files)
       event.target.value = '' 
     },
+
     async pickFolder() {
-      // Utilise l'API moderne showDirectoryPicker (Chrome/Edge 86+)
-      // Avantage : pas d'alerte native du navigateur, acces direct au dossier
-      if (!window.showDirectoryPicker) {
-        // Fallback pour Firefox : input webkitdirectory classique
+      // Utilise showDirectoryPicker si disponible (Chrome/Edge)
+      // Note : le navigateur affiche son selecteur de dossier natif (inevitable)
+      // mais AUCUNE alerte "upload X fichiers" — c'est la meilleure option possible via bouton
+      if (window.showDirectoryPicker) {
+        try {
+          const dirHandle = await window.showDirectoryPicker({ mode: 'read' })
+          const files = []
+          await this._readDirHandle(dirHandle, dirHandle.name, files)
+          if (files.length > 0) this.$emit('upload-direct', files)
+        } catch (err) {
+          if (err.name !== 'AbortError') console.error('Erreur lecteur dossier:', err)
+        }
+      } else {
+        // Fallback Firefox
         const input = document.createElement('input')
         input.type = 'file'
         input.setAttribute('webkitdirectory', '')
@@ -71,23 +82,13 @@ export default {
           if (files.length > 0) this.$emit('upload-direct', files)
         }
         input.click()
-        return
-      }
-      try {
-        const dirHandle = await window.showDirectoryPicker({ mode: 'read' })
-        const files = []
-        await this._readDirHandle(dirHandle, dirHandle.name, files)
-        if (files.length > 0) this.$emit('upload-direct', files)
-      } catch (err) {
-        // L'utilisateur a annule le selecteur, on ne fait rien
-        if (err.name !== 'AbortError') console.error('Erreur lecteur dossier:', err)
       }
     },
+
     async _readDirHandle(dirHandle, relativePath, files) {
       for await (const entry of dirHandle.values()) {
         if (entry.kind === 'file') {
           const file = await entry.getFile()
-          // Attacher webkitRelativePath manuellement
           Object.defineProperty(file, 'webkitRelativePath', {
             value: relativePath + '/' + entry.name,
             writable: false
@@ -98,18 +99,57 @@ export default {
         }
       }
     },
-    handleDrop(event) {
+
+    async handleDrop(event) {
+      // Lecture recursive via webkitGetAsEntry — ZERO alerte navigateur
+      // Fonctionne pour les fichiers ET les dossiers deposes par drag-and-drop
       this.isDragging = false
       const files = []
-      
-      if (event.dataTransfer.items) {
-        Array.from(event.dataTransfer.files).forEach(f => files.push(f))
+
+      if (event.dataTransfer.items && event.dataTransfer.items.length > 0) {
+        const entries = Array.from(event.dataTransfer.items)
+          .map(item => item.webkitGetAsEntry ? item.webkitGetAsEntry() : null)
+          .filter(Boolean)
+
+        for (const entry of entries) {
+          await this._readEntry(entry, '', files)
+        }
       } else {
+        // Fallback si webkitGetAsEntry non disponible
         Array.from(event.dataTransfer.files).forEach(f => files.push(f))
       }
-      
+
       if (files.length > 0) this.$emit('upload-direct', files)
     },
+
+    async _readEntry(entry, basePath, files) {
+      if (entry.isFile) {
+        const file = await new Promise((resolve, reject) => entry.file(resolve, reject))
+        const relPath = basePath ? basePath + '/' + entry.name : entry.name
+        Object.defineProperty(file, 'webkitRelativePath', {
+          value: relPath,
+          writable: false
+        })
+        files.push(file)
+      } else if (entry.isDirectory) {
+        const dirPath = basePath ? basePath + '/' + entry.name : entry.name
+        const reader = entry.createReader()
+        const subEntries = await new Promise((resolve, reject) => {
+          const all = []
+          const readBatch = () => {
+            reader.readEntries(batch => {
+              if (batch.length === 0) resolve(all)
+              else { all.push(...batch); readBatch() }
+            }, reject)
+          }
+          readBatch()
+        })
+        for (const sub of subEntries) {
+          await this._readEntry(sub, dirPath, files)
+        }
+      }
+    },
+
     triggerSelect() {
       this.$refs.fileInput.click()
     }
