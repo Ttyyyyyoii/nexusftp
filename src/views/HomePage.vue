@@ -194,7 +194,6 @@
             <br>👉 Cliquez simplement sur <strong>"Informations complémentaires"</strong> puis sur <strong>"Exécuter quand même"</strong>.
           </div>
         </div>
-        </div>
         <p class="text-xs text-surface-400">
           Toutes les releases sont disponibles sur
           <a href="https://github.com/Ttyyyyyoii/nexusftp/releases" target="_blank" class="text-primary-500 hover:underline">GitHub Releases</a>.
