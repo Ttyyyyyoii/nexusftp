@@ -17,7 +17,6 @@
     </button>
   </div>
 
-  <!-- Bouton CTA sur la HomePage -->
   <button
     v-else-if="variant === 'hero' && canInstall"
     @click="installApp"
@@ -30,7 +29,6 @@
   >
     <Download class="w-5 h-5" />
     {{ $t('pwa.installFull') }}
-    <Sparkles class="w-4 h-4 opacity-80" />
   </button>
 
   <!-- Bannière de mise à jour disponible -->

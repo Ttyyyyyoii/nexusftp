@@ -1,7 +1,12 @@
 <template>
   <AppLayout>
-    <div class="flex flex-col lg:flex-row h-full">
-      <div class="flex-1 flex items-center justify-center p-6 overflow-auto">
+    <div class="flex flex-col lg:flex-row h-full relative">
+      <!-- Mobile History Toggle Button -->
+      <button @click="showHistory = true" class="lg:hidden absolute top-4 right-4 z-10 flex items-center gap-2 px-3 py-2 bg-surface-100 dark:bg-surface-800 rounded-lg text-sm font-medium text-surface-700 dark:text-surface-300 shadow">
+        <Clock class="w-4 h-4" /> <span class="hidden sm:inline">Historique & Favoris</span>
+      </button>
+
+      <div class="flex-1 flex items-center justify-center p-6 pt-16 lg:pt-6 overflow-auto">
         <div class="w-full max-w-md">
           <div class="text-center mb-8">
             <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center mx-auto mb-4 shadow-glow">
@@ -71,7 +76,18 @@
           </form>
         </div>
       </div>
-      <div class="lg:w-80 bg-surface-50 dark:bg-surface-900 border-l border-surface-200 dark:border-surface-800 p-6 overflow-auto">
+      
+      <!-- Overlay for mobile drawer -->
+      <div v-if="showHistory" @click="showHistory = false" class="lg:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-40"></div>
+
+      <!-- Right Panel (Drawer on mobile, fixed width on desktop) -->
+      <div :class="showHistory ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'" class="fixed lg:static top-0 right-0 bottom-0 w-80 bg-surface-50 dark:bg-surface-900 border-l border-surface-200 dark:border-surface-800 p-6 overflow-auto z-50 transition-transform duration-300 shadow-2xl lg:shadow-none">
+        <div class="flex items-center justify-between mb-6 lg:hidden">
+          <h2 class="font-bold text-surface-900 dark:text-white">Historique & Favoris</h2>
+          <button @click="showHistory = false" class="p-1 rounded-lg hover:bg-surface-200 dark:hover:bg-surface-800">
+            <X class="w-5 h-5 text-surface-500" />
+          </button>
+        </div>
         <div class="mb-6">
           <h3 class="font-semibold text-surface-900 dark:text-white mb-4 flex items-center gap-2"><Bookmark class="w-4 h-4" />{{ $t('connection.savedConnections') }}</h3>
           <div v-if="savedConnections.length === 0" class="text-center py-8"><Bookmark class="w-10 h-10 text-surface-300 mx-auto mb-2" /><p class="text-sm text-surface-400">No saved connections</p></div>
@@ -117,18 +133,19 @@
 import AppLayout from '@/layouts/AppLayout.vue'
 import { useConnectionStore } from '@/stores/connection'
 import { useLogStore } from '@/stores/log'
-import { Plug, Server, User, Lock, Eye, EyeOff, Loader2, Activity, Bookmark, Clock, Edit2, Trash2 } from 'lucide-vue-next'
+import { Plug, Server, User, Lock, Eye, EyeOff, Loader2, Activity, Bookmark, Clock, Edit2, Trash2, X } from 'lucide-vue-next'
 import dayjs from 'dayjs'
 export default {
   name: 'ConnectPage',
-  components: { AppLayout, Plug, Server, User, Lock, Eye, EyeOff, Loader2, Activity, Bookmark, Clock, Edit2, Trash2 },
+  components: { AppLayout, Plug, Server, User, Lock, Eye, EyeOff, Loader2, Activity, Bookmark, Clock, Edit2, Trash2, X },
   data() {
     return {
       connectionStore: useConnectionStore(),
       logStore: useLogStore(),
       form: { host: '', port: '', username: '', password: '', type: 'ftp', saveConnection: false },
       showPassword: false, testing: false, error: '',
-      connectionTypes: [{ value: 'ftp', label: 'FTP' }, { value: 'ftps', label: 'FTPS' }, { value: 'ftpse', label: 'FTPES' }, { value: 'sftp', label: 'SFTP' }]
+      connectionTypes: [{ value: 'ftp', label: 'FTP' }, { value: 'ftps', label: 'FTPS' }, { value: 'ftpse', label: 'FTPES' }, { value: 'sftp', label: 'SFTP' }],
+      showHistory: false
     }
   },
   computed: {

@@ -35,11 +35,11 @@
             <Star class="w-3 h-3" /> Premium
           </div>
           <button v-else @click="showPremiumModal = true" class="px-3 py-1.5 ml-2 bg-gradient-to-r from-primary-500 to-purple-500 hover:from-primary-600 hover:to-purple-600 rounded-lg text-white text-xs font-semibold flex items-center gap-1.5 shadow transition-all hover:scale-105">
-            <Sparkles class="w-3.5 h-3.5" /> Premium
+            <Crown class="w-3.5 h-3.5" /> Premium
           </button>
         </div>
-        <div class="flex items-center gap-3">
-          <div class="relative" ref="langMenuRef">
+        <div class="flex items-center gap-2 sm:gap-3">
+          <div class="relative hidden sm:block" ref="langMenuRef">
             <button @click="showLangMenu = !showLangMenu" class="p-2 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-800 text-sm font-medium text-surface-600 dark:text-surface-400 transition-colors">
               {{ settingsStore.locale.toUpperCase() }}
             </button>
@@ -55,12 +55,43 @@
             <Sun v-if="settingsStore.isDark" class="w-5 h-5 text-amber-400" />
             <Moon v-else class="w-5 h-5 text-surface-500" />
           </button>
-          <router-link to="/connect" class="btn-primary flex items-center gap-2 text-sm">
+          <router-link to="/connect" class="btn-primary flex items-center gap-2 text-sm px-3 py-1.5 sm:px-4 sm:py-2">
             <LogIn class="w-4 h-4" />
             <span class="hidden sm:inline">{{ $t('nav.connect') }}</span>
           </router-link>
+          <button @click="showMobileMenu = !showMobileMenu" class="md:hidden p-2 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors">
+            <Menu v-if="!showMobileMenu" class="w-6 h-6 text-surface-600 dark:text-surface-300" />
+            <X v-else class="w-6 h-6 text-surface-600 dark:text-surface-300" />
+          </button>
         </div>
       </div>
+      
+      <!-- Mobile Menu -->
+      <transition name="slide-down">
+        <div v-if="showMobileMenu" class="md:hidden py-4 border-t border-surface-200 dark:border-surface-700 bg-surface-0/95 dark:bg-surface-900/95 backdrop-blur-md absolute left-0 right-0 shadow-lg px-6 flex flex-col gap-2 rounded-b-2xl max-h-[80vh] overflow-y-auto">
+          <router-link v-for="item in navItems" :key="item.path" :to="item.path" @click="showMobileMenu = false"
+            class="px-4 py-3 rounded-xl text-sm font-medium transition-all"
+            :class="$route.path === item.path ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400' : 'text-surface-600 dark:text-surface-400'">
+            {{ $t(item.label) }}
+          </router-link>
+          <div class="h-px bg-surface-200 dark:bg-surface-700 my-2"></div>
+          
+          <button v-if="!settingsStore.isPremium" @click="showPremiumModal = true; showMobileMenu = false" class="w-full justify-center px-4 py-3 bg-gradient-to-r from-primary-500 to-purple-500 rounded-xl text-white text-sm font-semibold flex items-center gap-2 shadow">
+            <Crown class="w-4 h-4" /> Obtenir Premium
+          </button>
+          
+          <div class="flex items-center justify-between mt-2 px-4 py-2 bg-surface-100 dark:bg-surface-800 rounded-xl">
+            <span class="text-sm font-medium text-surface-600 dark:text-surface-400">Langue</span>
+            <div class="flex gap-2">
+              <button v-for="lang in languages" :key="lang.code" @click="changeLanguage(lang.code)"
+                class="px-2 py-1 rounded-md text-xs font-bold uppercase transition-colors"
+                :class="settingsStore.locale === lang.code ? 'bg-primary-500 text-white' : 'text-surface-500 hover:bg-surface-200 dark:hover:bg-surface-700'">
+                {{ lang.code }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </transition>
     </div>
     <PremiumModal :visible="showPremiumModal" @close="showPremiumModal = false" />
   </nav>
@@ -68,16 +99,17 @@
 
 <script>
 import { useSettingsStore } from '@/stores/settings'
-import { HardDrive, LogIn, Sun, Moon, Star, Sparkles } from 'lucide-vue-next'
+import { HardDrive, LogIn, Sun, Moon, Star, Crown, Menu, X } from 'lucide-vue-next'
 import PremiumModal from '@/components/PremiumModal.vue'
 
 export default {
   name: 'AppNavbar',
-  components: { HardDrive, LogIn, Sun, Moon, Star, Sparkles, PremiumModal },
+  components: { HardDrive, LogIn, Sun, Moon, Star, Crown, Menu, X, PremiumModal },
   data() {
     return {
       settingsStore: useSettingsStore(),
       showLangMenu: false,
+      showMobileMenu: false,
       showPremiumModal: false,
       languages: [{ code: 'en', label: 'English' }, { code: 'fr', label: 'Français' }],
       navItems: [

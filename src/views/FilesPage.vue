@@ -1,7 +1,7 @@
 <template>
   <AppLayout>
     <div class="h-full flex flex-col relative">
-      <div class="flex items-center gap-2 px-4 py-2 border-b border-surface-200 dark:border-surface-800 bg-surface-50/50 dark:bg-surface-900/50 shrink-0">
+      <div class="flex items-center gap-2 px-4 py-2 border-b border-surface-200 dark:border-surface-800 bg-surface-50/50 dark:bg-surface-900/50 shrink-0 overflow-x-auto no-scrollbar">
         <button v-for="action in toolbarActions" :key="action.id" @click="action.handler" :disabled="action.disabled"
           class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all disabled:opacity-30 disabled:cursor-not-allowed"
           :class="action.danger ? 'text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20' : 'text-surface-700 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-800'">
@@ -27,20 +27,31 @@
           <FolderPlus class="w-4 h-4" /><span class="hidden sm:inline">{{ $t('files.newFolder') }}</span>
         </button>
       </div>
+      
+      <!-- Mobile Tabs -->
+      <div class="flex md:hidden items-center p-2 bg-surface-100/80 dark:bg-surface-800/80 border-b border-surface-200 dark:border-surface-800 shrink-0 gap-2 backdrop-blur-sm">
+        <button @click="mobileTab = 'remote'" :class="mobileTab === 'remote' ? 'bg-white dark:bg-surface-700 shadow-sm text-primary-600 dark:text-primary-400' : 'text-surface-600 dark:text-surface-400 hover:bg-surface-200 dark:hover:bg-surface-700'" class="flex-1 py-2 text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all">
+          <Globe class="w-4 h-4" /> {{ $t('files.remote') }}
+        </button>
+        <button @click="mobileTab = 'local'" :class="mobileTab === 'local' ? 'bg-white dark:bg-surface-700 shadow-sm text-primary-600 dark:text-primary-400' : 'text-surface-600 dark:text-surface-400 hover:bg-surface-200 dark:hover:bg-surface-700'" class="flex-1 py-2 text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all">
+          <Monitor class="w-4 h-4" /> {{ $t('files.local') }}
+        </button>
+      </div>
+
       <div class="flex-1 overflow-hidden">
-        <splitpanes class="h-full" @resized="onPaneResized">
-          <pane min-size="20" :size="leftPanelSize">
+        <splitpanes class="h-full mobile-panes" :class="mobileTab === 'local' ? 'show-local' : 'show-remote'" @resized="onPaneResized">
+          <pane min-size="20" :size="leftPanelSize" class="pane-local">
             <div class="h-full flex flex-col border-r border-surface-200 dark:border-surface-800">
-              <div class="px-4 py-2 bg-surface-100/50 dark:bg-surface-800/50 border-b border-surface-200 dark:border-surface-800 flex items-center gap-2">
+              <div class="hidden md:flex px-4 py-2 bg-surface-100/50 dark:bg-surface-800/50 border-b border-surface-200 dark:border-surface-800 items-center gap-2">
                 <Monitor class="w-4 h-4 text-surface-500" />
                 <span class="text-xs font-semibold text-surface-600 dark:text-surface-400 uppercase tracking-wider">{{ $t('files.local') }}</span>
               </div>
               <LocalFileBrowser ref="localBrowser" @files-selected="localFilesSelected = $event" @upload-direct="handleUpload" />
             </div>
           </pane>
-          <pane min-size="20" :size="100 - leftPanelSize">
+          <pane min-size="20" :size="100 - leftPanelSize" class="pane-remote">
             <div class="h-full flex flex-col">
-              <div class="px-4 py-2 bg-surface-100/50 dark:bg-surface-800/50 border-b border-surface-200 dark:border-surface-800 flex items-center gap-2">
+              <div class="hidden md:flex px-4 py-2 bg-surface-100/50 dark:bg-surface-800/50 border-b border-surface-200 dark:border-surface-800 items-center gap-2">
                 <Globe class="w-4 h-4 text-surface-500" />
                 <span class="text-xs font-semibold text-surface-600 dark:text-surface-400 uppercase tracking-wider">{{ $t('files.remote') }}</span>
                 <div v-if="loading" class="ml-auto"><Loader2 class="w-3 h-3 animate-spin text-primary-500" /></div>
@@ -249,6 +260,17 @@
 .modal-fade-enter-from, .modal-fade-leave-to { opacity: 0; }
 .modal-scale-enter-active, .modal-scale-leave-active { transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s ease; }
 .modal-scale-enter-from, .modal-scale-leave-to { transform: scale(0.88) translateY(16px); opacity: 0; }
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+@media (max-width: 767px) {
+  .mobile-panes :deep(.splitpanes__splitter) { display: none !important; }
+  .mobile-panes :deep(.pane-local), .mobile-panes :deep(.pane-remote) { width: 100% !important; height: 100% !important; }
+  
+  .mobile-panes.show-local :deep(.pane-remote) { display: none !important; }
+  .mobile-panes.show-remote :deep(.pane-local) { display: none !important; }
+}
 </style>
 
 <script>
@@ -292,6 +314,7 @@ export default {
       logStore: useLogStore(),
       settingsStore: useSettingsStore(),
       loading: false, leftPanelSize: 50, localFilesSelected: [], remoteFilesSelected: [],
+      mobileTab: 'remote',
       showCreateModal: false, createType: 'folder', newItemName: '',
       showRename: false, renameOldName: '', renameNewName: '',
       showDelete: false, filesToDelete: [],

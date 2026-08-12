@@ -1,7 +1,7 @@
 <template>
   <transition name="modal">
-    <div v-if="visible" class="fixed inset-0 z-[90] flex items-center justify-center p-4" @click.self="close">
-      <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+    <div v-if="visible" class="fixed inset-0 z-[90] flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" @click="close" />
       <div class="relative bg-white dark:bg-surface-800 rounded-2xl shadow-premium border border-surface-200 dark:border-surface-700 w-full overflow-hidden" :class="maxWidth">
         <div v-if="title" class="flex items-center justify-between px-6 py-4 border-b border-surface-200 dark:border-surface-700">
           <h3 class="text-lg font-semibold text-surface-900 dark:text-white">{{ title }}</h3>

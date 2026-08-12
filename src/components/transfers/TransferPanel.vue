@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-surface-0 dark:bg-surface-900 border-t border-surface-200 dark:border-surface-800 flex flex-col shrink-0 transition-all duration-300" :class="collapsed ? '' : 'h-48'">
+  <div class="bg-surface-0 dark:bg-surface-900 border-t border-surface-200 dark:border-surface-800 flex flex-col shrink-0 transition-all duration-300 md:relative fixed bottom-0 left-0 right-0 z-[100] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] md:shadow-none" :class="collapsed ? '' : 'h-[40vh] md:h-48'">
     <div class="flex items-center justify-between px-4 py-2 border-b border-surface-200 dark:border-surface-800 bg-surface-50/50 dark:bg-surface-800/50">
       <div class="flex items-center gap-3">
         <ArrowUpDown class="w-4 h-4 text-surface-500" />
