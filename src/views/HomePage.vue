@@ -149,19 +149,19 @@
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto mb-8">
           <!-- Windows -->
-          <a href="https://github.com/Ttyyyyyoii/nexusftp/releases/latest" target="_blank" rel="noopener"
-            class="group flex flex-col items-center gap-3 p-6 rounded-2xl bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 hover:border-primary-400 dark:hover:border-primary-500 hover:shadow-lg transition-all cursor-pointer">
+          <a :href="downloadUrls.windows"
+            class="group flex flex-col items-center gap-3 p-6 rounded-2xl bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 hover:border-primary-400 dark:hover:border-primary-500 hover:shadow-lg transition-all cursor-pointer relative overflow-hidden">
             <span class="text-3xl">🪟</span>
             <div>
               <div class="font-semibold text-surface-900 dark:text-white">Windows</div>
               <div class="text-xs text-surface-400 mt-0.5">.exe installateur</div>
             </div>
             <span class="flex items-center gap-1 text-xs text-primary-500 font-medium group-hover:gap-2 transition-all">
-              <Download class="w-3 h-3" /> Télécharger
+              <Download class="w-3 h-3" /> Télécharger direct
             </span>
           </a>
           <!-- macOS -->
-          <a href="https://github.com/Ttyyyyyoii/nexusftp/releases/latest" target="_blank" rel="noopener"
+          <a :href="downloadUrls.macos"
             class="group flex flex-col items-center gap-3 p-6 rounded-2xl bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 hover:border-primary-400 dark:hover:border-primary-500 hover:shadow-lg transition-all cursor-pointer">
             <span class="text-3xl">🍎</span>
             <div>
@@ -169,11 +169,11 @@
               <div class="text-xs text-surface-400 mt-0.5">.dmg image disque</div>
             </div>
             <span class="flex items-center gap-1 text-xs text-primary-500 font-medium group-hover:gap-2 transition-all">
-              <Download class="w-3 h-3" /> Télécharger
+              <Download class="w-3 h-3" /> Télécharger direct
             </span>
           </a>
           <!-- Linux -->
-          <a href="https://github.com/Ttyyyyyoii/nexusftp/releases/latest" target="_blank" rel="noopener"
+          <a :href="downloadUrls.linux"
             class="group flex flex-col items-center gap-3 p-6 rounded-2xl bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 hover:border-primary-400 dark:hover:border-primary-500 hover:shadow-lg transition-all cursor-pointer">
             <span class="text-3xl">🐧</span>
             <div>
@@ -181,9 +181,19 @@
               <div class="text-xs text-surface-400 mt-0.5">.AppImage portable</div>
             </div>
             <span class="flex items-center gap-1 text-xs text-primary-500 font-medium group-hover:gap-2 transition-all">
-              <Download class="w-3 h-3" /> Télécharger
+              <Download class="w-3 h-3" /> Télécharger direct
             </span>
           </a>
+        </div>
+        
+        <!-- SmartScreen Notice -->
+        <div class="max-w-2xl mx-auto bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-xl p-4 text-left mb-8 flex items-start gap-3">
+          <Shield class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+          <div class="text-sm text-amber-800 dark:text-amber-200">
+            <strong>Info Windows (SmartScreen) :</strong> Comme notre application n'a pas encore de certificat payant, Windows peut afficher un écran bleu "Windows a protégé votre ordinateur" lors de l'installation. 
+            <br>👉 Cliquez simplement sur <strong>"Informations complémentaires"</strong> puis sur <strong>"Exécuter quand même"</strong>.
+          </div>
+        </div>
         </div>
         <p class="text-xs text-surface-400">
           Toutes les releases sont disponibles sur
@@ -232,8 +242,14 @@ export default {
         { name: 'backup/', icon: 'Folder', color: 'text-violet-400', size: '—' },
         { name: 'config.php', icon: 'FileCode2', color: 'text-emerald-400', size: '2 KB' },
         { name: 'database.sql', icon: 'FileText', color: 'text-amber-400', size: '8 MB' },
-        { name: 'cron.log', icon: 'FileText', color: 'text-surface-500', size: '1 KB' },
+        { name: 'app.js', icon: 'FileCode2', color: 'text-emerald-400', size: '12 KB' },
       ],
+      latestRelease: null,
+      downloadUrls: {
+        windows: 'https://github.com/Ttyyyyyoii/nexusftp/releases/latest',
+        macos: 'https://github.com/Ttyyyyyoii/nexusftp/releases/latest',
+        linux: 'https://github.com/Ttyyyyyoii/nexusftp/releases/latest'
+      },
       stats: [
         { value: '4', label: this.$t('home.stats.protocols') },
         { value: '100%', label: this.$t('home.stats.browser') },
@@ -254,6 +270,27 @@ export default {
         { icon: 'Upload', title: this.$t('home.features.upload.title'), desc: this.$t('home.features.upload.desc') },
         { icon: 'Lock', title: this.$t('home.features.passwords.title'), desc: this.$t('home.features.passwords.desc') }
       ]
+    }
+  },
+  async mounted() {
+    try {
+      const response = await fetch('https://api.github.com/repos/Ttyyyyyoii/nexusftp/releases/latest')
+      if (response.ok) {
+        const data = await response.json()
+        this.latestRelease = data.tag_name
+        
+        data.assets.forEach(asset => {
+          if (asset.name.endsWith('.exe')) {
+            this.downloadUrls.windows = asset.browser_download_url
+          } else if (asset.name.endsWith('.dmg')) {
+            this.downloadUrls.macos = asset.browser_download_url
+          } else if (asset.name.endsWith('.AppImage')) {
+            this.downloadUrls.linux = asset.browser_download_url
+          }
+        })
+      }
+    } catch (error) {
+      console.error('Failed to fetch latest release', error)
     }
   }
 }
