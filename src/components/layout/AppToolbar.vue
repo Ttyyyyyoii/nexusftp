@@ -1,13 +1,27 @@
 <template>
   <header class="h-14 bg-surface-0 dark:bg-surface-900 border-b border-surface-200 dark:border-surface-800 flex items-center px-4 gap-3 shrink-0">
     <div class="flex items-center gap-3">
-      <button @click="settingsStore.toggleSidebar" class="p-2 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors">
+      <button @click="$emit('toggle-sidebar')" class="p-2 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors">
         <Menu class="w-5 h-5 text-surface-600 dark:text-surface-400" />
       </button>
       <router-link to="/" class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
-          <HardDrive class="w-4 h-4 text-white" />
-        </div>
+        <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" class="shrink-0">
+          <defs>
+            <linearGradient id="tbBg" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#6366f1"/>
+              <stop offset="100%" stop-color="#8b5cf6"/>
+            </linearGradient>
+          </defs>
+          <rect width="32" height="32" rx="8" fill="url(#tbBg)"/>
+          <rect x="5" y="7" width="22" height="5" rx="2" fill="white" fill-opacity="0.3"/>
+          <rect x="5" y="14" width="22" height="5" rx="2" fill="white" fill-opacity="0.2"/>
+          <path d="M10 25 L10 19" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          <path d="M7 22 L10 19 L13 22" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M22 19 L22 25" stroke="#a5b4fc" stroke-width="2" stroke-linecap="round"/>
+          <path d="M19 22 L22 25 L25 22" stroke="#a5b4fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <circle cx="23" cy="9.5" r="1.5" fill="#34d399"/>
+          <circle cx="23" cy="16.5" r="1.5" fill="#fbbf24"/>
+        </svg>
         <span class="font-bold text-surface-900 dark:text-white hidden lg:inline">{{ $t('app.name') }}</span>
       </router-link>
     </div>
@@ -50,11 +64,12 @@
 <script>
 import { useSettingsStore } from '@/stores/settings'
 import { useConnectionStore } from '@/stores/connection'
-import { Menu, HardDrive, Search, Sun, Moon, X, Plus } from 'lucide-vue-next'
+import { Menu, Search, Sun, Moon, X, Plus } from 'lucide-vue-next'
 
 export default {
   name: 'AppToolbar',
-  components: { Menu, HardDrive, Search, Sun, Moon, X, Plus },
+  components: { Menu, Search, Sun, Moon, X, Plus },
+  emits: ['toggle-sidebar'],
   data() {
     return {
       settingsStore: useSettingsStore(),
