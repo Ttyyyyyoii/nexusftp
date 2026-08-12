@@ -2,7 +2,7 @@
   <Teleport to="body">
     <Transition name="panel-slide">
       <div
-        v-if="queueStore.batches.length > 0"
+        v-if="queueStore.batches.length > 0 && isVisible"
         class="fixed top-0 right-0 h-full z-[80] flex flex-col"
         style="width: 340px;"
       >
@@ -17,21 +17,25 @@
                 <Upload class="w-3.5 h-3.5 text-white" />
               </div>
               <div>
-                <p class="text-white font-bold text-sm leading-tight">File d'attente</p>
-                <p class="text-white/70 text-xs">{{ queueStore.batches.length }} lot{{ queueStore.batches.length > 1 ? 's' : '' }}</p>
+                <p class="text-white font-bold text-sm leading-tight">{{ $t('queuePanel.title') }}</p>
+                <p class="text-white/70 text-xs">{{ queueStore.batches.length }} {{ queueStore.batches.length > 1 ? $t('queuePanel.lots') : $t('queuePanel.lot') }}</p>
               </div>
             </div>
             <div class="flex items-center gap-1.5">
               <button
-                v-if="queueStore.doneBatches.length > 0"
+                v-if="queueStore.batches.some(b => b.status === 'done' || b.status === 'done_with_errors')"
                 @click="queueStore.clearDone()"
                 class="px-2.5 py-1 rounded-lg bg-white/15 hover:bg-white/25 text-white text-xs font-medium transition-colors"
+                :title="$t('queuePanel.clear')"
               >
-                Nettoyer
+                {{ $t('queuePanel.clear') }}
               </button>
               <button @click="collapsed = !collapsed" class="w-7 h-7 rounded-lg bg-white/15 hover:bg-white/25 flex items-center justify-center transition-colors">
                 <ChevronRight v-if="collapsed" class="w-4 h-4 text-white" />
                 <ChevronLeft v-else class="w-4 h-4 text-white" />
+              </button>
+              <button @click="isVisible = false" class="w-7 h-7 rounded-lg bg-white/15 hover:bg-white/25 flex items-center justify-center transition-colors text-white" :title="$t('common.close')">
+                <X class="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -41,7 +45,7 @@
             <div class="flex items-center justify-between mb-1.5">
               <span class="text-xs font-semibold text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5">
                 <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse inline-block"></span>
-                Envoi en cours...
+                {{ $t('queuePanel.uploading') }}
               </span>
               <span class="text-xs text-indigo-600 dark:text-indigo-400">
                 {{ activeDoneCount }} / {{ queueStore.activeBatch.files.length }}
@@ -73,8 +77,8 @@
                   </div>
                   <div class="min-w-0">
                     <p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
-                      Lot {{ queueStore.batches.length - batchIdx }}
-                      <span class="font-normal text-slate-500 dark:text-slate-400">— {{ batch.files.length }} fichier{{ batch.files.length > 1 ? 's' : '' }}</span>
+                      {{ $t('queuePanel.lot') }} {{ queueStore.batches.length - batchIdx }}
+                      <span class="font-normal text-slate-500 dark:text-slate-400">— {{ batch.files.length }} {{ batch.files.length > 1 ? $t('queuePanel.files') : $t('queuePanel.file') }}</span>
                     </p>
                     <p class="text-[10px] text-slate-400 dark:text-slate-500 truncate">{{ batch.remotePath }}</p>
                   </div>
@@ -88,7 +92,7 @@
                     v-if="batch.status === 'pending'"
                     @click="queueStore.cancelBatch(batch.id)"
                     class="w-5 h-5 rounded flex items-center justify-center text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors"
-                    title="Annuler ce lot"
+                    :title="$t('queuePanel.cancelBatch')"
                   >
                     <X class="w-3 h-3" />
                   </button>
@@ -156,6 +160,17 @@ export default {
       queueStore: useUploadQueueStore(),
       collapsed: false,
       expandedBatches: {},
+      isVisible: true
+    }
+  },
+
+  watch: {
+    'queueStore.batches.length': {
+      handler(newLen, oldLen) {
+        if (newLen > (oldLen || 0)) {
+          this.isVisible = true; // Réafficher le panneau si un nouveau lot est ajouté
+        }
+      }
     }
   },
 
@@ -190,7 +205,12 @@ export default {
     },
 
     batchStatusLabel(status) {
-      const labels = { processing: 'En cours', pending: 'En attente', done: 'Terminé', done_with_errors: 'Erreurs' }
+      const labels = { 
+        processing: this.$t('queuePanel.processing'), 
+        pending: this.$t('queuePanel.pending'), 
+        done: this.$t('queuePanel.done'), 
+        done_with_errors: this.$t('queuePanel.errors') 
+      }
       return labels[status] || status
     },
 

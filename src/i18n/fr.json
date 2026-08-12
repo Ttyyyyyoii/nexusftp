@@ -65,10 +65,18 @@
     "protocols": {
       "title": "Tous les protocoles de transfert",
       "subtitle": "Que votre hébergeur utilise FTP, FTPS ou SFTP, NexusFTP se connecte à tous.",
-      "ftp": { "desc": "Protocole de transfert classique, rapide et universel. Compatible avec tous les hébergeurs web." },
-      "ftps": { "desc": "FTP sécurisé en mode implicite. La connexion est chiffrée dès le premier octet échangé (port 990)." },
-      "ftpse": { "desc": "FTP sécurisé en mode explicite. Démarre sur le port 21 standard et bascule en chiffrement SSL/TLS." },
-      "sftp": { "desc": "Protocole sécurisé basé sur SSH. Le plus sûr et le plus utilisé sur les serveurs Linux modernes." }
+      "ftp": {
+        "desc": "Protocole de transfert classique, rapide et universel. Compatible avec tous les hébergeurs web."
+      },
+      "ftps": {
+        "desc": "FTP sécurisé en mode implicite. La connexion est chiffrée dès le premier octet échangé (port 990)."
+      },
+      "ftpse": {
+        "desc": "FTP sécurisé en mode explicite. Démarre sur le port 21 standard et bascule en chiffrement SSL/TLS."
+      },
+      "sftp": {
+        "desc": "Protocole sécurisé basé sur SSH. Le plus sûr et le plus utilisé sur les serveurs Linux modernes."
+      }
     },
     "features": {
       "title": "Conçu pour les Professionnels",
@@ -486,5 +494,20 @@
     "details": "Détail de la comparaison",
     "uploadAll": "Uploader tout ({n})",
     "uploading": "Envoi en cours..."
+  },
+  "queuePanel": {
+    "title": "File d'attente",
+    "lots": "lots",
+    "lot": "lot",
+    "clear": "Nettoyer",
+    "uploading": "Envoi en cours...",
+    "files": "fichiers",
+    "file": "fichier",
+    "pending": "En attente",
+    "processing": "En cours",
+    "done": "Terminé",
+    "errors": "Erreurs",
+    "cancelBatch": "Annuler ce lot",
+    "allDone": "Tous les fichiers ont été envoyés !"
   }
 }

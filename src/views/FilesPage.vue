@@ -340,7 +340,7 @@ export default {
 
     // Quand tous les lots sont terminés, on rafraîchit la vue
     this.queueStore.onAllDone(async () => {
-      this.showToast('Tous les fichiers ont été envoyés !', 'success')
+      this.showToast(this.$t('queuePanel.allDone'), 'success')
       await this.refreshRemote()
     })
 

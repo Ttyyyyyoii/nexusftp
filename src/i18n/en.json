@@ -65,10 +65,18 @@
     "protocols": {
       "title": "All Transfer Protocols",
       "subtitle": "Whether your host uses FTP, FTPS or SFTP, NexusFTP connects to all of them.",
-      "ftp": { "desc": "Classic transfer protocol, fast and universal. Compatible with all web hosting providers." },
-      "ftps": { "desc": "Secure FTP in implicit mode. The connection is encrypted from the very first byte (port 990)." },
-      "ftpse": { "desc": "Secure FTP in explicit mode. Starts on standard port 21 then switches to SSL/TLS encryption." },
-      "sftp": { "desc": "Secure protocol based on SSH. The most secure and most used on modern Linux servers." }
+      "ftp": {
+        "desc": "Classic transfer protocol, fast and universal. Compatible with all web hosting providers."
+      },
+      "ftps": {
+        "desc": "Secure FTP in implicit mode. The connection is encrypted from the very first byte (port 990)."
+      },
+      "ftpse": {
+        "desc": "Secure FTP in explicit mode. Starts on standard port 21 then switches to SSL/TLS encryption."
+      },
+      "sftp": {
+        "desc": "Secure protocol based on SSH. The most secure and most used on modern Linux servers."
+      }
     },
     "features": {
       "title": "Built for Professionals",
@@ -496,5 +504,20 @@
     "details": "Comparison details",
     "uploadAll": "Upload all ({n})",
     "uploading": "Uploading..."
+  },
+  "queuePanel": {
+    "title": "Queue",
+    "lots": "batches",
+    "lot": "batch",
+    "clear": "Clear done",
+    "uploading": "Uploading...",
+    "files": "files",
+    "file": "file",
+    "pending": "Pending",
+    "processing": "Processing",
+    "done": "Done",
+    "errors": "Errors",
+    "cancelBatch": "Cancel this batch",
+    "allDone": "All files uploaded successfully!"
   }
 }
