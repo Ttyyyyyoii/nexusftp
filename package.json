@@ -14,15 +14,71 @@
   "build": {
     "appId": "com.nexusftp.app",
     "productName": "NexusFTP",
+    "copyright": "Copyright © 2026 NexusFTP",
     "directories": {
-      "output": "dist_electron"
+      "output": "dist_electron",
+      "buildResources": "public"
     },
     "files": [
       "dist/**/*",
-      "electron/**/*"
+      "electron/**/*",
+      "public/icon.png"
+    ],
+    "icon": "public/icon.png",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Ttyyyyyoii",
+        "repo": "nexusftp"
+      }
     ],
     "win": {
-      "target": "dir"
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "public/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "NexusFTP",
+      "installerIcon": "public/icon.png",
+      "uninstallerIcon": "public/icon.png"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
+      ],
+      "icon": "public/icon.png",
+      "category": "public.app-category.utilities"
+    },
+    "dmg": {
+      "title": "NexusFTP ${version}",
+      "contents": [
+        { "x": 410, "y": 150, "type": "link", "path": "/Applications" },
+        { "x": 130, "y": 150, "type": "file" }
+      ]
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "public/icon.png",
+      "category": "Network",
+      "description": "Client FTP, SFTP et FTPS premium en ligne"
     }
   },
   "dependencies": {

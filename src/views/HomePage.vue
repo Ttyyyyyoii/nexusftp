@@ -134,6 +134,65 @@
       </div>
     </section>
 
+    <!-- Download Desktop App Section -->
+    <section class="py-24 relative">
+      <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5" />
+      <div class="relative max-w-4xl mx-auto px-6 text-center">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-sm font-medium mb-6">
+          <Monitor class="w-4 h-4" /> Application de bureau
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-bold text-surface-900 dark:text-white mb-4">
+          Disponible aussi en application native
+        </h2>
+        <p class="text-lg text-surface-500 dark:text-surface-400 mb-10 max-w-xl mx-auto">
+          Téléchargez NexusFTP sur votre ordinateur pour une expérience encore plus fluide. Windows, macOS et Linux.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto mb-8">
+          <!-- Windows -->
+          <a href="https://github.com/Ttyyyyyoii/nexusftp/releases/latest" target="_blank" rel="noopener"
+            class="group flex flex-col items-center gap-3 p-6 rounded-2xl bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 hover:border-primary-400 dark:hover:border-primary-500 hover:shadow-lg transition-all cursor-pointer">
+            <span class="text-3xl">🪟</span>
+            <div>
+              <div class="font-semibold text-surface-900 dark:text-white">Windows</div>
+              <div class="text-xs text-surface-400 mt-0.5">.exe installateur</div>
+            </div>
+            <span class="flex items-center gap-1 text-xs text-primary-500 font-medium group-hover:gap-2 transition-all">
+              <Download class="w-3 h-3" /> Télécharger
+            </span>
+          </a>
+          <!-- macOS -->
+          <a href="https://github.com/Ttyyyyyoii/nexusftp/releases/latest" target="_blank" rel="noopener"
+            class="group flex flex-col items-center gap-3 p-6 rounded-2xl bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 hover:border-primary-400 dark:hover:border-primary-500 hover:shadow-lg transition-all cursor-pointer">
+            <span class="text-3xl">🍎</span>
+            <div>
+              <div class="font-semibold text-surface-900 dark:text-white">macOS</div>
+              <div class="text-xs text-surface-400 mt-0.5">.dmg image disque</div>
+            </div>
+            <span class="flex items-center gap-1 text-xs text-primary-500 font-medium group-hover:gap-2 transition-all">
+              <Download class="w-3 h-3" /> Télécharger
+            </span>
+          </a>
+          <!-- Linux -->
+          <a href="https://github.com/Ttyyyyyoii/nexusftp/releases/latest" target="_blank" rel="noopener"
+            class="group flex flex-col items-center gap-3 p-6 rounded-2xl bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 hover:border-primary-400 dark:hover:border-primary-500 hover:shadow-lg transition-all cursor-pointer">
+            <span class="text-3xl">🐧</span>
+            <div>
+              <div class="font-semibold text-surface-900 dark:text-white">Linux</div>
+              <div class="text-xs text-surface-400 mt-0.5">.AppImage portable</div>
+            </div>
+            <span class="flex items-center gap-1 text-xs text-primary-500 font-medium group-hover:gap-2 transition-all">
+              <Download class="w-3 h-3" /> Télécharger
+            </span>
+          </a>
+        </div>
+        <p class="text-xs text-surface-400">
+          Toutes les releases sont disponibles sur
+          <a href="https://github.com/Ttyyyyyoii/nexusftp/releases" target="_blank" class="text-primary-500 hover:underline">GitHub Releases</a>.
+          Version web toujours disponible sans installation.
+        </p>
+      </div>
+    </section>
+
     <!-- CTA Section -->
     <section class="py-24 relative">
       <div class="absolute inset-0 bg-gradient-to-br from-primary-500/5 to-violet-500/5" />
@@ -154,11 +213,11 @@
 <script>
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import PwaInstallPrompt from '@/components/ui/PwaInstallPrompt.vue'
-import { Sparkles, Zap, BookOpen, Folder, FileText, FileCode2, Image, Rocket, Shield, Gauge, Globe, Upload, Lock, Monitor, RefreshCw, Wifi } from 'lucide-vue-next'
+import { Sparkles, Zap, BookOpen, Folder, FileText, FileCode2, Image, Rocket, Shield, Gauge, Globe, Upload, Lock, Monitor, RefreshCw, Wifi, Download } from 'lucide-vue-next'
 
 export default {
   name: 'HomePage',
-  components: { DefaultLayout, PwaInstallPrompt, Sparkles, Zap, BookOpen, Folder, FileText, FileCode2, Image, Rocket, Shield, Gauge, Globe, Upload, Lock, Monitor, RefreshCw, Wifi },
+  components: { DefaultLayout, PwaInstallPrompt, Sparkles, Zap, BookOpen, Folder, FileText, FileCode2, Image, Rocket, Shield, Gauge, Globe, Upload, Lock, Monitor, RefreshCw, Wifi, Download },
   data() {
     return {
       mockLocalFiles: [

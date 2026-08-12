@@ -1,0 +1,165 @@
+name: Build & Release NexusFTP Desktop
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # Se déclenche sur les tags comme v1.0.0, v1.2.3, etc.
+
+permissions:
+  contents: write  # Nécessaire pour créer des GitHub Releases
+
+jobs:
+  # ─────────────────────────────────────────
+  # BUILD WINDOWS (.exe installer)
+  # ─────────────────────────────────────────
+  build-windows:
+    name: 🪟 Windows
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web app (Vite)
+        run: npm run build
+
+      - name: Build Electron Windows installer
+        run: npx electron-builder --win --publish never
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NexusFTP-Windows
+          path: dist_electron/*.exe
+          retention-days: 5
+
+  # ─────────────────────────────────────────
+  # BUILD macOS (.dmg)
+  # ─────────────────────────────────────────
+  build-macos:
+    name: 🍎 macOS
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web app (Vite)
+        run: npm run build
+
+      - name: Build Electron macOS DMG
+        run: npx electron-builder --mac --publish never
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NexusFTP-macOS
+          path: dist_electron/*.dmg
+          retention-days: 5
+
+  # ─────────────────────────────────────────
+  # BUILD LINUX (.AppImage)
+  # ─────────────────────────────────────────
+  build-linux:
+    name: 🐧 Linux
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web app (Vite)
+        run: npm run build
+
+      - name: Build Electron Linux AppImage
+        run: npx electron-builder --linux --publish never
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NexusFTP-Linux
+          path: dist_electron/*.AppImage
+          retention-days: 5
+
+  # ─────────────────────────────────────────
+  # PUBLIER LA RELEASE GITHUB
+  # ─────────────────────────────────────────
+  publish-release:
+    name: 📦 Publier la Release
+    needs: [build-windows, build-macos, build-linux]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-files
+
+      - name: List release files
+        run: find release-files -type f
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "NexusFTP ${{ github.ref_name }}"
+          body: |
+            ## 🚀 NexusFTP ${{ github.ref_name }}
+
+            Client FTP, SFTP et FTPS premium — Application de bureau
+
+            ### 📥 Télécharger
+
+            | Système | Fichier | Note |
+            |---------|---------|------|
+            | 🪟 **Windows** | `NexusFTP-Setup-*.exe` | Installateur NSIS |
+            | 🍎 **macOS** | `NexusFTP-*.dmg` | Image disque |
+            | 🐧 **Linux** | `NexusFTP-*.AppImage` | AppImage portable |
+
+            ### 🔐 Note de sécurité
+
+            **Windows :** Si Windows SmartScreen affiche un avertissement "éditeur inconnu", cliquez sur **"Informations supplémentaires"** puis **"Exécuter quand même"**. L'application n'est pas signée avec un certificat commercial mais est 100% sûre.
+
+            **macOS :** Si macOS bloque l'application, faites un clic droit sur le fichier `.dmg` et choisissez **"Ouvrir"**.
+
+            ### 🌐 Version Web
+            Disponible sur [nexusftp.onrender.com](https://nexusftp.onrender.com)
+          draft: false
+          prerelease: false
+          files: |
+            release-files/NexusFTP-Windows/*.exe
+            release-files/NexusFTP-macOS/*.dmg
+            release-files/NexusFTP-Linux/*.AppImage
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

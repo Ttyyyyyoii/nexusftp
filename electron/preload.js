@@ -1,2 +1,8 @@
-// Fichier preload vide par défaut.
-// Vous pouvez y exposer des API Node.js de manière sécurisée si besoin plus tard.
+const { contextBridge, ipcRenderer } = require('electron');
+
+// Exposer des APIs sécurisées à l'application web
+contextBridge.exposeInMainWorld('electronAPI', {
+  getVersion: () => ipcRenderer.invoke('get-app-version'),
+  getPlatform: () => ipcRenderer.invoke('get-platform'),
+  isElectron: true
+});

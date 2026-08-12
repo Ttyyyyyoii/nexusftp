@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router'
 import { tracker } from '@/utils/tracker'
 
 const routes = [
@@ -104,8 +104,12 @@ const routes = [
   }
 ]
 
+// Détecter si on est dans Electron (via la variable injectée par preload.js ou user agent)
+const isElectron = window?.electronAPI?.isElectron === true ||
+  navigator.userAgent.toLowerCase().includes('electron')
+
 const router = createRouter({
-  history: createWebHistory(),
+  history: isElectron ? createWebHashHistory() : createWebHistory(),
   routes,
   scrollBehavior() {
     return { top: 0, behavior: 'smooth' }
