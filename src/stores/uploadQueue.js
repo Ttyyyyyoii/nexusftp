@@ -97,14 +97,15 @@ export const useUploadQueueStore = defineStore('uploadQueue', {
       } catch(e) { /* fallback */ }
 
       let hasErrors = false
+      let sessionExpired = false
       let activeUploads = 0
       let currentIndex = 0
       const total = nextBatch.files.length
 
-      // Upload en parallèle (comme l'ancienne logique) : maxSimultaneous fichiers à la fois
+      // Upload en parallèle : maxSimultaneous fichiers à la fois
       await new Promise((resolve) => {
         const launchNext = () => {
-          // Tous les fichiers sont terminés
+          // Tous les fichiers sont terminés ou session expirée
           if (currentIndex >= total && activeUploads === 0) {
             resolve()
             return
@@ -134,6 +135,28 @@ export const useUploadQueueStore = defineStore('uploadQueue', {
                 fileEntry.status = 'error'
                 fileEntry.error = err.message
                 hasErrors = true
+
+                // Détection de session expirée (401 ou message d'auth)
+                const isSessionError = err.message?.toLowerCase?.().match(/(session|connect|login|authentification|401|unauthorized)/)
+                if (isSessionError && !sessionExpired) {
+                  sessionExpired = true
+                  // Marquer tous les fichiers restants comme annulés
+                  for (let i = currentIndex; i < total; i++) {
+                    if (nextBatch.files[i].status === 'pending') {
+                      nextBatch.files[i].status = 'error'
+                      nextBatch.files[i].error = 'Session expirée'
+                    }
+                  }
+                  // Marquer les lots en attente
+                  this.batches.forEach(b => {
+                    if (b.status === 'pending') {
+                      b.status = 'done_with_errors'
+                      b.files.forEach(f => { f.status = 'error'; f.error = 'Session expirée' })
+                    }
+                  })
+                  // Déclencher le modal de session expirée dans FilesPage
+                  window.dispatchEvent(new CustomEvent('upload-session-expired'))
+                }
               })
               .finally(() => {
                 activeUploads--
@@ -147,8 +170,15 @@ export const useUploadQueueStore = defineStore('uploadQueue', {
       // Marquer le lot comme terminé
       nextBatch.status = hasErrors ? 'done_with_errors' : 'done'
 
+      // Si session expirée, on arrête tout
+      if (sessionExpired) {
+        this.isProcessing = false
+        return
+      }
+
       // Traiter le lot suivant
       await this._processNext()
+
     },
 
     /**

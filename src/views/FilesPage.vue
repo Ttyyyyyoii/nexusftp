@@ -343,9 +343,16 @@ export default {
       this.showToast('Tous les fichiers ont été envoyés !', 'success')
       await this.refreshRemote()
     })
+
+    // Détection de session expirée depuis le store d'upload
+    this._onUploadSessionExpired = () => { this.showSessionExpiredModal = true }
+    window.addEventListener('upload-session-expired', this._onUploadSessionExpired)
   },
   beforeUnmount() {
     if (this.deployPollInterval) clearInterval(this.deployPollInterval)
+    if (this._onUploadSessionExpired) {
+      window.removeEventListener('upload-session-expired', this._onUploadSessionExpired)
+    }
   },
   methods: {
     async checkDeployStatus() {
