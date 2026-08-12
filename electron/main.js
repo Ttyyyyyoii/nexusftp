@@ -15,7 +15,7 @@ function createWindow() {
     minWidth: 900,
     minHeight: 600,
     title: 'NexusFTP',
-    icon: path.join(__dirname, '../public/icon.png'),
+    icon: path.join(__dirname, process.platform === 'win32' ? '../public/icon.ico' : '../public/icon.png'),
     backgroundColor: '#0f0f23',
     show: false, // Ne pas afficher avant que la page soit chargée
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',

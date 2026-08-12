@@ -22,7 +22,8 @@
     "files": [
       "dist/**/*",
       "electron/**/*",
-      "public/icon.png"
+      "public/icon.png",
+      "public/icon.ico"
     ],
     "icon": "public/icon.png",
     "publish": [
@@ -39,7 +40,7 @@
           "arch": ["x64"]
         }
       ],
-      "icon": "public/icon.png"
+      "icon": "public/icon.ico"
     },
     "nsis": {
       "oneClick": false,
@@ -49,8 +50,8 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "NexusFTP",
-      "installerIcon": "public/icon.png",
-      "uninstallerIcon": "public/icon.png"
+      "installerIcon": "public/icon.ico",
+      "uninstallerIcon": "public/icon.ico"
     },
     "mac": {
       "target": [
