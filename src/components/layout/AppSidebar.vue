@@ -15,6 +15,11 @@
           <span class="truncate">{{ fav.label || fav.host }}</span>
         </button>
       </div>
+
+      <!-- Bouton installation PWA -->
+      <div class="pt-4 mt-4 border-t border-surface-200 dark:border-surface-800">
+        <PwaInstallPrompt variant="sidebar" />
+      </div>
     </nav>
     <div class="p-3 border-t border-surface-200 dark:border-surface-800">
       <div v-if="connectionStore.isConnected" class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
@@ -34,11 +39,12 @@
 
 <script>
 import { useConnectionStore } from '@/stores/connection'
+import PwaInstallPrompt from '@/components/ui/PwaInstallPrompt.vue'
 import { Home, Plug, FolderOpen, Clock, Settings, ScrollText, Star, Heart, LayoutDashboard, TerminalSquare, ShieldCheck, Images, Activity, ArrowLeftRight } from 'lucide-vue-next'
 
 export default {
   name: 'AppSidebar',
-  components: { Home, Plug, FolderOpen, Clock, Settings, ScrollText, Star, Heart, LayoutDashboard, TerminalSquare, ShieldCheck, Images, Activity, ArrowLeftRight },
+  components: { Home, Plug, FolderOpen, Clock, Settings, ScrollText, Star, Heart, LayoutDashboard, TerminalSquare, ShieldCheck, Images, Activity, ArrowLeftRight, PwaInstallPrompt },
   data() {
     return {
       connectionStore: useConnectionStore(),

@@ -519,5 +519,12 @@
     "errors": "Errors",
     "cancelBatch": "Cancel this batch",
     "allDone": "All files uploaded successfully!"
+  },
+  "pwa": {
+    "install": "Install NexusFTP",
+    "installFull": "Install App",
+    "updateTitle": "Update Available",
+    "updateDesc": "A new version is ready.",
+    "updateBtn": "Update now"
   }
 }

@@ -140,9 +140,12 @@
       <div class="relative max-w-4xl mx-auto px-6 text-center">
         <h2 class="text-3xl sm:text-4xl font-bold text-surface-900 dark:text-white mb-6">{{ $t('home.cta.title') }}</h2>
         <p class="text-lg text-surface-500 dark:text-surface-400 mb-8 max-w-xl mx-auto">{{ $t('home.cta.subtitle') }}</p>
-        <router-link to="/connect" class="btn-primary inline-flex items-center gap-2 text-lg px-8 py-4">
-          <Rocket class="w-5 h-5" /> {{ $t('home.cta.button') }}
-        </router-link>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <router-link to="/connect" class="btn-primary inline-flex items-center gap-2 text-lg px-8 py-4">
+            <Rocket class="w-5 h-5" /> {{ $t('home.cta.button') }}
+          </router-link>
+          <PwaInstallPrompt variant="hero" />
+        </div>
       </div>
     </section>
   </DefaultLayout>
@@ -150,11 +153,12 @@
 
 <script>
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
+import PwaInstallPrompt from '@/components/ui/PwaInstallPrompt.vue'
 import { Sparkles, Zap, BookOpen, Folder, FileText, FileCode2, Image, Rocket, Shield, Gauge, Globe, Upload, Lock, Monitor, RefreshCw, Wifi } from 'lucide-vue-next'
 
 export default {
   name: 'HomePage',
-  components: { DefaultLayout, Sparkles, Zap, BookOpen, Folder, FileText, FileCode2, Image, Rocket, Shield, Gauge, Globe, Upload, Lock, Monitor, RefreshCw, Wifi },
+  components: { DefaultLayout, PwaInstallPrompt, Sparkles, Zap, BookOpen, Folder, FileText, FileCode2, Image, Rocket, Shield, Gauge, Globe, Upload, Lock, Monitor, RefreshCw, Wifi },
   data() {
     return {
       mockLocalFiles: [
