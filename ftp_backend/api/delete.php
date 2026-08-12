@@ -81,15 +81,20 @@ try {
             } else {
                 $del = @ftp_delete($conn, $fullPath);
                 $deleteLog['ftp_delete_absolute_result'] = $del;
-                $deleteLog['php_error_absolute'] = error_get_last();
 
                 if (!$del) {
-                    $curlResult = curlFtpCommand($session, $password, 'DELE ' . $fullPath);
-                    $deleteLog['curl_delete_fallback'] = $curlResult;
-                    $del = $curlResult['success'];
+                    // Fallback using raw FTP command
+                    $raw = @ftp_raw($conn, 'DELE ' . $fullPath);
+                    $deleteLog['ftp_raw_delete'] = $raw;
+                    if (is_array($raw) && count($raw) > 0) {
+                        $lastLine = end($raw);
+                        if (preg_match('/^2\d\d/', $lastLine)) {
+                            $del = true;
+                        } else {
+                            $deleteLog['failures'][] = "Raw DELE failed: $lastLine";
+                        }
+                    }
                 }
-
-                file_put_contents(__DIR__ . '/debug_delete.log', print_r($deleteLog, true));
 
                 if (!$del) {
                     throw new Exception("Failed to delete file (permissions or doesn't exist): $name");
@@ -241,12 +246,22 @@ function deleteFTPDir(&$conn, $path, $session, $password, &$deleteLog) {
                     continue;
                 }
 
-                // Fichier reel dont la suppression native a echoue: on tente cURL.
-                $curlResult = curlFtpCommand($session, $password, 'DELE ' . $entryPath);
-                $deleteLog['curl_delete_attempts'][] = $curlResult;
+                // Fichier reel dont la suppression native a echoue: fallback ftp_raw.
+                $raw = @ftp_raw($conn, 'DELE ' . $entryPath);
+                $deleteLog['ftp_raw_delete_attempts'][] = $raw;
 
-                if (!$curlResult['success']) {
-                    $reason = "Impossible de supprimer le fichier '$entryPath' (natif et cURL ont echoue: " . $curlResult['error'] . ")";
+                $success = false;
+                if (is_array($raw) && count($raw) > 0) {
+                    $lastLine = end($raw);
+                    if (preg_match('/^2\d\d/', $lastLine)) {
+                        $success = true;
+                    } else {
+                        $deleteLog['failures'][] = "Raw DELE failed on '$entryPath': $lastLine";
+                    }
+                }
+
+                if (!$success) {
+                    $reason = "Impossible de supprimer le fichier '$entryPath'";
                     $deleteLog['failures'][] = $reason;
                 }
             }
@@ -258,12 +273,21 @@ function deleteFTPDir(&$conn, $path, $session, $password, &$deleteLog) {
     $deleteLog['ftp_rmdir_absolute_result'][$path] = $rmdir;
 
     if ($rmdir === false) {
-        $curlResult = curlFtpCommand($session, $password, 'RMD ' . $path);
-        $deleteLog['curl_rmdir_attempts'][$path] = $curlResult;
-        $rmdir = $curlResult['success'];
+        $raw = @ftp_raw($conn, 'RMD ' . $path);
+        $deleteLog['ftp_raw_rmdir_attempts'][$path] = $raw;
+        
+        if (is_array($raw) && count($raw) > 0) {
+            $lastLine = end($raw);
+            if (preg_match('/^2\d\d/', $lastLine)) {
+                $rmdir = true;
+            } else {
+                $reason = "Impossible de supprimer le dossier '$path' : $lastLine";
+                $deleteLog['failures'][] = $reason;
+            }
+        }
 
-        if (!$rmdir) {
-            $reason = "Impossible de supprimer le dossier '$path' (natif et cURL ont echoue: " . $curlResult['error'] . ")";
+        if (!$rmdir && empty($deleteLog['failures'])) {
+            $reason = "Impossible de supprimer le dossier '$path' (raison inconnue, non vide ?)";
             $deleteLog['failures'][] = $reason;
         }
     }

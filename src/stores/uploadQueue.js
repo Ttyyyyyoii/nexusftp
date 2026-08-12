@@ -90,10 +90,11 @@ export const useUploadQueueStore = defineStore('uploadQueue', {
       const connectionStore = useConnectionStore()
 
       // Récupérer la limite de simultanéité depuis les settings
-      let maxSimultaneous = 3
+      let maxSimultaneous = 1 // Modifié à 1 pour éviter les limites de connexions FTP concurrentes
       try {
         const { useSettingsStore } = await import('./settings')
-        maxSimultaneous = useSettingsStore().planLimits?.maxSimultaneous || 3
+        const planLimit = useSettingsStore().planLimits?.maxSimultaneous
+        if (planLimit && planLimit < 3) maxSimultaneous = 1
       } catch(e) { /* fallback */ }
 
       let hasErrors = false
