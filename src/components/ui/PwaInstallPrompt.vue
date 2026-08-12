@@ -113,6 +113,9 @@ export default {
     onAppInstalled() {
       this.canInstall = false
       this.deferredPrompt = null
+      // Le navigateur transforme souvent l'onglet actuel en fenêtre PWA sans recharger.
+      // On force la redirection vers /connect juste après l'installation pour éviter de rester sur l'accueil.
+      this.$router.push('/connect')
     },
 
     async installApp() {
