@@ -122,6 +122,7 @@
           <button @click="activeTab = 'new'" class="text-sm text-primary-600 hover:underline">Créer un déploiement</button>
         </div>
 
+        <!-- Bouton Déployer maintenant -->
         <div v-else class="space-y-3">
           <p class="text-xs text-surface-400 font-medium uppercase tracking-wider">{{ deployments.length }} déploiement(s) actif(s)</p>
           <div v-for="dep in deployments" :key="dep.token" class="bg-surface-50 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-xl p-4 space-y-2">
@@ -140,6 +141,18 @@
               <span>→</span>
               <span class="font-mono bg-surface-100 dark:bg-surface-700 px-2 py-0.5 rounded text-surface-700 dark:text-surface-300">{{ dep.remotePath }}</span>
               <span v-if="dep.createdAt" class="ml-auto">{{ formatDate(dep.createdAt) }}</span>
+            </div>
+            <!-- Déployer maintenant -->
+            <button @click="deployNow(dep)" :disabled="deployingNow === dep.token"
+              class="w-full mt-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-primary-500 hover:bg-primary-600 disabled:opacity-60 text-white text-xs font-medium transition-all">
+              <Loader2 v-if="deployingNow === dep.token" class="w-3.5 h-3.5 animate-spin" />
+              <Zap v-else class="w-3.5 h-3.5" />
+              {{ deployingNow === dep.token ? 'Déploiement en cours...' : '⚡ Déployer maintenant' }}
+            </button>
+            <!-- Résultat du déploiement -->
+            <div v-if="deployNowResult[dep.token]" class="text-xs rounded-lg p-2 mt-1"
+              :class="deployNowResult[dep.token].success ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300' : 'bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-300'">
+              {{ deployNowResult[dep.token].message }}
             </div>
           </div>
         </div>
@@ -222,7 +235,10 @@ export default {
       loadingDeployments: false,
       deletingDep: null,
       deleting: false,
-      manageError: ''
+      manageError: '',
+      // Deploy now
+      deployingNow: null,
+      deployNowResult: {}
     }
   },
   computed: {
@@ -337,7 +353,37 @@ export default {
       localStorage.removeItem('nexus_github_token');
       localStorage.removeItem('nexus_github_username');
     },
-    reset() { this.step = 'connect'; this.selectedRepo = null; this.error = ''; this.deployResult = {} }
+    reset() { this.step = 'connect'; this.selectedRepo = null; this.error = ''; this.deployResult = {} },
+    async deployNow(dep) {
+      this.deployingNow = dep.token
+      this.deployNowResult = { ...this.deployNowResult, [dep.token]: null }
+      try {
+        const res  = await fetch(`${API_BASE}/github_deploy_now.php`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ sessionId: this.sessionId, token: dep.token })
+        })
+        const data = await res.json()
+        this.deployNowResult = {
+          ...this.deployNowResult,
+          [dep.token]: {
+            success: data.success,
+            message: data.success
+              ? `✅ ${data.filesUploaded} fichier(s) déployé(s) vers ${data.remotePath}`
+              : `❌ ${data.message}`
+          }
+        }
+        if (data.success) this.$emit('refresh-files')
+      } catch {
+        this.deployNowResult = {
+          ...this.deployNowResult,
+          [dep.token]: { success: false, message: '❌ Erreur réseau. Vérifiez votre connexion.' }
+        }
+      } finally {
+        this.deployingNow = null
+      }
+    }
   }
 }
 </script>
