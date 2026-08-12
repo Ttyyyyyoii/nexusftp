@@ -88,32 +88,61 @@ export const useUploadQueueStore = defineStore('uploadQueue', {
       nextBatch.status = 'processing'
 
       const connectionStore = useConnectionStore()
+
+      // Récupérer la limite de simultanéité depuis les settings
+      let maxSimultaneous = 3
+      try {
+        const { useSettingsStore } = await import('./settings')
+        maxSimultaneous = useSettingsStore().planLimits?.maxSimultaneous || 3
+      } catch(e) { /* fallback */ }
+
       let hasErrors = false
+      let activeUploads = 0
+      let currentIndex = 0
+      const total = nextBatch.files.length
 
-      // Upload de tous les fichiers du lot (séquentiellement pour l'instant)
-      for (const fileEntry of nextBatch.files) {
-        fileEntry.status = 'uploading'
+      // Upload en parallèle (comme l'ancienne logique) : maxSimultaneous fichiers à la fois
+      await new Promise((resolve) => {
+        const launchNext = () => {
+          // Tous les fichiers sont terminés
+          if (currentIndex >= total && activeUploads === 0) {
+            resolve()
+            return
+          }
 
-        // Calculer le chemin distant de ce fichier
-        let targetPath = nextBatch.remotePath
-        if (fileEntry.relativePath && fileEntry.relativePath.includes('/')) {
-          const parts = fileEntry.relativePath.split('/')
-          parts.pop() // Retire le nom du fichier
-          const relDir = parts.join('/')
-          const base = targetPath === '/' ? '' : targetPath.replace(/\/$/, '')
-          targetPath = base + '/' + relDir
+          while (activeUploads < maxSimultaneous && currentIndex < total) {
+            const fileEntry = nextBatch.files[currentIndex++]
+            activeUploads++
+            fileEntry.status = 'uploading'
+
+            // Calculer le chemin distant de ce fichier
+            let targetPath = nextBatch.remotePath
+            if (fileEntry.relativePath && fileEntry.relativePath.includes('/')) {
+              const parts = fileEntry.relativePath.split('/')
+              parts.pop()
+              const relDir = parts.join('/')
+              const base = targetPath === '/' ? '' : targetPath.replace(/\/$/, '')
+              targetPath = base + '/' + relDir
+            }
+
+            connectionStore.uploadFile(fileEntry.file, targetPath)
+              .then(() => {
+                fileEntry.status = 'done'
+                fileEntry.progress = 100
+              })
+              .catch((err) => {
+                fileEntry.status = 'error'
+                fileEntry.error = err.message
+                hasErrors = true
+              })
+              .finally(() => {
+                activeUploads--
+                launchNext()
+              })
+          }
         }
-
-        try {
-          await connectionStore.uploadFile(fileEntry.file, targetPath)
-          fileEntry.status = 'done'
-          fileEntry.progress = 100
-        } catch (err) {
-          fileEntry.status = 'error'
-          fileEntry.error = err.message
-          hasErrors = true
-        }
-      }
+        launchNext()
+      })
 
       // Marquer le lot comme terminé
       nextBatch.status = hasErrors ? 'done_with_errors' : 'done'
