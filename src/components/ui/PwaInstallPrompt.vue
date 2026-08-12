@@ -13,7 +13,6 @@
         <Download class="w-3 h-3 text-white" />
       </div>
       <span class="truncate">{{ $t('pwa.install') }}</span>
-      <Sparkles class="w-3.5 h-3.5 text-indigo-400 shrink-0 ml-auto" />
     </button>
   </div>
 
