@@ -112,6 +112,27 @@ const router = createRouter({
   }
 })
 
+// Redirect PWA standalone mode: skip homepage, go directly to app
+const isPWA = () => window.matchMedia('(display-mode: standalone)').matches ||
+                    window.navigator.standalone === true
+
+let pwaRedirectDone = false
+router.beforeEach((to) => {
+  if (!pwaRedirectDone && to.name === 'Home' && isPWA()) {
+    pwaRedirectDone = true
+    // On importe dynamiquement le store pour éviter les problèmes de timing
+    import('@/stores/connection').then(({ useConnectionStore }) => {
+      const store = useConnectionStore()
+      if (store.isConnected) {
+        router.replace('/files')
+      } else {
+        router.replace('/connect')
+      }
+    })
+    return false // bloque la navigation vers Home
+  }
+})
+
 router.afterEach((to) => {
   const baseTitle = 'NexusFTP - Client FTP & SFTP Premium En Ligne'
   if (to.name && to.name !== 'Home') {

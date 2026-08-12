@@ -17,7 +17,7 @@ export default defineConfig(({ command }) => ({
         display: 'standalone',
         orientation: 'any',
         scope: '/',
-        start_url: '/',
+        start_url: '/connect',
         lang: 'fr',
         categories: ['utilities', 'productivity'],
         icons: [

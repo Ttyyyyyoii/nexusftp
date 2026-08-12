@@ -22,6 +22,16 @@ export default {
   mounted() {
     this.settingsStore.restore()
     
+    // Masquer le splash screen natif avec une belle transition
+    const splash = document.getElementById('splash-screen')
+    if (splash) {
+      // Laisser un court délai pour que la page Vue soit rendue
+      setTimeout(() => {
+        splash.classList.add('hidden')
+        setTimeout(() => splash.remove(), 600)
+      }, 600)
+    }
+
     // Keep-alive ping pour empêcher Render de s'endormir (toutes les 10 min)
     this.pingInterval = setInterval(() => {
       fetch('/api/ping.php').catch(() => {})
