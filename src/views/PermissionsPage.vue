@@ -1,7 +1,7 @@
 <template>
   <AppLayout>
-    <div class="h-full overflow-y-auto bg-surface-50 dark:bg-surface-950 p-4 md:p-6">
-      <div class="max-w-5xl mx-auto space-y-6">
+    <div class="h-full overflow-y-auto bg-surface-50 dark:bg-surface-950 p-4 md:p-6 flex flex-col">
+      <div class="max-w-7xl mx-auto w-full space-y-6 flex-1 flex flex-col">
 
         <!-- Header -->
         <div class="flex items-center justify-between">
@@ -14,9 +14,33 @@
               {{ $t('permissions.subtitle') }}
             </p>
           </div>
-          <div class="text-xs text-surface-400 font-mono bg-surface-100 dark:bg-surface-800 px-3 py-1.5 rounded-lg">
-            {{ connectionStore.currentPath || '/' }}
+        </div>
+
+        <!-- Folder navigation bar -->
+        <div v-if="connectionStore.isConnected" class="flex items-center gap-2 bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-800 rounded-xl px-3 py-2 shrink-0">
+          <button @click="navigateUp" :disabled="currentPath === '/'" class="p-1.5 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-800 disabled:opacity-30 transition-colors">
+            <ChevronLeft class="w-4 h-4 text-surface-500 dark:text-surface-400" />
+          </button>
+          <div class="flex items-center gap-1 flex-1 overflow-x-auto">
+            <button @click="navigateTo('/')" class="flex items-center gap-1 text-xs text-surface-500 hover:text-primary-500 transition-colors shrink-0">
+              <Home class="w-3.5 h-3.5" />
+            </button>
+            <span v-for="(seg, i) in pathSegments" :key="i" class="flex items-center gap-1 shrink-0">
+              <ChevronRight class="w-3 h-3 text-surface-400 dark:text-surface-600" />
+              <button @click="navigateTo(seg.path)" class="text-xs font-medium transition-colors" :class="i === pathSegments.length - 1 ? 'text-surface-900 dark:text-white' : 'text-surface-500 dark:text-surface-400 hover:text-primary-500'">{{ seg.name }}</button>
+            </span>
           </div>
+          <!-- Subfolder list -->
+          <div class="flex items-center gap-1 ml-2">
+            <button v-for="folder in subfolders.slice(0,4)" :key="folder.name" @click="navigateTo(currentPath.replace(/\/$/,'') + '/' + folder.name)"
+              class="px-2 py-1 text-xs bg-surface-100 dark:bg-surface-800 text-surface-600 dark:text-surface-300 hover:bg-primary-50 dark:hover:bg-primary-900/40 hover:text-primary-600 dark:hover:text-primary-300 rounded-lg transition-colors truncate max-w-[80px]">
+              📁 {{ folder.name }}
+            </button>
+            <span v-if="subfolders.length > 4" class="text-xs text-surface-500">+{{ subfolders.length - 4 }}</span>
+          </div>
+          <button @click="refreshDir" class="p-1.5 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors">
+            <RefreshCw class="w-3.5 h-3.5 text-surface-500 dark:text-surface-400" :class="navigating ? 'animate-spin' : ''" />
+          </button>
         </div>
 
         <!-- Not connected -->
@@ -61,7 +85,11 @@
                     <td class="px-4 py-3">
                       <div class="flex items-center gap-2">
                         <component :is="file.isDirectory ? 'FolderIcon' : 'FileIcon'" class="w-4 h-4 shrink-0" :class="file.isDirectory ? 'text-amber-500' : 'text-surface-400'" />
-                        <span class="font-medium text-surface-800 dark:text-surface-200 truncate max-w-[180px]">{{ file.name }}</span>
+                        <span 
+                          class="font-medium truncate max-w-[180px] transition-colors"
+                          :class="file.isDirectory ? 'text-primary-600 dark:text-primary-400 cursor-pointer hover:underline' : 'text-surface-800 dark:text-surface-200'"
+                          @click="file.isDirectory && navigateTo(currentPath.replace(/\/$/,'') + '/' + file.name)"
+                        >{{ file.name }}</span>
                       </div>
                     </td>
                     <td class="px-4 py-3">
@@ -133,30 +161,31 @@
 <script>
 import AppLayout from '@/layouts/AppLayout.vue'
 import { useConnectionStore } from '@/stores/connection'
-import { ShieldCheck, ShieldOff, Loader2, Check, Lock, FolderOpen, AlertCircle } from 'lucide-vue-next'
-
-function FolderIcon(props, { slots }) {
-  return h('svg', { xmlns: 'http://www.w3.org/2000/svg', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '2', ...props }, [
-    h('path', { d: 'M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z' })
-  ])
-}
-function FileIcon(props, { slots }) {
-  return h('svg', { xmlns: 'http://www.w3.org/2000/svg', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '2', ...props }, [
-    h('path', { d: 'M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z' }),
-    h('polyline', { points: '13 2 13 9 20 9' })
-  ])
-}
-
-import { h } from 'vue'
+import { ShieldCheck, ShieldOff, Loader2, Check, Lock, FolderOpen as FolderIcon, File as FileIcon, AlertCircle, Home, ChevronLeft, ChevronRight, RefreshCw, FolderOpen } from 'lucide-vue-next'
 
 export default {
   name: 'PermissionsPage',
-  components: { AppLayout, ShieldCheck, ShieldOff, Loader2, Check, Lock, FolderOpen, AlertCircle, FolderIcon, FileIcon },
+  components: { AppLayout, ShieldCheck, ShieldOff, Loader2, Check, Lock, FolderIcon, FileIcon, AlertCircle, Home, ChevronLeft, ChevronRight, RefreshCw },
   data() {
     return {
       connectionStore: useConnectionStore(),
       files: [],
-      loading: false
+      loading: false,
+      navigating: false
+    }
+  },
+  computed: {
+    currentPath() { return this.connectionStore.currentPath || '/' },
+    pathSegments() {
+      const parts = this.currentPath.split('/').filter(Boolean)
+      let p = ''
+      return parts.map(part => {
+        p += '/' + part
+        return { name: part, path: p }
+      })
+    },
+    subfolders() {
+      return this.connectionStore.remoteFiles?.filter(f => f.isDirectory && f.name !== '.' && f.name !== '..') || []
     }
   },
   mounted() {
@@ -207,6 +236,22 @@ export default {
           }
         })
       this.loading = false
+    },
+    async navigateTo(path) {
+      if (path === this.connectionStore.currentPath) return
+      this.navigating = true
+      await this.connectionStore.listDirectory(path)
+      this.navigating = false
+    },
+    async navigateUp() {
+      if (this.currentPath === '/') return
+      const parent = this.currentPath.split('/').slice(0, -1).join('/') || '/'
+      await this.navigateTo(parent)
+    },
+    async refreshDir() {
+      this.navigating = true
+      await this.connectionStore.listDirectory(this.currentPath)
+      this.navigating = false
     },
     async applyChmod(file) {
       file.applying = true
