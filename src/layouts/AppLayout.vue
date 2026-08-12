@@ -22,6 +22,7 @@
     </div>
     <AppStatusbar />
     <ToastContainer />
+    <PremiumModal :visible="showPremiumModal" @close="showPremiumModal = false" />
   </div>
 </template>
 
@@ -31,10 +32,11 @@ import AppToolbar from '@/components/layout/AppToolbar.vue'
 import AppSidebar from '@/components/layout/AppSidebar.vue'
 import AppStatusbar from '@/components/layout/AppStatusbar.vue'
 import ToastContainer from '@/components/ui/ToastContainer.vue'
+import PremiumModal from '@/components/PremiumModal.vue'
 
 export default {
   name: 'AppLayout',
-  components: { AppToolbar, AppSidebar, AppStatusbar, ToastContainer },
+  components: { AppToolbar, AppSidebar, AppStatusbar, ToastContainer, PremiumModal },
   data() {
     const mobile = window.innerWidth < 768
     const store = useSettingsStore()
@@ -42,20 +44,26 @@ export default {
       settingsStore: store,
       // Initialiser correctement la valeur par defaut
       sidebarOpen: mobile ? false : !store.sidebarCollapsed,
-      isMobile: mobile
+      isMobile: mobile,
+      showPremiumModal: false
     }
   },
   mounted() {
     this._onResize = () => { this.isMobile = window.innerWidth < 768 }
     window.addEventListener('resize', this._onResize)
+    window.addEventListener('show-premium-modal', this.handleShowPremiumModal)
   },
   beforeUnmount() {
     window.removeEventListener('resize', this._onResize)
+    window.removeEventListener('show-premium-modal', this.handleShowPremiumModal)
   },
   methods: {
     toggleSidebar() {
       this.sidebarOpen = !this.sidebarOpen
       this.settingsStore.sidebarCollapsed = !this.sidebarOpen
+    },
+    handleShowPremiumModal() {
+      this.showPremiumModal = true
     }
   }
 }
