@@ -59,6 +59,7 @@
         </splitpanes>
       </div>
       <TransferPanel v-if="transfersStore.transfers.length > 0" />
+      <UploadQueuePanel />
       
       <!-- Create Modal -->
       <BaseModal :visible="showCreateModal" :title="createType === 'folder' ? 'Créer un dossier' : 'Créer un fichier'" @close="showCreateModal = false">
@@ -269,6 +270,8 @@ import MediaViewer from '@/components/ui/MediaViewer.vue'
 import AIAssistant from '@/components/ftp/AIAssistant.vue'
 import GitHubDeployModal from '@/components/ui/GitHubDeployModal.vue'
 import GuestShareModal from '@/components/ui/GuestShareModal.vue'
+import UploadQueuePanel from '@/components/transfers/UploadQueuePanel.vue'
+import { useUploadQueueStore } from '@/stores/uploadQueue'
 import { Upload, Download, Trash2, Edit2, RefreshCw, FolderPlus, FilePlus, Monitor, Globe, Loader2, Unlink, Search as SearchIcon, Bot, Github, Users, Folder, File, HardDrive, MapPin, Send } from 'lucide-vue-next'
 
 const LANG_MAP = {
@@ -280,11 +283,12 @@ const LANG_MAP = {
 
 export default {
   name: 'FilesPage',
-  components: { AppLayout, Splitpanes, Pane, FileList, LocalFileBrowser, TransferPanel, BaseModal, MonacoEditor, SearchModal, ShareModal, MediaViewer, AIAssistant, GitHubDeployModal, GuestShareModal, Monitor, Globe, Loader2, Unlink, FolderPlus, FilePlus, Upload, Download, Trash2, Edit2, RefreshCw, SearchIcon, Bot, Github, Users, Folder, File, HardDrive, MapPin, Send },
+  components: { AppLayout, Splitpanes, Pane, FileList, LocalFileBrowser, TransferPanel, UploadQueuePanel, BaseModal, MonacoEditor, SearchModal, ShareModal, MediaViewer, AIAssistant, GitHubDeployModal, GuestShareModal, Monitor, Globe, Loader2, Unlink, FolderPlus, FilePlus, Upload, Download, Trash2, Edit2, RefreshCw, SearchIcon, Bot, Github, Users, Folder, File, HardDrive, MapPin, Send },
   data() {
     return {
       connectionStore: useConnectionStore(),
       transfersStore: useTransfersStore(),
+      queueStore: useUploadQueueStore(),
       logStore: useLogStore(),
       settingsStore: useSettingsStore(),
       loading: false, leftPanelSize: 50, localFilesSelected: [], remoteFilesSelected: [],
@@ -333,6 +337,12 @@ export default {
   async mounted() { 
     if (this.connectionStore.isConnected) await this.refreshRemote() 
     this.deployPollInterval = setInterval(this.checkDeployStatus, 5000)
+
+    // Quand tous les lots sont terminés, on rafraîchit la vue
+    this.queueStore.onAllDone(async () => {
+      this.showToast('Tous les fichiers ont été envoyés !', 'success')
+      await this.refreshRemote()
+    })
   },
   beforeUnmount() {
     if (this.deployPollInterval) clearInterval(this.deployPollInterval)
@@ -505,11 +515,10 @@ export default {
     },
     async _doUpload(files) { 
       const settingsStore = useSettingsStore()
-      const maxSimultaneous = settingsStore.planLimits.maxSimultaneous
       const maxFileSizeMB = settingsStore.planLimits.maxFileSize
       const maxFileSizeBytes = maxFileSizeMB * 1024 * 1024
 
-      // Filter files by size
+      // Filtrer les fichiers trop grands
       const validFiles = []
       for (const file of files) {
         if (file.size > maxFileSizeBytes) {
@@ -518,77 +527,14 @@ export default {
           validFiles.push(file)
         }
       }
-
-      if (validFiles.length === 0) return;
+      if (validFiles.length === 0) return
       if (validFiles.length < files.length && !settingsStore.isPremium) {
         window.dispatchEvent(new CustomEvent('show-premium-modal'))
       }
 
-      const total = validFiles.length;
-      this.globalLoader = { 
-        show: true, 
-        title: 'Sending files', 
-        message: `Preparing upload...`,
-        progress: 0,
-        total: total
-      };
-      
-      let successCount = 0;
-      let activeUploads = 0;
-      let currentIndex = 0;
-      
-      return new Promise((resolve) => {
-        const nextUpload = async () => {
-          if (currentIndex >= total && activeUploads === 0) {
-            this.globalLoader.show = false;
-            if (successCount > 0) this.showToast(`${successCount} fichier(s) envoyé(s)`, 'success') 
-            await this.refreshRemote();
-            resolve();
-            return;
-          }
-          
-          while (activeUploads < maxSimultaneous && currentIndex < total) {
-            const i = currentIndex++;
-            activeUploads++;
-            const file = validFiles[i];
-            
-            let targetPath = this.connectionStore.currentPath;
-            // webkitRelativePath = "jona/subdir/fichier.php" pour les fichiers dans un dossier uploadé
-            // On doit reconstruire le chemin complet du dossier parent distant
-            const webkitPath = file.webkitRelativePath || file.customPath || '';
-            if (webkitPath && webkitPath.includes('/')) {
-              // On retire le nom du fichier pour n'avoir que le chemin du dossier
-              const pathParts = webkitPath.split('/');
-              pathParts.pop(); // Retire le nom du fichier
-              const relativeDir = pathParts.join('/'); // ex: "jona" ou "jona/subdir"
-              const base = targetPath === '/' ? '' : targetPath;
-              targetPath = base + '/' + relativeDir;
-            }
-            // Si webkitRelativePath est vide (fichier simple sans dossier), targetPath reste inchangé
-            
-            this.globalLoader.message = `Envoi de ${successCount} sur ${total}: ${file.name}`;
-            
-            const transferId = this.transfersStore.addTransfer(file, 'upload', targetPath); 
-            
-            this.connectionStore.uploadFile(file, targetPath).then(() => {
-              this.transfersStore.completeTransfer(transferId); 
-              successCount++;
-            }).catch((err) => {
-              this.transfersStore.failTransfer(transferId, err.message); 
-              this.showToast(`Échec de l'envoi (${file.name}): ${err.message}`, 'error') 
-              if (err.message.toLowerCase().match(/(session|connect|login|authentification|401)/)) {
-                this.showSessionExpiredModal = true;
-              }
-            }).finally(() => {
-              activeUploads--;
-              this.globalLoader.progress = successCount;
-              this.globalLoader.message = `Envoi de ${successCount} sur ${total}...`;
-              nextUpload();
-            });
-          }
-        };
-        nextUpload();
-      });
+      // Ajouter le lot dans la file d'attente (non bloquant !)
+      this.queueStore.addBatch(validFiles, this.connectionStore.currentPath)
+      this.showToast(`${validFiles.length} fichier(s) ajouté(s) à la file d'envoi`, 'info')
     },
     async reconnectSession() {
       this.showSessionExpiredModal = false;
