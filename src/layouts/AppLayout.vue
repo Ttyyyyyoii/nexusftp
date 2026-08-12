@@ -46,7 +46,9 @@ export default {
   },
   mounted() {
     const stored = this.settingsStore.sidebarCollapsed
-    this.sidebarOpen = !stored
+    const mobile = window.innerWidth < 768
+    // Sur mobile: toujours fermé au démarrage. Sur desktop: respecter le réglage sauvegardé
+    this.sidebarOpen = mobile ? false : !stored
     this._onResize = () => { this.isMobile = window.innerWidth < 768 }
     window.addEventListener('resize', this._onResize)
   },

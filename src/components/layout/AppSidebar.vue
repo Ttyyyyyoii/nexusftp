@@ -2,6 +2,7 @@
   <aside class="w-64 bg-surface-50 dark:bg-surface-900 border-r border-surface-200 dark:border-surface-800 flex flex-col shrink-0">
     <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
       <router-link v-for="item in menuItems" :key="item.path" :to="item.path"
+        @click="$emit('close')"
         class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group"
         :class="$route.path === item.path ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm' : 'text-surface-600 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800'">
         <component :is="item.icon" class="w-5 h-5 transition-transform group-hover:scale-110" :class="$route.path === item.path ? 'text-primary-500' : ''" />
@@ -45,6 +46,7 @@ import { Home, Plug, FolderOpen, Clock, Settings, ScrollText, Star, Heart, Layou
 export default {
   name: 'AppSidebar',
   components: { Home, Plug, FolderOpen, Clock, Settings, ScrollText, Star, Heart, LayoutDashboard, TerminalSquare, ShieldCheck, Images, Activity, ArrowLeftRight, PwaInstallPrompt },
+  emits: ['close'],
   data() {
     return {
       connectionStore: useConnectionStore(),
@@ -70,6 +72,7 @@ export default {
   },
   methods: {
     async quickConnect(fav) {
+      this.$emit('close')
       const result = await this.connectionStore.connect({ host: fav.host, port: fav.port, username: fav.username, password: '', type: fav.type })
       if (result.success) this.$router.push('/files')
     }
