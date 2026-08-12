@@ -241,7 +241,7 @@ export default {
     async navigateTo(path) {
       if (path === this.connectionStore.currentPath) return
       this.navigating = true
-      await this.connectionStore.listDirectory(path)
+      await this.connectionStore.listRemotePath(path)
       this.navigating = false
     },
     async navigateUp() {
@@ -251,7 +251,7 @@ export default {
     },
     async refreshDir() {
       this.navigating = true
-      await this.connectionStore.listDirectory(this.currentPath)
+      await this.connectionStore.listRemotePath(this.currentPath)
       this.navigating = false
     },
     async applyChmod(file) {
