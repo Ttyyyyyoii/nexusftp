@@ -90,86 +90,124 @@ export const useUploadQueueStore = defineStore('uploadQueue', {
       const connectionStore = useConnectionStore()
 
       // Récupérer la limite de simultanéité depuis les settings
-      let maxSimultaneous = 2 // Fixé à 2: Compromis idéal entre rapidité et sécurité contre le ban IP
+      let maxSimultaneous = 3 // Remis à 3 pour la rapidité, combiné à la logique de retry
       try {
         const { useSettingsStore } = await import('./settings')
         const planLimit = useSettingsStore().planLimits?.maxSimultaneous
-        if (planLimit && planLimit < 3) maxSimultaneous = 2
+        if (planLimit && planLimit < 3) maxSimultaneous = 3
       } catch(e) { /* fallback */ }
 
-      let hasErrors = false
       let sessionExpired = false
-      let activeUploads = 0
-      let currentIndex = 0
       const total = nextBatch.files.length
+      let batchFinished = false;
 
-      // Upload en parallèle : maxSimultaneous fichiers à la fois
-      await new Promise((resolve) => {
-        const launchNext = () => {
-          // Tous les fichiers sont terminés ou session expirée
-          if (currentIndex >= total && activeUploads === 0) {
-            resolve()
-            return
-          }
+      while (!batchFinished && !sessionExpired) {
+        let activeUploads = 0
+        let currentIndex = 0
+        let hasErrorsInPass = false
 
-          while (activeUploads < maxSimultaneous && currentIndex < total) {
-            const fileEntry = nextBatch.files[currentIndex++]
-            activeUploads++
-            fileEntry.status = 'uploading'
-
-            // Calculer le chemin distant de ce fichier
-            let targetPath = nextBatch.remotePath
-            if (fileEntry.relativePath && fileEntry.relativePath.includes('/')) {
-              const parts = fileEntry.relativePath.split('/')
-              parts.pop()
-              const relDir = parts.join('/')
-              const base = targetPath === '/' ? '' : targetPath.replace(/\/$/, '')
-              targetPath = base + '/' + relDir
+        await new Promise((resolve) => {
+          const launchNext = () => {
+            // Trouver le prochain fichier 'pending'
+            let nextPendingIdx = -1
+            for (let i = currentIndex; i < total; i++) {
+              if (nextBatch.files[i].status === 'pending') {
+                nextPendingIdx = i
+                break
+              }
             }
 
-            connectionStore.uploadFile(fileEntry.file, targetPath)
-              .then(() => {
-                fileEntry.status = 'done'
-                fileEntry.progress = 100
-              })
-              .catch((err) => {
-                fileEntry.status = 'error'
-                fileEntry.error = err.message
-                hasErrors = true
+            // Tous les fichiers restants sont traités ou en cours
+            if (nextPendingIdx === -1) {
+              if (activeUploads === 0) resolve()
+              return
+            }
 
-                // Détection de session expirée (401 ou message d'auth)
-                const isSessionError = err.message?.toLowerCase?.().match(/(session|connect|login|authentification|401|unauthorized)/)
-                if (isSessionError && !sessionExpired) {
-                  sessionExpired = true
-                  // Marquer tous les fichiers restants comme annulés
-                  for (let i = currentIndex; i < total; i++) {
-                    if (nextBatch.files[i].status === 'pending') {
-                      nextBatch.files[i].status = 'error'
-                      nextBatch.files[i].error = 'Session expirée'
+            while (activeUploads < maxSimultaneous && nextPendingIdx !== -1 && !sessionExpired) {
+              currentIndex = nextPendingIdx + 1
+              const fileEntry = nextBatch.files[nextPendingIdx]
+              
+              activeUploads++
+              fileEntry.status = 'uploading'
+
+              // Calculer le chemin distant de ce fichier
+              let targetPath = nextBatch.remotePath
+              if (fileEntry.relativePath && fileEntry.relativePath.includes('/')) {
+                const parts = fileEntry.relativePath.split('/')
+                parts.pop()
+                const relDir = parts.join('/')
+                const base = targetPath === '/' ? '' : targetPath.replace(/\/$/, '')
+                targetPath = base + '/' + relDir
+              }
+
+              connectionStore.uploadFile(fileEntry.file, targetPath)
+                .then(() => {
+                  fileEntry.status = 'done'
+                  fileEntry.progress = 100
+                })
+                .catch((err) => {
+                  const isSessionError = err.message?.toLowerCase?.().match(/(session|connect|login|authentification|401|unauthorized)/)
+                  if (isSessionError && !sessionExpired) {
+                    sessionExpired = true
+                    // Marquer tous les fichiers restants comme annulés
+                    for (let i = 0; i < total; i++) {
+                      if (nextBatch.files[i].status === 'pending' || nextBatch.files[i].status === 'uploading') {
+                        nextBatch.files[i].status = 'error'
+                        nextBatch.files[i].error = 'Session expirée'
+                      }
                     }
+                    // Marquer les lots en attente
+                    this.batches.forEach(b => {
+                      if (b.status === 'pending') {
+                        b.status = 'done_with_errors'
+                        b.files.forEach(f => { f.status = 'error'; f.error = 'Session expirée' })
+                      }
+                    })
+                    // Déclencher le modal de session expirée
+                    window.dispatchEvent(new CustomEvent('upload-session-expired'))
+                  } else if (!sessionExpired) {
+                    fileEntry.status = 'error'
+                    fileEntry.error = err.message
+                    hasErrorsInPass = true
                   }
-                  // Marquer les lots en attente
-                  this.batches.forEach(b => {
-                    if (b.status === 'pending') {
-                      b.status = 'done_with_errors'
-                      b.files.forEach(f => { f.status = 'error'; f.error = 'Session expirée' })
-                    }
-                  })
-                  // Déclencher le modal de session expirée dans FilesPage
-                  window.dispatchEvent(new CustomEvent('upload-session-expired'))
+                })
+                .finally(() => {
+                  activeUploads--
+                  launchNext()
+                })
+                
+              // Chercher le prochain pending pour la boucle while
+              nextPendingIdx = -1
+              for (let i = currentIndex; i < total; i++) {
+                if (nextBatch.files[i].status === 'pending') {
+                  nextPendingIdx = i
+                  break
                 }
-              })
-              .finally(() => {
-                activeUploads--
-                launchNext()
-              })
+              }
+            }
           }
-        }
-        launchNext()
-      })
+          launchNext()
+        })
 
-      // Marquer le lot comme terminé
-      nextBatch.status = hasErrors ? 'done_with_errors' : 'done'
+        // Fin d'une passe sur les fichiers. Vérifier si on doit faire un retry.
+        const retryableFiles = nextBatch.files.filter(f => f.status === 'error' && (f.retries || 0) < 2 && f.error !== 'Session expirée')
+        if (retryableFiles.length > 0 && !sessionExpired) {
+          // Relancer les fichiers qui ont échoué
+          retryableFiles.forEach(f => {
+            f.status = 'pending'
+            f.error = null
+            f.progress = 0
+            f.retries = (f.retries || 0) + 1
+          })
+          // La boucle externe continue
+        } else {
+          batchFinished = true
+        }
+      }
+
+      // Marquer le lot comme terminé définitivement
+      const finalErrors = nextBatch.files.some(f => f.status === 'error')
+      nextBatch.status = finalErrors ? 'done_with_errors' : 'done'
 
       // Si session expirée, on arrête tout
       if (sessionExpired) {
@@ -179,7 +217,6 @@ export const useUploadQueueStore = defineStore('uploadQueue', {
 
       // Traiter le lot suivant
       await this._processNext()
-
     },
 
     /**

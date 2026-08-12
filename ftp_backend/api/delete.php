@@ -166,6 +166,7 @@ function robust_nlist(&$conn, $path, $session, $password) {
 
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_USERPWD, $session['username'] . ":" . $password);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'LIST -a'); // Force listing of hidden files like .env
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_TIMEOUT, 6);
         curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
@@ -201,8 +202,11 @@ function robust_nlist(&$conn, $path, $session, $password) {
         }
     }
 
-    // Secours si cURL indisponible
-    $list = @ftp_nlist($conn, $path);
+    // Secours si cURL indisponible (on tente d'abord avec -a pour les fichiers cachés)
+    $list = @ftp_nlist($conn, "-a " . $path);
+    if ($list === false) {
+        $list = @ftp_nlist($conn, $path); // Fallback standard si -a n'est pas supporté par le serveur
+    }
     if (@ftp_pwd($conn) === false) {
         @ftp_close($conn);
         $conn = ftp_connect($session['host'], $session['port'], 30);
