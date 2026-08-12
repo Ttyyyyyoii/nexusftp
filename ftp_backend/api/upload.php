@@ -64,19 +64,20 @@ try {
         
         @ftp_pasv($conn, $session['passive'] ?? true);
         
-        // Creation recursive des dossiers si necessaire (logique originale)
-        $parts = explode('/', trim($remotePath, '/'));
-        $current = '';
-        foreach ($parts as $part) {
-            if (empty($part)) continue;
-            $current .= '/' . $part;
-            if (!@ftp_chdir($conn, $current)) {
-                @ftp_mkdir($conn, $current);
-                @ftp_chdir($conn, $current);
+        // Optmisation: on essaie de se rendre directement dans le dossier distant.
+        // On ne crée les dossiers que si ftp_chdir échoue (ce qui veut dire qu'ils n'existent pas).
+        if (!@ftp_chdir($conn, $remotePath)) {
+            $parts = explode('/', trim($remotePath, '/'));
+            $current = '';
+            foreach ($parts as $part) {
+                if (empty($part)) continue;
+                $current .= '/' . $part;
+                if (!@ftp_chdir($conn, $current)) {
+                    @ftp_mkdir($conn, $current);
+                    @ftp_chdir($conn, $current);
+                }
             }
         }
-        
-        @ftp_chdir($conn, $remotePath);
         
         $success = @ftp_put($conn, $remoteName, $file['tmp_name'], FTP_BINARY);
         @ftp_close($conn);
