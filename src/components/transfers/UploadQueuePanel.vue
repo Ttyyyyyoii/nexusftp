@@ -31,8 +31,8 @@
                 {{ $t('queuePanel.clear') }}
               </button>
               <button @click="collapsed = !collapsed" class="w-7 h-7 rounded-lg bg-white/15 hover:bg-white/25 flex items-center justify-center transition-colors">
-                <ChevronRight v-if="collapsed" class="w-4 h-4 text-white" />
-                <ChevronLeft v-else class="w-4 h-4 text-white" />
+                <ChevronDown v-if="collapsed" class="w-4 h-4 text-white" />
+                <ChevronUp v-else class="w-4 h-4 text-white" />
               </button>
               <button @click="isVisible = false" class="w-7 h-7 rounded-lg bg-white/15 hover:bg-white/25 flex items-center justify-center transition-colors text-white" :title="$t('common.close')">
                 <X class="w-4 h-4" />
