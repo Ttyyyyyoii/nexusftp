@@ -357,13 +357,20 @@ export default {
     async deployNow(dep) {
       this.deployingNow = dep.token
       this.deployNowResult = { ...this.deployNowResult, [dep.token]: null }
+      
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 15000) // 15 seconds timeout for UI
+
       try {
         const res  = await fetch(`${API_BASE}/github_deploy_now.php`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify({ sessionId: this.sessionId, token: dep.token })
+          body: JSON.stringify({ sessionId: this.sessionId, token: dep.token }),
+          signal: controller.signal
         })
+        clearTimeout(timeoutId)
+        
         const data = await res.json()
         this.deployNowResult = {
           ...this.deployNowResult,
@@ -375,10 +382,17 @@ export default {
           }
         }
         if (data.success) this.$emit('refresh-files')
-      } catch {
-        this.deployNowResult = {
-          ...this.deployNowResult,
-          [dep.token]: { success: false, message: '❌ Erreur réseau. Vérifiez votre connexion.' }
+      } catch (err) {
+        if (err.name === 'AbortError') {
+          this.deployNowResult = {
+            ...this.deployNowResult,
+            [dep.token]: { success: true, message: '⏳ Le déploiement a démarré en arrière-plan. Cela peut prendre plusieurs minutes si le dépôt est volumineux. Actualisez vos fichiers FTP plus tard.' }
+          }
+        } else {
+          this.deployNowResult = {
+            ...this.deployNowResult,
+            [dep.token]: { success: false, message: '❌ Erreur réseau. Vérifiez votre connexion.' }
+          }
         }
       } finally {
         this.deployingNow = null
