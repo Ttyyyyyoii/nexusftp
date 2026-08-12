@@ -175,6 +175,7 @@ export default {
     }
   },
   computed: {
+    remoteFiles() { return this.connectionStore.remoteFiles },
     currentPath() { return this.connectionStore.currentPath || '/' },
     pathSegments() {
       const parts = this.currentPath.split('/').filter(Boolean)
@@ -281,8 +282,13 @@ export default {
     }
   },
   watch: {
-    'connectionStore.remoteFiles'() { if (this.connectionStore.isConnected) this.loadFiles() },
-    'connectionStore.currentPath'() { if (this.connectionStore.isConnected) this.loadFiles() }
+    remoteFiles: {
+      handler() { if (this.connectionStore.isConnected) this.loadFiles() },
+      deep: true
+    },
+    currentPath() {
+      if (this.connectionStore.isConnected) this.loadFiles()
+    }
   }
 }
 </script>
