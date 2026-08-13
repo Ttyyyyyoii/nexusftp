@@ -179,9 +179,7 @@
           <!-- Linux -->
           <a :href="downloadUrls.linux"
             class="group flex flex-col items-center gap-3 p-6 rounded-2xl bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 hover:border-primary-400 dark:hover:border-primary-500 hover:shadow-lg transition-all cursor-pointer">
-            <svg viewBox="0 0 448 512" class="w-8 h-8 fill-current text-surface-900 dark:text-white mb-1">
-              <path d="M220.8 123.3c1 .5 1.8 1.7 3 1.7 1.1 0 2.8-.4 2.9-1.5.2-1.4-1.9-2.3-3.2-2.9-1.7-.7-3.9-1-5.5-.1-.4.2-.8.7-.6 1.1.3 1.3 2.3 1.1 3.4 1.7zm-21.9 1.7c1.2 0 2-1.2 3-1.7 1.1-.6 3.1-.4 3.5-1.7.2-.4-.2-.9-.6-1.1-1.6-.9-3.8-.6-5.5.1-1.3.6-3.4 1.5-3.2 2.9.1 1 1.8 1.5 2.8 1.5zM420 103h-24v-40c0-13.3-10.7-24-24-24H276c-13.3 0-24 10.7-24 24v40h-24V39c0-21.5-17.5-39-39-39s-39 17.5-39 39v64h-24V63c0-13.3-10.7-24-24-24H28C14.7 39 4 49.7 4 63v40H12c-6.6 0-12 5.4-12 12v336c0 35.3 28.7 64 64 64h320c35.3 0 64-28.7 64-64V115c0-6.6-5.4-12-12-12zm-8 348c0 17.7-14.3 32-32 32H68c-17.7 0-32-14.3-32-32V135h376v316zM352 199c-22.1 0-40 17.9-40 40s17.9 40 40 40 40-17.9 40-40-17.9-40-40-40zm-256 0c-22.1 0-40 17.9-40 40s17.9 40 40 40 40-17.9 40-40-17.9-40-40-40zm48 108c-4.4 0-8 3.6-8 8v32c0 4.4 3.6 8 8 8h160c4.4 0 8-3.6 8-8v-32c0-4.4-3.6-8-8-8H144z"/>
-            </svg>
+            <div class="text-3xl mb-1 group-hover:scale-110 transition-transform">🐧</div>
             <div class="text-center">
               <div class="font-semibold text-surface-900 dark:text-white">Linux</div>
               <div class="text-xs text-surface-400 mt-0.5">{{ $t('home.download.linux') }}</div>
