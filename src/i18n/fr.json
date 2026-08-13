@@ -106,6 +106,20 @@
         "desc": "Enregistrez vos connexions favorites pour vous reconnecter en un clic sans ressaisir vos identifiants à chaque fois."
       }
     },
+    "download": {
+      "windows": ".exe installateur",
+      "macos": ".dmg image disque",
+      "linux": ".AppImage portable",
+      "direct": "Télécharger direct",
+      "smartscreen_title": "Info Windows (SmartScreen) :",
+      "smartscreen_desc1": "Comme notre application n'a pas encore de certificat payant, Windows peut afficher un écran bleu \"Windows a protégé votre ordinateur\" lors de l'installation.",
+      "smartscreen_desc2": "Cliquez simplement sur",
+      "smartscreen_desc3": "\"Informations complémentaires\"",
+      "smartscreen_desc4": "puis sur",
+      "smartscreen_desc5": "\"Exécuter quand même\"",
+      "releases": "Toutes les releases sont disponibles sur",
+      "web_version": "Version web toujours disponible sans installation."
+    },
     "cta": {
       "title": "Prêt à gérer vos fichiers ?",
       "subtitle": "Connectez-vous à votre serveur FTP ou SFTP en quelques secondes, directement depuis votre navigateur.",

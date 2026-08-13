@@ -106,6 +106,20 @@
         "desc": "Save your favorite connections to reconnect in one click without re-entering your credentials each time."
       }
     },
+    "download": {
+      "windows": ".exe installer",
+      "macos": ".dmg disk image",
+      "linux": ".AppImage portable",
+      "direct": "Direct download",
+      "smartscreen_title": "Windows Info (SmartScreen):",
+      "smartscreen_desc1": "Since our application doesn't have a paid certificate yet, Windows might show a blue \"Windows protected your PC\" screen during installation.",
+      "smartscreen_desc2": "Simply click on",
+      "smartscreen_desc3": "\"More info\"",
+      "smartscreen_desc4": "and then",
+      "smartscreen_desc5": "\"Run anyway\"",
+      "releases": "All releases are available on",
+      "web_version": "Web version always available without installation."
+    },
     "cta": {
       "title": "Ready to manage your files?",
       "subtitle": "Connect to your FTP or SFTP server in seconds, directly from your browser.",

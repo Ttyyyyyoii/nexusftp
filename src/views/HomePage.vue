@@ -151,15 +151,15 @@
           <!-- Windows -->
           <a :href="downloadUrls.windows"
             class="group flex flex-col items-center gap-3 p-6 rounded-2xl bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 hover:border-primary-400 dark:hover:border-primary-500 hover:shadow-lg transition-all cursor-pointer relative overflow-hidden">
-            <svg viewBox="0 0 88 88" class="w-8 h-8 fill-primary-500 mb-1">
-              <path d="M0 12.402l35.687-4.86.016 34.423-35.67.203zm35.67 33.529l.028 34.453L0 75.44v-21.84zm4.326-39.02L87.314 0v41.527l-47.318.376zm47.318 39.882H40.012v35.812l47.318 6.645z"/>
+            <svg viewBox="0 0 88 88" class="w-8 h-8 fill-[#00a4ef] mb-1">
+              <path d="M0 0h41.6v41.6H0V0zm46.4 0H88v41.6H46.4V0zM0 46.4h41.6V88H0V46.4zm46.4 0H88V88H46.4V46.4z"/>
             </svg>
-            <div>
+            <div class="text-center">
               <div class="font-semibold text-surface-900 dark:text-white">Windows</div>
-              <div class="text-xs text-surface-400 mt-0.5">.exe installateur</div>
+              <div class="text-xs text-surface-400 mt-0.5">{{ $t('home.download.windows') }}</div>
             </div>
             <span class="flex items-center gap-1 text-xs text-primary-500 font-medium group-hover:gap-2 transition-all">
-              <Download class="w-3 h-3" /> Télécharger direct
+              <Download class="w-3 h-3" /> {{ $t('home.download.direct') }}
             </span>
           </a>
           <!-- macOS -->
@@ -168,26 +168,26 @@
             <svg viewBox="0 0 384 512" class="w-8 h-8 fill-current text-surface-900 dark:text-white mb-1">
               <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/>
             </svg>
-            <div>
+            <div class="text-center">
               <div class="font-semibold text-surface-900 dark:text-white">macOS</div>
-              <div class="text-xs text-surface-400 mt-0.5">.dmg image disque</div>
+              <div class="text-xs text-surface-400 mt-0.5">{{ $t('home.download.macos') }}</div>
             </div>
             <span class="flex items-center gap-1 text-xs text-primary-500 font-medium group-hover:gap-2 transition-all">
-              <Download class="w-3 h-3" /> Télécharger direct
+              <Download class="w-3 h-3" /> {{ $t('home.download.direct') }}
             </span>
           </a>
           <!-- Linux -->
           <a :href="downloadUrls.linux"
             class="group flex flex-col items-center gap-3 p-6 rounded-2xl bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 hover:border-primary-400 dark:hover:border-primary-500 hover:shadow-lg transition-all cursor-pointer">
-            <svg viewBox="0 0 448 512" class="w-8 h-8 fill-current text-amber-500 mb-1">
-              <path d="M220.8 123.3c1 .5 1.8 1.7 3 1.7 1.1 0 2.8-.4 2.9-1.5.2-1.4-1.9-2.3-3.2-2.9-1.7-.7-3.9-1-5.5-.1-.4.2-.8.7-.6 1.1.3 1.3 2.3 1.1 3.4 1.7zm-21.9 1.7c1.2 0 2-1.2 3-1.7 1.1-.6 3.1-.4 3.5-1.7.2-.4-.2-.9-.6-1.1-1.6-.9-3.8-.6-5.5.1-1.3.6-3.4 1.5-3.2 2.9.1 1 1.8 1.5 2.8 1.5zM420 103h-24v-40c0-13.3-10.7-24-24-24H276c-13.3 0-24 10.7-24 24v40h-24V39c0-21.5-17.5-39-39-39s-39 17.5-39 39v64h-24V63c0-13.3-10.7-24-24-24H28C14.7 39 4 49.7 4 63v40H12c-6.6 0-12 5.4-12 12v336c0 35.3 28.7 64 64 64h320c35.3 0 64-28.7 64-64V115c0-6.6-5.4-12-12-12zm-8 348c0 17.7-14.3 32-32 32H68c-17.7 0-32-14.3-32-32V135h376v316zM352 199c-22.1 0-40 17.9-40 40s17.9 40 40 40 40-17.9 40-40-17.9-40-40-40zm-256 0c-22.1 0-40 17.9-40 40s17.9 40 40 40 40-17.9 40-40-17.9-40-40-40zm48 108c-4.4 0-8 3.6-8 8v32c0 4.4 3.6 8 8 8h160c4.4 0 8-3.6 8-8v-32c0-4.4-3.6-8-8-8H144z"/>
+            <svg viewBox="0 0 512 512" class="w-8 h-8 fill-[#E95420] mb-1">
+              <path d="M256 512A256 256 0 10256 0a256 256 0 000 512zM218.4 173.8c-26-8-55.8 4.6-67.7 28.3a54.3 54.3 0 005.1 48.7c15.8 24.8 49 32.8 74.4 18 25.4-14.8 33-47.5 16.9-71.8a54 54 0 00-28.7-23.2zm-28.1 154.5a54.4 54.4 0 00-47.5-12.2c-26 7.6-40.4 35.6-32.5 61.3 7.8 25.8 35.3 40.7 61.2 33 26-7.7 41-35.4 33-61.4a54 54 0 00-14.2-20.7zm173 14a54.2 54.2 0 00-28.8-1.5c-26.6 6-43.5 32.4-37.7 58.7 5.7 26.4 32 43.8 58.8 38 26.6-6 44-32.4 38-58.8a54 54 0 00-30.3-36.4zm85.8-232a54.5 54.5 0 00-31.5-35.8c-25-11-53.8.4-64 25.2a54 54 0 00.5 44 54 54 0 0041.5 25.3c25 10.7 54.5-1.5 64-26.8a54 54 0 00-10.5-31.9zM161.4 256c0-12.7 4.5-24.8 12.3-34.4a71 71 0 0115.7-14.8c11-7.7 23.4-12.5 36.3-14 3.7-.4 7.6-.7 11.4-.7h141.2c16 0 31-4 44-11.2a138 138 0 00-27-24H276.5a137 137 0 00-74.8 22A138 138 0 00135.2 256a138 138 0 0066.5 119h121.7a138 138 0 0027-24h-141a13 13 0 01-11.5-.7c-13-1.6-25.2-6.5-36-14.2a71 71 0 01-15.6-14.8 58 58 0 01-12.2-34.4z"/>
             </svg>
-            <div>
+            <div class="text-center">
               <div class="font-semibold text-surface-900 dark:text-white">Linux</div>
-              <div class="text-xs text-surface-400 mt-0.5">.AppImage portable</div>
+              <div class="text-xs text-surface-400 mt-0.5">{{ $t('home.download.linux') }}</div>
             </div>
             <span class="flex items-center gap-1 text-xs text-primary-500 font-medium group-hover:gap-2 transition-all">
-              <Download class="w-3 h-3" /> Télécharger direct
+              <Download class="w-3 h-3" /> {{ $t('home.download.direct') }}
             </span>
           </a>
         </div>
@@ -196,14 +196,14 @@
         <div class="max-w-2xl mx-auto bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-xl p-4 text-left mb-8 flex items-start gap-3">
           <Shield class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
           <div class="text-sm text-amber-800 dark:text-amber-200">
-            <strong>Info Windows (SmartScreen) :</strong> Comme notre application n'a pas encore de certificat payant, Windows peut afficher un écran bleu "Windows a protégé votre ordinateur" lors de l'installation. 
-            <br>👉 Cliquez simplement sur <strong>"Informations complémentaires"</strong> puis sur <strong>"Exécuter quand même"</strong>.
+            <strong>{{ $t('home.download.smartscreen_title') }}</strong> {{ $t('home.download.smartscreen_desc1') }}
+            <br>{{ $t('home.download.smartscreen_desc2') }} <strong>{{ $t('home.download.smartscreen_desc3') }}</strong> {{ $t('home.download.smartscreen_desc4') }} <strong>{{ $t('home.download.smartscreen_desc5') }}</strong>.
           </div>
         </div>
         <p class="text-xs text-surface-400">
-          Toutes les releases sont disponibles sur
+          {{ $t('home.download.releases') }}
           <a href="https://github.com/Ttyyyyyoii/nexusftp/releases" target="_blank" class="text-primary-500 hover:underline">GitHub Releases</a>.
-          Version web toujours disponible sans installation.
+          {{ $t('home.download.web_version') }}
         </p>
       </div>
     </section>
