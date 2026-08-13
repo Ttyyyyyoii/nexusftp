@@ -43,6 +43,8 @@ jobs:
 
       - name: Build web app (Vite)
         run: npm run build
+        env:
+          VITE_API_URL: https://nexusftp.onrender.com/api
 
       - name: Build Electron Windows installer
         run: npx electron-builder --win --publish never
@@ -81,6 +83,8 @@ jobs:
 
       - name: Build web app (Vite)
         run: npm run build
+        env:
+          VITE_API_URL: https://nexusftp.onrender.com/api
 
       - name: Build Electron macOS DMG
         run: npx electron-builder --mac --publish never
@@ -115,6 +119,8 @@ jobs:
 
       - name: Build web app (Vite)
         run: npm run build
+        env:
+          VITE_API_URL: https://nexusftp.onrender.com/api
 
       - name: Build Electron Linux AppImage
         run: npx electron-builder --linux --publish never
