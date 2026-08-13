@@ -107,6 +107,9 @@
       }
     },
     "download": {
+      "badge": "Application de bureau",
+      "title": "Disponible aussi en application native",
+      "subtitle": "Téléchargez NexusFTP sur votre ordinateur pour une expérience encore plus fluide. Windows, macOS et Linux.",
       "windows": ".exe installateur",
       "macos": ".dmg image disque",
       "linux": ".AppImage portable",

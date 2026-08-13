@@ -139,13 +139,13 @@
       <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5" />
       <div class="relative max-w-4xl mx-auto px-6 text-center">
         <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-sm font-medium mb-6">
-          <Monitor class="w-4 h-4" /> Application de bureau
+          <Monitor class="w-4 h-4" /> {{ $t('home.download.badge') }}
         </div>
         <h2 class="text-3xl sm:text-4xl font-bold text-surface-900 dark:text-white mb-4">
-          Disponible aussi en application native
+          {{ $t('home.download.title') }}
         </h2>
         <p class="text-lg text-surface-500 dark:text-surface-400 mb-10 max-w-xl mx-auto">
-          Téléchargez NexusFTP sur votre ordinateur pour une expérience encore plus fluide. Windows, macOS et Linux.
+          {{ $t('home.download.subtitle') }}
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto mb-8">
           <!-- Windows -->
